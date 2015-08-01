@@ -1,0 +1,513 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="AC_DBModel.Store" Alias="Self" Provider="System.Data.SqlClient" ProviderManifestToken="2012" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <EntityContainer Name="AC_DBModelStoreContainer">
+    <EntitySet Name="Drivers" EntityType="AC_DBModel.Store.Drivers" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Laps" EntityType="AC_DBModel.Store.Laps" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Sessions" EntityType="AC_DBModel.Store.Sessions" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Results" EntityType="AC_DBModel.Store.Results" store:Type="Tables" Schema="dbo" />
+    <EntitySet Name="Incidents" EntityType="AC_DBModel.Store.Incidents" store:Type="Tables" Schema="dbo" />
+    <AssociationSet Name="FK_Laps_To_Drivers" Association="AC_DBModel.Store.FK_Laps_To_Drivers">
+      <End Role="Drivers" EntitySet="Drivers" />
+      <End Role="Laps" EntitySet="Laps" />
+    </AssociationSet>
+    <AssociationSet Name="FK_Laps_To_Sessions" Association="AC_DBModel.Store.FK_Laps_To_Sessions">
+      <End Role="Sessions" EntitySet="Sessions" />
+      <End Role="Laps" EntitySet="Laps" />
+    </AssociationSet>
+    <AssociationSet Name="SessionResult" Association="AC_DBModel.Store.SessionResult">
+      <End Role="Session" EntitySet="Sessions" />
+      <End Role="Result" EntitySet="Results" />
+    </AssociationSet>
+    <AssociationSet Name="DriverResult" Association="AC_DBModel.Store.DriverResult">
+      <End Role="Driver" EntitySet="Drivers" />
+      <End Role="Result" EntitySet="Results" />
+    </AssociationSet>
+    <AssociationSet Name="Incidents1" Association="AC_DBModel.Store.SessionIncidents">
+      <End Role="Session" EntitySet="Sessions" />
+      <End Role="Incident" EntitySet="Incidents" />
+    </AssociationSet>
+    <AssociationSet Name="DriverIncident1" Association="AC_DBModel.Store.DriverIncident1">
+      <End Role="Driver" EntitySet="Drivers" />
+      <End Role="Incident" EntitySet="Incidents" />
+    </AssociationSet>
+    <AssociationSet Name="DriverIncidents2" Association="AC_DBModel.Store.DriverIncidents2">
+      <End Role="Driver" EntitySet="Drivers" />
+      <End Role="Incident" EntitySet="Incidents" />
+    </AssociationSet>
+  </EntityContainer>
+  <EntityType Name="Drivers">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SteamId" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Team" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="IncidentCount" Type="int" Nullable="false" />
+    <Property Name="Distance" Type="int" Nullable="false" />
+    <Property Name="Points" Type="int" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Laps">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SessionId" Type="int" Nullable="false" />
+    <Property Name="DriverId" Type="int" Nullable="false" />
+    <Property Name="Car" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="LapNo" Type="smallint" Nullable="false" />
+    <Property Name="Time" Type="int" Nullable="false" />
+    <Property Name="Cuts" Type="smallint" Nullable="false" />
+    <Property Name="Position" Type="smallint" Nullable="false" />
+    <Property Name="Grip" Type="real" Nullable="false" />
+    <Property Name="TimeStamp" Type="datetime" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Sessions">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="Server" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Name" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Type" Type="tinyint" Nullable="false" />
+    <Property Name="Track" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="LapCount" Type="smallint" Nullable="true" />
+    <Property Name="Time" Type="int" Nullable="true" />
+    <Property Name="Ambient" Type="tinyint" Nullable="false" />
+    <Property Name="Road" Type="tinyint" Nullable="false" />
+    <Property Name="Weather" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="TimeStamp" Type="datetime" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Results">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SessionId" Type="int" Nullable="false" />
+    <Property Name="DriverId" Type="int" Nullable="false" />
+    <Property Name="Car" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Position" Type="smallint" Nullable="false" />
+    <Property Name="IncidentCount" Type="int" Nullable="false" />
+    <Property Name="Distance" Type="int" Nullable="false" />
+    <Property Name="LapCount" Type="smallint" Nullable="false" />
+    <Property Name="Gap" Type="nvarchar(max)" Nullable="false" />
+  </EntityType>
+  <EntityType Name="Incidents">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="SessionId" Type="int" Nullable="false" />
+    <Property Name="Type" Type="tinyint" Nullable="false" />
+    <Property Name="RelativeSpeed" Type="real" Nullable="false" />
+    <Property Name="TimeStamp" Type="datetime" Nullable="false" />
+    <Property Name="DriverId1" Type="int" Nullable="false" />
+    <Property Name="DriverId2" Type="int" Nullable="true" />
+    <Property Name="WorldPosX" Type="real" Nullable="false" />
+    <Property Name="WorldPosY" Type="real" Nullable="false" />
+    <Property Name="WorldPosZ" Type="real" Nullable="false" />
+  </EntityType>
+  <Association Name="FK_Laps_To_Drivers">
+    <End Role="Drivers" Type="AC_DBModel.Store.Drivers" Multiplicity="1" />
+    <End Role="Laps" Type="AC_DBModel.Store.Laps" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Drivers">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Laps">
+        <PropertyRef Name="DriverId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="FK_Laps_To_Sessions">
+    <End Role="Sessions" Type="AC_DBModel.Store.Sessions" Multiplicity="1" />
+    <End Role="Laps" Type="AC_DBModel.Store.Laps" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Sessions">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Laps">
+        <PropertyRef Name="SessionId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="SessionResult">
+    <End Role="Session" Type="AC_DBModel.Store.Sessions" Multiplicity="1" />
+    <End Role="Result" Type="AC_DBModel.Store.Results" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Session">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Result">
+        <PropertyRef Name="SessionId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="DriverResult">
+    <End Role="Driver" Type="AC_DBModel.Store.Drivers" Multiplicity="1" />
+    <End Role="Result" Type="AC_DBModel.Store.Results" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Driver">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Result">
+        <PropertyRef Name="DriverId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="SessionIncidents">
+    <End Role="Session" Type="AC_DBModel.Store.Sessions" Multiplicity="1" />
+    <End Role="Incident" Type="AC_DBModel.Store.Incidents" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Session">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Incident">
+        <PropertyRef Name="SessionId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="DriverIncident1">
+    <End Role="Driver" Type="AC_DBModel.Store.Drivers" Multiplicity="1" />
+    <End Role="Incident" Type="AC_DBModel.Store.Incidents" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Driver">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Incident">
+        <PropertyRef Name="DriverId1" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="DriverIncidents2">
+    <End Role="Driver" Type="AC_DBModel.Store.Drivers" Multiplicity="0..1" />
+    <End Role="Incident" Type="AC_DBModel.Store.Incidents" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Driver">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Incident">
+        <PropertyRef Name="DriverId2" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+</Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="AC_DBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Driver">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SteamId" Type="String" Nullable="false" />
+          <Property Name="Name" Type="String" FixedLength="false" Nullable="false" />
+          <Property Name="Team" Type="String" FixedLength="false" />
+          <NavigationProperty Name="Laps" Relationship="Self.FK_Laps_To_Drivers" FromRole="Drivers" ToRole="Laps" />
+          <NavigationProperty Name="Results" Relationship="AC_DBModel.DriverResult" FromRole="Driver" ToRole="Result" />
+          <Property Name="IncidentCount" Type="Int32" Nullable="false" />
+          <Property Name="Distance" Type="Int32" Nullable="false" />
+          <Property Name="Points" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Incidents1" Relationship="AC_DBModel.DriverIncident1" FromRole="Driver" ToRole="Incident" />
+          <NavigationProperty Name="Incidents2" Relationship="AC_DBModel.DriverIncidents2" FromRole="Driver" ToRole="Incident" />
+        </EntityType>
+        <EntityType Name="Lap">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SessionId" Type="Int32" Nullable="false" />
+          <Property Name="DriverId" Type="Int32" Nullable="false" />
+          <Property Name="Car" Type="String" Nullable="false" />
+          <Property Name="LapNo" Type="Int16" Nullable="false" />
+          <Property Name="Time" Type="Int32" Nullable="false" />
+          <Property Name="Cuts" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="Driver" Relationship="Self.FK_Laps_To_Drivers" FromRole="Laps" ToRole="Drivers" />
+          <NavigationProperty Name="Session" Relationship="Self.FK_Laps_To_Sessions" FromRole="Laps" ToRole="Sessions" />
+          <Property Name="Position" Type="Int16" Nullable="false" />
+          <Property Name="Grip" Type="Single" Nullable="false" />
+          <Property Name="TimeStamp" Type="DateTime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Session">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Server" Type="String" FixedLength="false" Nullable="false" />
+          <Property Name="Name" Type="String" Nullable="false" />
+          <Property Name="Type" Type="Byte" Nullable="false" />
+          <Property Name="Track" Type="String" Nullable="false" />
+          <Property Name="LapCount" Type="Int16" />
+          <Property Name="Time" Type="Int32" />
+          <NavigationProperty Name="Laps" ToRole="Laps" FromRole="Sessions" Relationship="Self.FK_Laps_To_Sessions" />
+          <NavigationProperty Name="Results" Relationship="AC_DBModel.SessionResult" FromRole="Session" ToRole="Result" />
+          <Property Name="Ambient" Type="Byte" Nullable="false" />
+          <Property Name="Road" Type="Byte" Nullable="false" />
+          <Property Name="Weather" Type="String" Nullable="false" />
+          <Property Name="TimeStamp" Type="DateTime" Nullable="false" />
+          <NavigationProperty Name="Incidents" Relationship="AC_DBModel.SessionIncidents" FromRole="Session" ToRole="Incident" />
+        </EntityType>
+        <Association Name="FK_Laps_To_Drivers">
+          <End Role="Drivers" Type="Self.Driver" Multiplicity="1" />
+          <End Role="Laps" Type="Self.Lap" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Drivers">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Laps">
+              <PropertyRef Name="DriverId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Laps_To_Sessions">
+          <End Role="Sessions" Type="Self.Session" Multiplicity="1" />
+          <End Role="Laps" Type="Self.Lap" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Sessions">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Laps">
+              <PropertyRef Name="SessionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="AC_DBEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Drivers" EntityType="Self.Driver" />
+          <EntitySet Name="Laps" EntityType="Self.Lap" />
+          <EntitySet Name="Sessions" EntityType="Self.Session" />
+          <AssociationSet Name="FK_Laps_To_Drivers" Association="Self.FK_Laps_To_Drivers">
+            <End Role="Drivers" EntitySet="Drivers" />
+            <End Role="Laps" EntitySet="Laps" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Laps_To_Sessions" Association="Self.FK_Laps_To_Sessions">
+            <End Role="Sessions" EntitySet="Sessions" />
+            <End Role="Laps" EntitySet="Laps" />
+          </AssociationSet>
+          <EntitySet Name="Results" EntityType="AC_DBModel.Result" />
+          <AssociationSet Name="SessionResult" Association="AC_DBModel.SessionResult">
+            <End Role="Session" EntitySet="Sessions" />
+            <End Role="Result" EntitySet="Results" />
+          </AssociationSet>
+          <AssociationSet Name="DriverResult" Association="AC_DBModel.DriverResult">
+            <End Role="Driver" EntitySet="Drivers" />
+            <End Role="Result" EntitySet="Results" />
+          </AssociationSet>
+          <EntitySet Name="Incidents" EntityType="AC_DBModel.Incident" />
+          <AssociationSet Name="Incidents1" Association="AC_DBModel.SessionIncidents">
+            <End Role="Session" EntitySet="Sessions" />
+            <End Role="Incident" EntitySet="Incidents" />
+          </AssociationSet>
+          <AssociationSet Name="DriverIncident1" Association="AC_DBModel.DriverIncident1">
+            <End Role="Driver" EntitySet="Drivers" />
+            <End Role="Incident" EntitySet="Incidents" />
+          </AssociationSet>
+          <AssociationSet Name="DriverIncidents2" Association="AC_DBModel.DriverIncidents2">
+            <End EntitySet="Drivers" Role="Driver" />
+            <End EntitySet="Incidents" Role="Incident" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="Result">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SessionId" Type="Int32" Nullable="false" />
+          <Property Name="DriverId" Type="Int32" Nullable="false" />
+          <Property Name="Car" Type="String" Nullable="false" />
+          <Property Name="Position" Type="Int16" Nullable="false" />
+          <NavigationProperty Name="Session" Relationship="AC_DBModel.SessionResult" FromRole="Result" ToRole="Session" />
+          <NavigationProperty Name="Driver" Relationship="AC_DBModel.DriverResult" FromRole="Result" ToRole="Driver" />
+          <Property Name="IncidentCount" Nullable="false" Type="Int32" />
+          <Property Name="Distance" Nullable="false" Type="Int32" />
+          <Property Name="LapCount" Type="Int16" Nullable="false" />
+          <Property Name="Gap" Type="String" Nullable="false" />
+        </EntityType>
+        <Association Name="SessionResult">
+          <End Type="AC_DBModel.Session" Role="Session" Multiplicity="1" />
+          <End Type="AC_DBModel.Result" Role="Result" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Session">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Result">
+              <PropertyRef Name="SessionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DriverResult">
+          <End Type="AC_DBModel.Driver" Role="Driver" Multiplicity="1" />
+          <End Type="AC_DBModel.Result" Role="Result" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Driver">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Result">
+              <PropertyRef Name="DriverId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="Incident">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="SessionId" Type="Int32" Nullable="false" />
+          <Property Name="Type" Type="Byte" Nullable="false" />
+          <Property Name="RelativeSpeed" Type="Single" Nullable="false" />
+          <Property Name="TimeStamp" Type="DateTime" Nullable="false" />
+          <NavigationProperty Name="Session" Relationship="AC_DBModel.SessionIncidents" FromRole="Incident" ToRole="Session" />
+          <NavigationProperty Name="Driver1" Relationship="AC_DBModel.DriverIncident1" FromRole="Incident" ToRole="Driver" />
+          <Property Name="DriverId1" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Driver2" Relationship="AC_DBModel.DriverIncidents2" FromRole="Incident" ToRole="Driver" />
+          <Property Name="DriverId2" Type="Int32" Nullable="true" />
+          <Property Name="WorldPosX" Type="Single" Nullable="false" />
+          <Property Name="WorldPosY" Type="Single" Nullable="false" />
+          <Property Name="WorldPosZ" Type="Single" Nullable="false" />
+        </EntityType>
+        <Association Name="SessionIncidents">
+          <End Type="AC_DBModel.Session" Role="Session" Multiplicity="1" />
+          <End Type="AC_DBModel.Incident" Role="Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Session">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="SessionId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DriverIncident1">
+          <End Type="AC_DBModel.Driver" Role="Driver" Multiplicity="1" />
+          <End Type="AC_DBModel.Incident" Role="Incident" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Driver">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="DriverId1" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="DriverIncidents2">
+          <End Type="AC_DBModel.Driver" Multiplicity="0..1" Role="Driver" />
+          <End Type="AC_DBModel.Incident" Multiplicity="*" Role="Incident" />
+          <ReferentialConstraint>
+            <Principal Role="Driver">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="Incident">
+              <PropertyRef Name="DriverId2" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+    <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="AC_DBModelStoreContainer" CdmEntityContainer="AC_DBEntities">
+    <EntitySetMapping Name="Drivers">
+      <EntityTypeMapping TypeName="IsTypeOf(AC_DBModel.Driver)">
+        <MappingFragment StoreEntitySet="Drivers">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="SteamId" ColumnName="SteamId" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Team" ColumnName="Team" />
+          <ScalarProperty Name="IncidentCount" ColumnName="IncidentCount" />
+          <ScalarProperty Name="Distance" ColumnName="Distance" />
+          <ScalarProperty Name="Points" ColumnName="Points" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Laps">
+      <EntityTypeMapping TypeName="IsTypeOf(AC_DBModel.Lap)">
+        <MappingFragment StoreEntitySet="Laps">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="SessionId" ColumnName="SessionId" />
+          <ScalarProperty Name="DriverId" ColumnName="DriverId" />
+          <ScalarProperty Name="Car" ColumnName="Car" />
+          <ScalarProperty Name="LapNo" ColumnName="LapNo" />
+          <ScalarProperty Name="Time" ColumnName="Time" />
+          <ScalarProperty Name="Cuts" ColumnName="Cuts" />
+          <ScalarProperty Name="Position" ColumnName="Position" />
+          <ScalarProperty Name="Grip" ColumnName="Grip" />
+          <ScalarProperty Name="TimeStamp" ColumnName="TimeStamp" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Sessions">
+      <EntityTypeMapping TypeName="IsTypeOf(AC_DBModel.Session)">
+        <MappingFragment StoreEntitySet="Sessions">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="Server" ColumnName="Server" />
+          <ScalarProperty Name="Name" ColumnName="Name" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="Track" ColumnName="Track" />
+          <ScalarProperty Name="LapCount" ColumnName="LapCount" />
+          <ScalarProperty Name="Time" ColumnName="Time" />
+          <ScalarProperty Name="Ambient" ColumnName="Ambient" />
+          <ScalarProperty Name="Road" ColumnName="Road" />
+          <ScalarProperty Name="Weather" ColumnName="Weather" />
+          <ScalarProperty Name="TimeStamp" ColumnName="TimeStamp" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Results">
+      <EntityTypeMapping TypeName="IsTypeOf(AC_DBModel.Result)">
+        <MappingFragment StoreEntitySet="Results">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="SessionId" ColumnName="SessionId" />
+          <ScalarProperty Name="DriverId" ColumnName="DriverId" />
+          <ScalarProperty Name="Car" ColumnName="Car" />
+          <ScalarProperty Name="Position" ColumnName="Position" />
+          <ScalarProperty Name="IncidentCount" ColumnName="IncidentCount" />
+          <ScalarProperty Name="Distance" ColumnName="Distance" />
+          <ScalarProperty Name="LapCount" ColumnName="LapCount" />
+          <ScalarProperty Name="Gap" ColumnName="Gap" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="Incidents">
+      <EntityTypeMapping TypeName="IsTypeOf(AC_DBModel.Incident)">
+        <MappingFragment StoreEntitySet="Incidents">
+          <ScalarProperty Name="Id" ColumnName="Id" />
+          <ScalarProperty Name="SessionId" ColumnName="SessionId" />
+          <ScalarProperty Name="Type" ColumnName="Type" />
+          <ScalarProperty Name="RelativeSpeed" ColumnName="RelativeSpeed" />
+          <ScalarProperty Name="TimeStamp" ColumnName="TimeStamp" />
+          <ScalarProperty Name="DriverId1" ColumnName="DriverId1" />
+          <ScalarProperty Name="DriverId2" ColumnName="DriverId2" />
+          <ScalarProperty Name="WorldPosX" ColumnName="WorldPosX" />
+          <ScalarProperty Name="WorldPosY" ColumnName="WorldPosY" />
+          <ScalarProperty Name="WorldPosZ" ColumnName="WorldPosZ" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping></edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="False" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

@@ -131,7 +131,7 @@ namespace AC_SessionReportPlugin
                             int winnerlapcount = 0;
                             int winnertime = 0;
                             // might be incorrect for players connected after race started
-                            foreach (DriverReport connection in this.currentSession.Connections.OrderByDescending(d => d.LapCount).ThenBy(d => d.TotalTime))
+                            foreach (DriverReport connection in this.currentSession.Connections.OrderByDescending(d => d.LapCount).ThenBy(d => this.currentSession.Laps.Where(l=> l.ConnectionId == d.ConnectionId && l.LapNo == d.LapCount).First().TimeStamp))
                             {
                                 if (position == 1)
                                 {
@@ -343,12 +343,13 @@ namespace AC_SessionReportPlugin
                     DriverReport driver = carUsedByDictionary[msg.CarId];
                     bool withOtherCar = msg.Subtype == (byte)ACSProtocol.MessageType.ACSP_CE_COLLISION_WITH_CAR;
 
-                    driver.Incidents += withOtherCar ? 4 : 2; // TODO only if relVel > thresh
+                    driver.Incidents += withOtherCar ? 2 : 1; // TODO only if relVel > thresh
 
                     DriverReport driver2 = null;
                     if (withOtherCar)
                     {
                         driver2 = carUsedByDictionary[msg.OtherCarId];
+                        driver2.Incidents += 2; // TODO only if relVel > thresh
                     }
 
                     currentSession.Events.Add(new IncidentReport()
@@ -362,7 +363,10 @@ namespace AC_SessionReportPlugin
                         RelPosition = ToSingle3(msg.RelativePosition),
                     });
 
-                    //this.BroadcastChatMessage(string.Format("Collision Relative Velocity: {0}", msg.RelativeVelocity));
+                    if (withOtherCar)
+                    {
+                        this.BroadcastChatMessage(string.Format("Collision between {0} and {1} with {2}km/h", driver.Name, driver2.Name, msg.RelativeVelocity));
+                    }
                 }
                 catch (Exception ex)
                 {

@@ -111,9 +111,9 @@ namespace AC_SessionReportPlugin
                             {
                                 connection.BestLap = validLaps.Min(l => l.LapTime);
                             }
-                            else if (currentSession.Type == 3)
+                            else if (currentSession.Type != 3)
                             {
-                                // temporarily set BestLap to MaxValue for easier sorting for qualifying results                                
+                                // temporarily set BestLap to MaxValue for easier sorting for qualifying/practice results
                                 connection.BestLap = int.MaxValue;
                             }
 

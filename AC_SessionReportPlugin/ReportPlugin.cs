@@ -268,7 +268,10 @@ namespace AC_SessionReportPlugin
                     }
                 }
 
-                EnableRealtimeReport(1000);
+                if (msg != null)
+                {
+                    EnableRealtimeReport(1000);
+                }
             }
         }
 

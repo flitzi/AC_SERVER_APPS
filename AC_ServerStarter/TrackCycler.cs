@@ -251,6 +251,11 @@ namespace AC_ServerStarter
                     if (message.StartsWith(this.send_chatCommand))
                     {
                         string msg = message.Substring(this.send_chatCommand.Length).Trim();
+                        int endix = msg.IndexOf(" received from ");
+                        if (endix > 0)
+                        {
+                            msg = msg.Substring(0, endix);
+                        }
                         if (this.plugin != null)
                         {
                             this.plugin.BroadcastChatMessage(msg);

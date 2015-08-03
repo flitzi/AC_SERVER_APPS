@@ -8,14 +8,6 @@ namespace AC_SessionReport
         public float X, Y, Z;
     }
 
-    public class CarInfo
-    {
-        public int CarId { get; set; }
-        public string Model { get; set; }
-        public string Skin { get; set; }
-        public short BallastKG { get; set; }
-    }
-
     public class DriverReport
     {
         private const double MaxSpeed = 150;
@@ -23,9 +15,13 @@ namespace AC_SessionReport
         public int ConnectionId { get; set; }
         public long ConnectedTimeStamp { get; set; }
         public long DisconnectedTimeStamp { get; set; }
-        public string Name { get; set; }
         public string SteamId { get; set; }
+        public string Name { get; set; }
+        public string Team { get; set; } // currently not set
         public byte CarId { get; set; }
+        public string CarModel { get; set; }
+        public string CarSkin { get; set; }
+        public short BallastKG { get; set; } // currently not set
         public int BestLap { get; set; }
         public int TotalTime { get; set; }
         public short LapCount { get; set; }
@@ -87,7 +83,6 @@ namespace AC_SessionReport
     {
         public SessionReport()
         {
-            this.Cars = new List<CarInfo>();
             this.Connections = new List<DriverReport>();
             this.Laps = new List<LapReport>();
             this.Events = new List<IncidentReport>();
@@ -105,7 +100,6 @@ namespace AC_SessionReport
         public byte RoadTemp { get; set; }
         public string Weather { get; set; }
 
-        public List<CarInfo> Cars { get; set; }
         public List<DriverReport> Connections { get; set; }
         public List<LapReport> Laps { get; set; }
         public List<IncidentReport> Events { get; set; }

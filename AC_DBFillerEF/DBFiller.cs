@@ -30,12 +30,6 @@ namespace AC_DBFillerEF
 
                     entities.Sessions.Add(session);
 
-                    Dictionary<int, CarInfo> carDict = new Dictionary<int, CarInfo>();
-                    foreach (CarInfo car in report.Cars)
-                    {
-                        carDict.Add(car.CarId, car);
-                    }
-
                     Dictionary<int, Driver> driverDict = new Dictionary<int, Driver>();
                     Dictionary<int, DriverReport> driverReportDict = new Dictionary<int, DriverReport>();
                     foreach (DriverReport connection in report.Connections)
@@ -49,7 +43,7 @@ namespace AC_DBFillerEF
                         }
 
                         driver.Name = connection.Name;
-                        driver.Team = "NA";
+                        driver.Team = connection.Team;
                         driver.IncidentCount += connection.Incidents;
                         driver.Distance += (int)connection.Distance;
                         driver.Points += 0; //TODO?
@@ -60,7 +54,7 @@ namespace AC_DBFillerEF
                         Result result = new Result();
                         result.Session = session;
                         result.Driver = driver;
-                        result.Car = carDict[connection.CarId].Model;
+                        result.Car = connection.CarModel;
                         result.Position = connection.Position;
                         result.IncidentCount = connection.Incidents;
                         result.Distance = (int)connection.Distance;
@@ -75,7 +69,7 @@ namespace AC_DBFillerEF
                         Lap lap = new Lap();
                         lap.Session = session;
                         lap.Driver = driverDict[lapReport.ConnectionId];
-                        lap.Car = carDict[driverReportDict[lapReport.ConnectionId].CarId].Model;
+                        lap.Car = driverReportDict[lapReport.ConnectionId].CarModel;
                         lap.LapNo = lapReport.LapNo;
                         lap.Time = lapReport.LapTime;
                         lap.Cuts = lapReport.Cuts;

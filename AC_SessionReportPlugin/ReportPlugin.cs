@@ -4,6 +4,7 @@ using acPlugins4net.kunos;
 using acPlugins4net.messages;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 
 namespace AC_SessionReportPlugin
@@ -64,6 +65,16 @@ namespace AC_SessionReportPlugin
             }
         }
 
+        public int BroadcastIncidents { get; set; }
+
+        public int BroadcastResults { get; set; }
+
+        public ReportPlugin()
+        {
+            this.BroadcastIncidents = this.Config.GetSettingAsInt("BroadcastIncidents", 0);
+            this.BroadcastResults = this.Config.GetSettingAsInt("BroadcastResults", 0);
+        }
+
         public bool SessionHasInfo()
         {
             lock (this.lockObject)
@@ -72,12 +83,14 @@ namespace AC_SessionReportPlugin
             }
         }
 
+        /// <summary>
+        /// Do not reset if players are still connected or you don't plan on restarting the server.
+        /// </summary>
         public void ResetAll()
         {
             lock (this.lockObject)
             {
                 this.carUsedByDictionary.Clear();
-                this.CarInfo.Clear();
                 this.currentSession = new SessionReport();
             }
         }
@@ -90,18 +103,6 @@ namespace AC_SessionReportPlugin
                 {
                     if (this.SessionHasInfo())
                     {
-                        // add car info to session
-                        foreach (MsgCarInfo carInfo in this.CarInfo.Values)
-                        {
-                            this.currentSession.Cars.Add(new CarInfo()
-                            {
-                                CarId = carInfo.CarId,
-                                Model = carInfo.CarModel,
-                                Skin = carInfo.CarSkin,
-                                BallastKG = 0, // ballast currently not available through UDP
-                            });
-                        }
-
                         // update PlayerConnections with results
                         foreach (DriverReport connection in this.currentSession.Connections)
                         {
@@ -131,7 +132,7 @@ namespace AC_SessionReportPlugin
                             int winnerlapcount = 0;
                             int winnertime = 0;
                             // might be incorrect for players connected after race started
-                            foreach (DriverReport connection in this.currentSession.Connections.OrderByDescending(d => d.LapCount).ThenBy(d => this.currentSession.Laps.Where(l=> l.ConnectionId == d.ConnectionId && l.LapNo == d.LapCount).First().TimeStamp))
+                            foreach (DriverReport connection in this.currentSession.Connections.OrderByDescending(d => d.LapCount).ThenBy(d => this.currentSession.Laps.Where(l => l.ConnectionId == d.ConnectionId && l.LapNo == d.LapCount).First().TimeStamp))
                             {
                                 if (position == 1)
                                 {
@@ -181,18 +182,13 @@ namespace AC_SessionReportPlugin
                             }
                         }
 
-                        this.BroadcastChatMessage("Pos  Name\tCar\tGap\tBestLap\tIncidents");
-                        foreach (DriverReport d in this.currentSession.Connections.OrderBy(d => d.Position))
+                        if (this.BroadcastResults > 0)
                         {
-                            string car = "unknown";
-
-                            MsgCarInfo carInfo;
-                            if (this.CarInfo.TryGetValue(d.CarId, out carInfo))
+                            this.BroadcastChatMessage("Pos  Name\tCar\tGap\tBestLap\tIncidents");
+                            foreach (DriverReport d in this.currentSession.Connections.OrderBy(d => d.Position).Take(this.BroadcastResults))
                             {
-                                car = carInfo.CarModel;
+                                this.BroadcastChatMessage(string.Format("{0}   {1}\t{2}\t{3}\t{4}\t{5}", d.Position.ToString("00"), d.Name, d.CarModel, d.Gap, FormatTimespan(d.BestLap), d.Incidents));
                             }
-
-                            this.BroadcastChatMessage(string.Format("{0}   {1}\t{2}\t{3}\t{4}\t{5}", d.Position.ToString("00"), d.Name, car, d.Gap, FormatTimespan(d.BestLap), d.Incidents));
                         }
 
                         foreach (ISessionReportHandler handler in this.SessionReportHandlers)
@@ -249,10 +245,14 @@ namespace AC_SessionReportPlugin
                             {
                                 ConnectionId = nextConnectionId++,
                                 ConnectedTimeStamp = found.ConnectedTimeStamp,
-                                DisconnectedTimeStamp = found.DisconnectedTimeStamp,
-                                Name = found.Name,
+                                DisconnectedTimeStamp = found.DisconnectedTimeStamp, // should be not set yet
                                 SteamId = found.SteamId,
+                                Name = found.Name,
+                                Team = found.Team,
                                 CarId = found.CarId,
+                                CarModel = found.CarModel,
+                                CarSkin = found.CarSkin,
+                                BallastKG = found.BallastKG,
                                 BestLap = 0,
                                 TotalTime = 0,
                                 LapCount = 0,
@@ -284,9 +284,13 @@ namespace AC_SessionReportPlugin
                     ConnectionId = nextConnectionId++,
                     ConnectedTimeStamp = DateTime.UtcNow.Ticks,
                     DisconnectedTimeStamp = 0,
-                    Name = msg.DriverName,
                     SteamId = msg.DriverGuid,
+                    Name = msg.DriverName,
+                    Team = "NA", // missing in msg
                     CarId = msg.CarId,
+                    CarModel = msg.CarModel,
+                    CarSkin = msg.CarSkin,
+                    BallastKG = 0, // missing in msg
                     BestLap = 0,
                     TotalTime = 0,
                     LapCount = 0,
@@ -366,9 +370,16 @@ namespace AC_SessionReportPlugin
                         RelPosition = ToSingle3(msg.RelativePosition),
                     });
 
-                    if (withOtherCar)
+                    if (this.BroadcastIncidents > 0)
                     {
-                        this.BroadcastChatMessage(string.Format("Collision between {0} and {1} with {2}km/h", driver.Name, driver2.Name, msg.RelativeVelocity));
+                        if (withOtherCar)
+                        {
+                            this.BroadcastChatMessage(string.Format("Collision between {0} and {1} with {2}km/h", driver.Name, driver2.Name, Math.Round(msg.RelativeVelocity)));
+                        }
+                        else if (this.BroadcastIncidents > 1)
+                        {
+                            this.BroadcastChatMessage(string.Format("{0} crashed into wall with {1}km/h", driver.Name, Math.Round(msg.RelativeVelocity)));
+                        }
                     }
                 }
                 catch (Exception ex)

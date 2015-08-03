@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Configuration;
 
 namespace AC_TrackCycle_Console
 {
@@ -44,10 +45,15 @@ namespace AC_TrackCycle_Console
         [STAThread]
         static void Main()
         {
-            string serverfolder = @"D:\Games\Steam\SteamApps\common\assettocorsa\server\"; //not used if acServer.exe is found next to this app
+            string serverfolder;
             if (File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "acServer.exe")))
             {
                 serverfolder = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+            }
+            else
+            {
+                //not used if acServer.exe is found next to this app
+                serverfolder = ConfigurationManager.AppSettings["acServerDirectory"];
             }
 
             ReportPlugin plugin = new ReportPlugin();
@@ -60,6 +66,8 @@ namespace AC_TrackCycle_Console
             {
                 Console.WriteLine("Could not load SessionReportHandler");
             }
+
+            plugin.Connect();
 
             trackCycler = new TrackCycler(serverfolder, plugin);
 
@@ -100,6 +108,8 @@ namespace AC_TrackCycle_Console
             }
 
             trackCycler.StopServer();
+
+            plugin.Disconnect();
         }
     }
 }

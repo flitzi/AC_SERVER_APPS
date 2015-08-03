@@ -4,6 +4,7 @@ using AC_ServerStarter;
 using System;
 using System.IO;
 using System.Windows.Forms;
+using System.Configuration;
 
 namespace AC_TrackCycle_Console
 {
@@ -30,10 +31,15 @@ namespace AC_TrackCycle_Console
 
             myPlugin.Connect();
 
-            string serverfolder = @"C:\Steam\SteamApps\common\assettocorsa\server\"; //not used if acServer.exe is found next to this app
+            string serverfolder;
             if (File.Exists(Path.Combine(Application.StartupPath, "acServer.exe")))
             {
                 serverfolder = Application.StartupPath;
+            }
+            else
+            {
+                //not used if acServer.exe is found next to this app
+                serverfolder = ConfigurationManager.AppSettings["acServerDirectory"];
             }
 
             this.trackCycler = new TrackCycler(serverfolder, myPlugin);
@@ -103,6 +109,7 @@ namespace AC_TrackCycle_Console
         {
             base.OnClosed(e);
             this.trackCycler.StopServer();
+            this.myPlugin.Disconnect();
         }
 
         private void buttonStart_Click(object sender, EventArgs e)

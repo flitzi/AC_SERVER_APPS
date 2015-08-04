@@ -15,7 +15,7 @@ namespace AC_ServerStarter
 
     public class TrackCycler
     {
-        private readonly string serverfolder;
+        private readonly string serverfolder, server_cfg;
 
         private readonly List<string> iniLines = new List<string>();
         private readonly List<object> Sessions = new List<object>();
@@ -25,7 +25,7 @@ namespace AC_ServerStarter
 
         //private readonly List<string> admins = new List<string>(); //not used, you have to pass the admin password everytime for /next_track and /change_track, e.g. "/next_track <mypassword>" or /change_track <mypassword> spa
 
-        private string servername, next_trackCommand, change_trackCommand, send_chatCommand;
+        private string next_trackCommand, change_trackCommand, send_chatCommand;
 
         public bool WriteAllMessages { get; set; }
 
@@ -46,13 +46,14 @@ namespace AC_ServerStarter
         {
             this.WriteAllMessages = true;
             this.serverfolder = serverfolder;
+            this.server_cfg = Path.Combine(serverfolder, @"cfg\server_cfg.ini");
             this.plugin = plugin;
             this.logWriter = logWriter;
             this.AutoChangeTrack = true;
 
-            string adminpw, track, layout;
+            string servername, adminpw, track, layout;
             int laps;
-            ReadCfg(Path.Combine(serverfolder, @"cfg\server_cfg.ini"), true, out this.servername, out adminpw, out track, out layout, out laps, ref this.Sessions, ref this.iniLines);
+            ReadCfg(this.server_cfg, true, out servername, out adminpw, out track, out layout, out laps, ref this.Sessions, ref this.iniLines);
             this.setAdminCommands(adminpw);
 
             if (this.Sessions.Count == 0)
@@ -147,75 +148,71 @@ namespace AC_ServerStarter
                 this.plugin.Disconnect();
             }
 
-            if (this.cycle >= this.Sessions.Count)
+            if (this.HasCycle)
             {
-                this.cycle = 0;
+                if (this.cycle >= this.Sessions.Count)
+                {
+                    this.cycle = 0;
+                }
+                if (this.Sessions[this.cycle] is RaceSession)
+                {
+                    RaceSession session = (RaceSession)this.Sessions[this.cycle];
+                    StreamWriter sw = new StreamWriter(this.server_cfg);
+                    foreach (string line in this.iniLines)
+                    {
+                        string outLine = line;
+
+                        if (line.StartsWith("TRACK=", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            outLine = "TRACK=" + session.Track;
+                        }
+
+                        if (line.StartsWith("CONFIG_TRACK=", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            outLine = "CONFIG_TRACK=" + session.Layout;
+                        }
+
+                        if (line.StartsWith("LAPS=", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            outLine = "LAPS=" + session.Laps;
+                        }
+
+                        sw.WriteLine(outLine);
+                    }
+                    sw.Dispose();
+                }
+                else if (this.Sessions[this.cycle] is string)
+                {
+                    string cfgDir = (string)this.Sessions[this.cycle];
+
+                    if (Directory.Exists(cfgDir))
+                    {
+                        string newcfg = Path.Combine(cfgDir, "server_cfg.ini");
+                        if (File.Exists(newcfg))
+                        {
+                            File.Copy(newcfg, this.server_cfg, true);
+                        }
+
+                        string newentrylist = Path.Combine(cfgDir, "entry_list.ini");
+                        if (File.Exists(newcfg))
+                        {
+                            File.Copy(newentrylist, this.server_cfg, true);
+                        }
+                    }
+                }
             }
 
-            string adminpw, track = "nurburgring", layout = "";
+            string servername, adminpw, track, layout;
             int laps;
+            List<object> tmpS = new List<object>();
+            List<string> tmpL = new List<string>();
 
-            if (this.Sessions[this.cycle] is RaceSession)
-            {
-                RaceSession session = (RaceSession)this.Sessions[this.cycle];
-                track = session.Track;
-                layout = session.Layout;
-                laps = session.Laps;
-
-                StreamWriter sw = new StreamWriter(Path.Combine(this.serverfolder, @"cfg\server_cfg.ini"));
-                foreach (string line in this.iniLines)
-                {
-                    string outLine = line;
-
-                    if (line.StartsWith("TRACK=", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        outLine = "TRACK=" + track;
-                    }
-
-                    if (line.StartsWith("CONFIG_TRACK=", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        outLine = "CONFIG_TRACK=" + layout;
-                    }
-
-                    if (line.StartsWith("LAPS=", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        outLine = "LAPS=" + laps;
-                    }
-
-                    sw.WriteLine(outLine);
-                }
-
-                sw.Dispose();
-            }
-            else if (this.Sessions[this.cycle] is string)
-            {
-                string cfgDir = (string)this.Sessions[this.cycle];
-                string cfg = Path.Combine(serverfolder, @"cfg\server_cfg.ini");
-                if (Directory.Exists(cfgDir))
-                {
-                    string newcfg = Path.Combine(cfgDir, "server_cfg.ini");
-                    if (File.Exists(newcfg))
-                    {
-                        File.Copy(newcfg, cfg, true);
-                    }
-
-                    string newentrylist = Path.Combine(cfgDir, "entry_list.ini");
-                    if (File.Exists(newcfg))
-                    {
-                        File.Copy(newentrylist, Path.Combine(serverfolder, @"cfg\entry_list.ini"), true);
-                    }
-                }
-
-                List<object> tmpS = new List<object>();
-                List<string> tmpL = new List<string>();
-
-                ReadCfg(cfg, true, out this.servername, out adminpw, out track, out layout, out laps, ref tmpS, ref tmpL);
-                this.setAdminCommands(adminpw);
-            }
+            ReadCfg(this.server_cfg, false, out servername, out adminpw, out track, out layout, out laps, ref tmpS, ref tmpL);
+            this.setAdminCommands(adminpw);
 
             if (this.plugin != null)
             {
-                this.plugin.ServerName = this.servername;
+                this.plugin.ServerName = servername;
                 this.plugin.CurrentTrack = track;
                 this.plugin.CurrentTrackLayout = layout;
 
@@ -332,7 +329,7 @@ namespace AC_ServerStarter
 
         public void ChangeTrack(int index)
         {
-            if (this.Sessions.Count > 1)
+            if (this.HasCycle)
             {
                 if (this.plugin != null)
                 {

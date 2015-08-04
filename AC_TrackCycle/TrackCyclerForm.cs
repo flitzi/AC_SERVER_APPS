@@ -49,7 +49,7 @@ namespace AC_TrackCycle_Console
 
             this.trackCycler = new TrackCycler(serverfolder, plugin, plugin.LogWriter);
 
-            if (trackCycler.HasCycle)
+            if (!trackCycler.HasCycle)
             {
                 this.buttonNextTrack.Enabled = false;
                 this.checkBoxAutoChangeTrack.Checked = false;

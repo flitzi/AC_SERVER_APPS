@@ -200,8 +200,7 @@ namespace AC_SessionReportPlugin
                     {
                         short position = 1;
                         int winnerlapcount = 0;
-                        int winnertime = 0;
-                        // might be incorrect for players connected after race started
+                        int winnertime = 0;                        
                         foreach (DriverReport connection in this.currentSession.Connections.OrderByDescending(d => d.LapCount).ThenBy(d => this.currentSession.Laps.Where(l => l.ConnectionId == d.ConnectionId && l.LapNo == d.LapCount).First().TimeStamp))
                         {
                             if (position == 1)
@@ -213,6 +212,7 @@ namespace AC_SessionReportPlugin
 
                             if (connection.LapCount == winnerlapcount)
                             {
+                                // might be incorrect for players connected after race started
                                 connection.Gap = FormatTimespan(connection.TotalTime - winnertime);
                             }
                             else

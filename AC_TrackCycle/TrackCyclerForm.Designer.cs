@@ -79,6 +79,8 @@
             // 
             // textBoxCurrentCycle
             // 
+            this.textBoxCurrentCycle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCurrentCycle.Location = new System.Drawing.Point(107, 12);
             this.textBoxCurrentCycle.Name = "textBoxCurrentCycle";
             this.textBoxCurrentCycle.ReadOnly = true;
@@ -110,7 +112,7 @@
             // 
             // checkBoxCreateLogs
             // 
-            this.checkBoxCreateLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.checkBoxCreateLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.checkBoxCreateLogs.AutoSize = true;
             this.checkBoxCreateLogs.Checked = true;
             this.checkBoxCreateLogs.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -124,6 +126,8 @@
             // 
             // textBox_chat
             // 
+            this.textBox_chat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_chat.Location = new System.Drawing.Point(47, 500);
             this.textBox_chat.Name = "textBox_chat";
             this.textBox_chat.Size = new System.Drawing.Size(455, 20);
@@ -132,6 +136,7 @@
             // 
             // label2
             // 
+            this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(12, 503);
             this.label2.Name = "label2";
@@ -141,6 +146,8 @@
             // 
             // textBox_sessionInfo
             // 
+            this.textBox_sessionInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_sessionInfo.Location = new System.Drawing.Point(107, 38);
             this.textBox_sessionInfo.Name = "textBox_sessionInfo";
             this.textBox_sessionInfo.ReadOnly = true;

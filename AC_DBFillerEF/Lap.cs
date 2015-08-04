@@ -23,7 +23,7 @@ namespace AC_DBFillerEF
         public short Cuts { get; set; }
         public short Position { get; set; }
         public float Grip { get; set; }
-        public System.DateTime TimeStamp { get; set; }
+        public System.DateTime Timestamp { get; set; }
     
         public virtual Driver Driver { get; set; }
         public virtual Session Session { get; set; }

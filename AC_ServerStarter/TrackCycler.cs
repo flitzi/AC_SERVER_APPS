@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace AC_ServerStarter
 {
@@ -16,6 +17,8 @@ namespace AC_ServerStarter
     public class TrackCycler
     {
         private readonly string serverfolder, server_cfg, entry_list;
+
+        private readonly object lockObject = new object();
 
         private readonly List<string> iniLines = new List<string>();
         private readonly List<object> Sessions = new List<object>();
@@ -234,97 +237,104 @@ namespace AC_ServerStarter
 
         private void process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            try
+            string message = e.Data;
+            Task.Run(() => processAsync(message));
+        }
+
+        private void processAsync(string message)
+        {
+            lock (lockObject)
             {
-                string message = e.Data;
-
-                if (!string.IsNullOrEmpty(message) && !message.StartsWith("No car with address"))
+                try
                 {
-                    if (this.logWriter != null)
+                    if (!string.IsNullOrEmpty(message) && !message.StartsWith("No car with address"))
                     {
-                        this.logWriter.LogMessage(message);
-                    }
-
-                    if (this.AutoChangeTrack && message == "HasSentRaceoverPacket, move to the next session")
-                    {
-                        this.NextTrack();
-                    }
-
-                    //this is not secure, someone with the same name can exploit admin rights
-                    //if (e.Data.StartsWith("Making") && e.Data.EndsWith("admin"))
-                    //{
-                    //    admins.Add(e.Data.Replace("Making", "").Replace("admin", "").Trim());
-                    //}
-
-                    //if (e.Data.StartsWith("ADMIN COMMAND: /next_track received from") && admins.Contains(e.Data.Replace("ADMIN COMMAND: /next_track received from", "").Trim()))
-                    //{
-                    //    cycle++;
-                    //    StartServer();
-                    //}
-
-                    if (message.StartsWith(this.next_trackCommand))
-                    {
-                        this.NextTrack();
-                    }
-
-                    if (message.StartsWith(this.change_trackCommand))
-                    {
-                        string track = message.Substring(this.change_trackCommand.Length).Trim();
-                        string layout = string.Empty;
-                        track = track.Substring(0, track.IndexOf(" "));
-                        string[] parts = track.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                        if (parts.Length == 2)
+                        if (this.logWriter != null)
                         {
-                            track = parts[0];
-                            layout = parts[1];
+                            this.logWriter.LogMessage(message);
                         }
-                        int index = -1;
-                        for (int i = 0; i < this.Sessions.Count; i++)
+
+                        if (this.AutoChangeTrack && message == "HasSentRaceoverPacket, move to the next session")
                         {
-                            if (this.Sessions[i] is RaceSession)
+                            this.NextTrack();
+                        }
+
+                        //this is not secure, someone with the same name can exploit admin rights
+                        //if (e.Data.StartsWith("Making") && e.Data.EndsWith("admin"))
+                        //{
+                        //    admins.Add(e.Data.Replace("Making", "").Replace("admin", "").Trim());
+                        //}
+
+                        //if (e.Data.StartsWith("ADMIN COMMAND: /next_track received from") && admins.Contains(e.Data.Replace("ADMIN COMMAND: /next_track received from", "").Trim()))
+                        //{
+                        //    cycle++;
+                        //    StartServer();
+                        //}
+
+                        if (message.StartsWith(this.next_trackCommand))
+                        {
+                            this.NextTrack();
+                        }
+
+                        if (message.StartsWith(this.change_trackCommand))
+                        {
+                            string track = message.Substring(this.change_trackCommand.Length).Trim();
+                            string layout = string.Empty;
+                            track = track.Substring(0, track.IndexOf(" "));
+                            string[] parts = track.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                            if (parts.Length == 2)
                             {
-                                RaceSession session = (RaceSession)this.Sessions[i];
-                                if (session.Track == track && session.Layout == layout)
+                                track = parts[0];
+                                layout = parts[1];
+                            }
+                            int index = -1;
+                            for (int i = 0; i < this.Sessions.Count; i++)
+                            {
+                                if (this.Sessions[i] is RaceSession)
                                 {
-                                    index = i;
-                                    break;
+                                    RaceSession session = (RaceSession)this.Sessions[i];
+                                    if (session.Track == track && session.Layout == layout)
+                                    {
+                                        index = i;
+                                        break;
+                                    }
+                                }
+                                else if (this.Sessions[i] is string)
+                                {
+                                    if ((string)this.Sessions[i] == track)
+                                    {
+                                        index = i;
+                                        break;
+                                    }
                                 }
                             }
-                            else if (this.Sessions[i] is string)
+                            if (index > -1)
                             {
-                                if ((string)this.Sessions[i] == track)
-                                {
-                                    index = i;
-                                    break;
-                                }
+                                this.ChangeTrack(index);
                             }
                         }
-                        if (index > -1)
-                        {
-                            this.ChangeTrack(index);
-                        }
-                    }
 
-                    if (message.StartsWith(this.send_chatCommand))
-                    {
-                        string msg = message.Substring(this.send_chatCommand.Length).Trim();
-                        int endix = msg.IndexOf(" received from ");
-                        if (endix > 0)
+                        if (message.StartsWith(this.send_chatCommand))
                         {
-                            msg = msg.Substring(0, endix);
-                        }
-                        if (this.plugin != null && this.plugin.IsConnected)
-                        {
-                            this.plugin.BroadcastChatMessage(msg);
+                            string msg = message.Substring(this.send_chatCommand.Length).Trim();
+                            int endix = msg.IndexOf(" received from ");
+                            if (endix > 0)
+                            {
+                                msg = msg.Substring(0, endix);
+                            }
+                            if (this.plugin != null && this.plugin.IsConnected)
+                            {
+                                this.plugin.BroadcastChatMessage(msg);
+                            }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                if (this.logWriter != null)
+                catch (Exception ex)
                 {
-                    this.logWriter.LogException(ex);
+                    if (this.logWriter != null)
+                    {
+                        this.logWriter.LogException(ex);
+                    }
                 }
             }
         }
@@ -335,6 +345,7 @@ namespace AC_ServerStarter
             {
                 if (this.plugin != null && this.plugin.IsConnected)
                 {
+                    Thread.Sleep(1000);
                     this.plugin.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
                     Thread.Sleep(2000);
                 }

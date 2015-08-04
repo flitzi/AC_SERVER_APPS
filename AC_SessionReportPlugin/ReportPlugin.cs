@@ -209,7 +209,7 @@ namespace AC_SessionReportPlugin
                         short position = 1;
                         int winnerlapcount = 0;
                         int winnertime = 0;
-                        foreach (DriverReport connection in this.currentSession.Connections.OrderByDescending(d => d.LapCount).ThenBy(d => this.currentSession.Laps.Where(l => l.ConnectionId == d.ConnectionId && l.LapNo == d.LapCount).First().TimeStamp))
+                        foreach (DriverReport connection in this.currentSession.Connections.OrderByDescending(d => d.LapCount).ThenBy(d => GetLastLapTimestamp(d)))
                         {
                             if (position == 1)
                             {
@@ -220,7 +220,7 @@ namespace AC_SessionReportPlugin
 
                             if (connection.LapCount == winnerlapcount)
                             {
-                                // might be incorrect for players connected after race started
+                                // is incorrect for players connected after race started
                                 connection.Gap = FormatTimespan(connection.TotalTime - winnertime);
                             }
                             else
@@ -262,6 +262,7 @@ namespace AC_SessionReportPlugin
 
                     if (this.BroadcastResults > 0)
                     {
+                        this.BroadcastChatMessage(this.currentSession.SessionName + " Results:");
                         this.BroadcastChatMessage("Pos  Name\tCar\tGap\tBestLap\tIncidents");
                         foreach (DriverReport d in this.currentSession.Connections.OrderBy(d => d.Position).Take(this.BroadcastResults))
                         {
@@ -301,7 +302,7 @@ namespace AC_SessionReportPlugin
                         Type = msg.SessionType,
                         Time = msg.TimeOfDay,
                         RaceLaps = (short)msg.Laps,
-                        TimeStamp = DateTime.UtcNow.Ticks,
+                        Timestamp = DateTime.UtcNow.Ticks,
                         AmbientTemp = msg.AmbientTemp,
                         RoadTemp = msg.RoadTemp,
                         Weather = msg.Weather
@@ -322,8 +323,8 @@ namespace AC_SessionReportPlugin
                         DriverReport recreatedConnection = new DriverReport()
                         {
                             ConnectionId = nextConnectionId++,
-                            ConnectedTimeStamp = found.ConnectedTimeStamp,
-                            DisconnectedTimeStamp = found.DisconnectedTimeStamp, // should be not set yet
+                            ConnectedTimestamp = found.ConnectedTimestamp,
+                            DisconnectedTimestamp = found.DisconnectedTimestamp, // should be not set yet
                             SteamId = found.SteamId,
                             Name = found.Name,
                             Team = found.Team,
@@ -353,10 +354,20 @@ namespace AC_SessionReportPlugin
                 if (LogWriter != null)
                 {
                     LogWriter.StartLoggingToFile(
-                        new DateTime(currentSession.TimeStamp, DateTimeKind.Utc).ToString("yyyyMMdd_HHmmss")
+                        new DateTime(currentSession.Timestamp, DateTimeKind.Utc).ToString("yyyyMMdd_HHmmss")
                         + "_" + currentSession.TrackName + "_" + currentSession.SessionName + ".log");
                 }
             }
+        }
+
+        private long GetLastLapTimestamp(DriverReport driver)
+        {
+            LapReport lapReport = this.currentSession.Laps.Where(l => l.ConnectionId == driver.ConnectionId && l.LapNo == driver.LapCount).FirstOrDefault();
+            if (lapReport != null)
+            {
+                return lapReport.Timestamp;
+            }
+            return long.MaxValue;
         }
 
         public virtual void OnNewConnectionMsg(MsgNewConnection msg)
@@ -364,11 +375,11 @@ namespace AC_SessionReportPlugin
             DriverReport newConnection = new DriverReport()
             {
                 ConnectionId = nextConnectionId++,
-                ConnectedTimeStamp = DateTime.UtcNow.Ticks,
-                DisconnectedTimeStamp = 0,
+                ConnectedTimestamp = DateTime.UtcNow.Ticks,
+                DisconnectedTimestamp = 0,
                 SteamId = msg.DriverGuid,
                 Name = msg.DriverName,
-                Team = "NA", // missing in msg
+                Team = null, // missing in msg
                 CarId = msg.CarId,
                 CarModel = msg.CarModel,
                 CarSkin = msg.CarSkin,
@@ -435,7 +446,7 @@ namespace AC_SessionReportPlugin
                 currentSession.Events.Add(new IncidentReport()
                 {
                     Type = msg.Subtype,
-                    TimeStamp = DateTime.UtcNow.Ticks,
+                    Timestamp = DateTime.UtcNow.Ticks,
                     ConnectionId1 = driver.ConnectionId,
                     ConnectionId2 = withOtherCar ? driver2.ConnectionId : -1,
                     ImpactSpeed = msg.RelativeVelocity,
@@ -482,7 +493,7 @@ namespace AC_SessionReportPlugin
                 currentSession.Laps.Add(new LapReport()
                 {
                     ConnectionId = driver.ConnectionId,
-                    TimeStamp = DateTime.UtcNow.Ticks,
+                    Timestamp = DateTime.UtcNow.Ticks,
                     LapTime = (int)msg.Laptime,
                     LapNo = (short)lapNo,
                     Position = position,
@@ -498,12 +509,10 @@ namespace AC_SessionReportPlugin
 
         public virtual void OnSessionEndedMsg(MsgSessionEnded msg)
         {
-            throw new NotImplementedException();
         }
 
         public virtual void OnCarInfoMsg(MsgCarInfo msg)
         {
-            throw new NotImplementedException();
         }
 
         #endregion

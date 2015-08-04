@@ -18,7 +18,7 @@ namespace AC_DBFillerEF
         public int SessionId { get; set; }
         public byte Type { get; set; }
         public float RelativeSpeed { get; set; }
-        public System.DateTime TimeStamp { get; set; }
+        public System.DateTime Timestamp { get; set; }
         public int DriverId1 { get; set; }
         public Nullable<int> DriverId2 { get; set; }
         public float WorldPosX { get; set; }

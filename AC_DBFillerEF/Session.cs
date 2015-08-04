@@ -32,7 +32,7 @@ namespace AC_DBFillerEF
         public byte Ambient { get; set; }
         public byte Road { get; set; }
         public string Weather { get; set; }
-        public System.DateTime TimeStamp { get; set; }
+        public System.DateTime Timestamp { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<Lap> Laps { get; set; }

@@ -17,7 +17,7 @@ namespace AC_ServerStarter
             {
                 Directory.CreateDirectory(dir);
             }
-            StreamWriter writer = new StreamWriter(Path.Combine(dir, new DateTime(report.TimeStamp, DateTimeKind.Utc).ToString("yyyyMMdd_HHmmss") + "_" + report.TrackName + "_" + report.SessionName + ".json"));
+            StreamWriter writer = new StreamWriter(Path.Combine(dir, new DateTime(report.Timestamp, DateTimeKind.Utc).ToString("yyyyMMdd_HHmmss") + "_" + report.TrackName + "_" + report.SessionName + ".json"));
             writer.Write(output);
             writer.Close();
             writer.Dispose();

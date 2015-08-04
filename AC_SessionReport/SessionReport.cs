@@ -13,8 +13,8 @@ namespace AC_SessionReport
         private const double MaxSpeed = 150;
 
         public int ConnectionId { get; set; }
-        public long ConnectedTimeStamp { get; set; }
-        public long DisconnectedTimeStamp { get; set; }
+        public long ConnectedTimestamp { get; set; }
+        public long DisconnectedTimestamp { get; set; }
         public string SteamId { get; set; }
         public string Name { get; set; }
         public string Team { get; set; } // currently not set
@@ -60,7 +60,7 @@ namespace AC_SessionReport
     public class LapReport
     {
         public int ConnectionId { get; set; }
-        public long TimeStamp { get; set; }
+        public long Timestamp { get; set; }
         public int LapTime { get; set; }
         public short LapNo { get; set; }
         public short Position { get; set; }
@@ -71,7 +71,7 @@ namespace AC_SessionReport
     public class IncidentReport
     {
         public byte Type { get; set; }
-        public long TimeStamp { get; set; }
+        public long Timestamp { get; set; }
         public int ConnectionId1 { get; set; }
         public int ConnectionId2 { get; set; }
         public float ImpactSpeed { get; set; }
@@ -95,7 +95,7 @@ namespace AC_SessionReport
         public byte Type { get; set; }
         public int Time { get; set; }
         public short RaceLaps { get; set; }
-        public long TimeStamp { get; set; }
+        public long Timestamp { get; set; }
         public byte AmbientTemp { get; set; }
         public byte RoadTemp { get; set; }
         public string Weather { get; set; }

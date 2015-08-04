@@ -26,7 +26,7 @@ namespace AC_DBFillerEF
                     session.Ambient = report.AmbientTemp;
                     session.Road = report.RoadTemp;
                     session.Weather = report.Weather;
-                    session.TimeStamp = new DateTime(report.TimeStamp, DateTimeKind.Utc);
+                    session.Timestamp = new DateTime(report.Timestamp, DateTimeKind.Utc);
 
                     entities.Sessions.Add(session);
 
@@ -75,7 +75,7 @@ namespace AC_DBFillerEF
                         lap.Cuts = lapReport.Cuts;
                         lap.Position = lapReport.Position;
                         lap.Grip = lapReport.Grip;
-                        lap.TimeStamp = new DateTime(lapReport.TimeStamp, DateTimeKind.Utc);
+                        lap.Timestamp = new DateTime(lapReport.Timestamp, DateTimeKind.Utc);
 
                         entities.Laps.Add(lap);
                     }
@@ -86,7 +86,7 @@ namespace AC_DBFillerEF
                         incident.Session = session;
                         incident.Type = incidentReport.Type;
                         incident.RelativeSpeed = incidentReport.ImpactSpeed;
-                        incident.TimeStamp = new DateTime(incidentReport.TimeStamp, DateTimeKind.Utc);
+                        incident.Timestamp = new DateTime(incidentReport.Timestamp, DateTimeKind.Utc);
                         incident.Driver1 = driverDict[incidentReport.ConnectionId1];
                         incident.Driver2 = incidentReport.ConnectionId2 >= 0 ? driverDict[incidentReport.ConnectionId2] : null;
                         incident.WorldPosX = incidentReport.WorldPosition.X;

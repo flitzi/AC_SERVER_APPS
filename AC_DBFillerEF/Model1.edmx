@@ -65,7 +65,7 @@
     <Property Name="Cuts" Type="smallint" Nullable="false" />
     <Property Name="Position" Type="smallint" Nullable="false" />
     <Property Name="Grip" Type="real" Nullable="false" />
-    <Property Name="TimeStamp" Type="datetime" Nullable="false" />
+    <Property Name="Timestamp" Type="datetime" Nullable="false" />
   </EntityType>
   <EntityType Name="Sessions">
     <Key>
@@ -81,7 +81,7 @@
     <Property Name="Ambient" Type="tinyint" Nullable="false" />
     <Property Name="Road" Type="tinyint" Nullable="false" />
     <Property Name="Weather" Type="nvarchar(max)" Nullable="false" />
-    <Property Name="TimeStamp" Type="datetime" Nullable="false" />
+    <Property Name="Timestamp" Type="datetime" Nullable="false" />
   </EntityType>
   <EntityType Name="Results">
     <Key>
@@ -95,7 +95,7 @@
     <Property Name="IncidentCount" Type="int" Nullable="false" />
     <Property Name="Distance" Type="int" Nullable="false" />
     <Property Name="LapCount" Type="smallint" Nullable="false" />
-    <Property Name="Gap" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="Gap" Type="nvarchar(max)" Nullable="true" />
   </EntityType>
   <EntityType Name="Incidents">
     <Key>
@@ -105,7 +105,7 @@
     <Property Name="SessionId" Type="int" Nullable="false" />
     <Property Name="Type" Type="tinyint" Nullable="false" />
     <Property Name="RelativeSpeed" Type="real" Nullable="false" />
-    <Property Name="TimeStamp" Type="datetime" Nullable="false" />
+    <Property Name="Timestamp" Type="datetime" Nullable="false" />
     <Property Name="DriverId1" Type="int" Nullable="false" />
     <Property Name="DriverId2" Type="int" Nullable="true" />
     <Property Name="WorldPosX" Type="real" Nullable="false" />
@@ -207,7 +207,7 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="SteamId" Type="String" Nullable="false" />
           <Property Name="Name" Type="String" FixedLength="false" Nullable="false" />
-          <Property Name="Team" Type="String" FixedLength="false" />
+          <Property Name="Team" Type="String" FixedLength="false" Nullable="true" />
           <NavigationProperty Name="Laps" Relationship="Self.FK_Laps_To_Drivers" FromRole="Drivers" ToRole="Laps" />
           <NavigationProperty Name="Results" Relationship="AC_DBModel.DriverResult" FromRole="Driver" ToRole="Result" />
           <Property Name="IncidentCount" Type="Int32" Nullable="false" />
@@ -231,7 +231,7 @@
           <NavigationProperty Name="Session" Relationship="Self.FK_Laps_To_Sessions" FromRole="Laps" ToRole="Sessions" />
           <Property Name="Position" Type="Int16" Nullable="false" />
           <Property Name="Grip" Type="Single" Nullable="false" />
-          <Property Name="TimeStamp" Type="DateTime" Nullable="false" />
+          <Property Name="Timestamp" Type="DateTime" Nullable="false" />
         </EntityType>
         <EntityType Name="Session">
           <Key>
@@ -249,7 +249,7 @@
           <Property Name="Ambient" Type="Byte" Nullable="false" />
           <Property Name="Road" Type="Byte" Nullable="false" />
           <Property Name="Weather" Type="String" Nullable="false" />
-          <Property Name="TimeStamp" Type="DateTime" Nullable="false" />
+          <Property Name="Timestamp" Type="DateTime" Nullable="false" />
           <NavigationProperty Name="Incidents" Relationship="AC_DBModel.SessionIncidents" FromRole="Session" ToRole="Incident" />
         </EntityType>
         <Association Name="FK_Laps_To_Drivers">
@@ -325,7 +325,7 @@
           <Property Name="IncidentCount" Nullable="false" Type="Int32" />
           <Property Name="Distance" Nullable="false" Type="Int32" />
           <Property Name="LapCount" Type="Int16" Nullable="false" />
-          <Property Name="Gap" Type="String" Nullable="false" />
+          <Property Name="Gap" Type="String" Nullable="true" />
         </EntityType>
         <Association Name="SessionResult">
           <End Type="AC_DBModel.Session" Role="Session" Multiplicity="1" />
@@ -359,7 +359,7 @@
           <Property Name="SessionId" Type="Int32" Nullable="false" />
           <Property Name="Type" Type="Byte" Nullable="false" />
           <Property Name="RelativeSpeed" Type="Single" Nullable="false" />
-          <Property Name="TimeStamp" Type="DateTime" Nullable="false" />
+          <Property Name="Timestamp" Type="DateTime" Nullable="false" />
           <NavigationProperty Name="Session" Relationship="AC_DBModel.SessionIncidents" FromRole="Incident" ToRole="Session" />
           <NavigationProperty Name="Driver1" Relationship="AC_DBModel.DriverIncident1" FromRole="Incident" ToRole="Driver" />
           <Property Name="DriverId1" Type="Int32" Nullable="false" />
@@ -436,7 +436,7 @@
           <ScalarProperty Name="Cuts" ColumnName="Cuts" />
           <ScalarProperty Name="Position" ColumnName="Position" />
           <ScalarProperty Name="Grip" ColumnName="Grip" />
-          <ScalarProperty Name="TimeStamp" ColumnName="TimeStamp" />
+          <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -453,7 +453,7 @@
           <ScalarProperty Name="Ambient" ColumnName="Ambient" />
           <ScalarProperty Name="Road" ColumnName="Road" />
           <ScalarProperty Name="Weather" ColumnName="Weather" />
-          <ScalarProperty Name="TimeStamp" ColumnName="TimeStamp" />
+          <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>
@@ -479,7 +479,7 @@
           <ScalarProperty Name="SessionId" ColumnName="SessionId" />
           <ScalarProperty Name="Type" ColumnName="Type" />
           <ScalarProperty Name="RelativeSpeed" ColumnName="RelativeSpeed" />
-          <ScalarProperty Name="TimeStamp" ColumnName="TimeStamp" />
+          <ScalarProperty Name="Timestamp" ColumnName="Timestamp" />
           <ScalarProperty Name="DriverId1" ColumnName="DriverId1" />
           <ScalarProperty Name="DriverId2" ColumnName="DriverId2" />
           <ScalarProperty Name="WorldPosX" ColumnName="WorldPosX" />

@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 08/01/2015 21:06:27
+-- Date Created: 08/04/2015 22:09:18
 -- Generated from EDMX file: C:\Users\Tom\Documents\GitHub\AC_SERVER_APPS\AC_DBFillerEF\Model1.edmx
 -- --------------------------------------------------
 
@@ -86,7 +86,7 @@ CREATE TABLE [dbo].[Laps] (
     [Cuts] smallint  NOT NULL,
     [Position] smallint  NOT NULL,
     [Grip] real  NOT NULL,
-    [TimeStamp] datetime  NOT NULL
+    [Timestamp] datetime  NOT NULL
 );
 GO
 
@@ -102,7 +102,7 @@ CREATE TABLE [dbo].[Sessions] (
     [Ambient] tinyint  NOT NULL,
     [Road] tinyint  NOT NULL,
     [Weather] nvarchar(max)  NOT NULL,
-    [TimeStamp] datetime  NOT NULL
+    [Timestamp] datetime  NOT NULL
 );
 GO
 
@@ -116,7 +116,7 @@ CREATE TABLE [dbo].[Results] (
     [IncidentCount] int  NOT NULL,
     [Distance] int  NOT NULL,
     [LapCount] smallint  NOT NULL,
-    [Gap] nvarchar(max)  NOT NULL
+    [Gap] nvarchar(max)  NULL
 );
 GO
 
@@ -126,7 +126,7 @@ CREATE TABLE [dbo].[Incidents] (
     [SessionId] int  NOT NULL,
     [Type] tinyint  NOT NULL,
     [RelativeSpeed] real  NOT NULL,
-    [TimeStamp] datetime  NOT NULL,
+    [Timestamp] datetime  NOT NULL,
     [DriverId1] int  NOT NULL,
     [DriverId2] int  NULL,
     [WorldPosX] real  NOT NULL,

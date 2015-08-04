@@ -65,7 +65,7 @@ namespace AC_ServerStarter
                     string[] templates = templatecycle.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string template in templates)
                     {
-                        string dir = Path.Combine(this.serverfolder, "cfg", template);
+                        string dir = Path.Combine(this.serverfolder, "cfg", template.Trim());
                         if (Directory.Exists(dir))
                         {
                             this.Sessions.Add(dir);

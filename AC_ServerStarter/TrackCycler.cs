@@ -1,6 +1,7 @@
 ﻿using AC_SessionReportPlugin;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -15,28 +16,31 @@ namespace AC_ServerStarter
     public class TrackCycler
     {
         private readonly string serverfolder;
-        private readonly string servername = "unnamed server";
+
         private readonly List<string> iniLines = new List<string>();
-        public readonly List<RaceSession> Sessions = new List<RaceSession>();
-        //private readonly List<string> admins = new List<string>(); //not used, you have to pass the admin password everytime for /next_track and /change_track, e.g. "/next_track <mypassword>" or /change_track <mypassword> spa
-        private readonly string next_trackCommand, change_trackCommand, send_chatCommand;
+        private readonly List<object> Sessions = new List<object>();
+
         private readonly ReportPlugin plugin;
         private readonly LogWriter logWriter;
 
-        public RaceSession CurrentSession
-        {
-            get
-            {
-                return this.Sessions[this.cycle];
-            }
-        }
+        //private readonly List<string> admins = new List<string>(); //not used, you have to pass the admin password everytime for /next_track and /change_track, e.g. "/next_track <mypassword>" or /change_track <mypassword> spa
+
+        private string servername, next_trackCommand, change_trackCommand, send_chatCommand;
 
         public bool WriteAllMessages { get; set; }
 
-        private int cycle = 0;
+        public bool HasCycle
+        {
+            get
+            {
+                return this.Sessions.Count > 1;
+            }
+        }
+
+        private int cycle;
         private Process serverInstance;
 
-        public bool AutoChangeTrack = true;
+        public bool AutoChangeTrack { get; set; }
 
         public TrackCycler(string serverfolder, ReportPlugin plugin, LogWriter logWriter)
         {
@@ -44,114 +48,179 @@ namespace AC_ServerStarter
             this.serverfolder = serverfolder;
             this.plugin = plugin;
             this.logWriter = logWriter;
+            this.AutoChangeTrack = true;
 
-            StreamReader sr = new StreamReader(Path.Combine(serverfolder, @"cfg\server_cfg.ini"));
+            string adminpw, track, layout;
+            int laps;
+            ReadCfg(Path.Combine(serverfolder, @"cfg\server_cfg.ini"), true, out this.servername, out adminpw, out track, out layout, out laps, ref this.Sessions, ref this.iniLines);
+            this.setAdminCommands(adminpw);
 
-            string ctrack = "nurburgring", clayout = "";
-            int claps = 5;
+            if (this.Sessions.Count == 0)
+            {
+                string templatecycle = ConfigurationManager.AppSettings["templateCycle"];
+                if (!string.IsNullOrEmpty(templatecycle))
+                {
+                    string[] templates = templatecycle.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string template in templates)
+                    {
+                        this.Sessions.Add(Path.Combine(this.serverfolder, "cfg", template));
+                    }
+                }
+            }
+        }
+
+        private static void ReadCfg(string cfg, bool readTrackCycle, out string servername, out string adminpw, out string track, out string layout, out int laps, ref List<object> sessions, ref List<string> iniLines)
+        {
+            servername = "AC server";
+            adminpw = "pippo";
+            track = "nurburgring";
+            layout = "";
+            laps = 5;
+
+            StreamReader sr = new StreamReader(cfg);
 
             string line = sr.ReadLine();
             while (line != null)
             {
-                if (line.StartsWith("TRACKS=", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    foreach (string parts in line.Substring(line.IndexOf("=") + 1).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
-                    {
-                        string[] part = parts.Split(',');
-                        string track = part[0].Trim();
-                        string config = string.Empty;
-                        if (part.Length == 3)
-                        {
-                            config = part[1].Trim();
-                        }
-                        int laps = int.Parse(part[part.Length - 1]);
-                        this.Sessions.Add(new RaceSession(track, config, laps));
-                    }
-                }
-
                 if (line.StartsWith("ADMIN_PASSWORD=", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    string adminpw = line.Substring(line.IndexOf("=") + 1);
-                    this.next_trackCommand = "ADMIN COMMAND: /next_track " + adminpw;
-                    this.change_trackCommand = "ADMIN COMMAND: /change_track " + adminpw;
-                    this.send_chatCommand = "ADMIN COMMAND: /send_chat " + adminpw;
+                    adminpw = line.Substring(line.IndexOf("=") + 1);
                 }
 
                 if (line.StartsWith("TRACK=", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    ctrack = line.Replace("TRACK=", "").Trim();
+                    track = line.Replace("TRACK=", "").Trim();
                 }
 
                 if (line.StartsWith("CONFIG_TRACK=", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    clayout = line.Replace("CONFIG_TRACK=", "").Trim();
+                    layout = line.Replace("CONFIG_TRACK=", "").Trim();
                 }
 
                 if (line.StartsWith("LAPS=", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    claps = int.Parse(line.Replace("LAPS=", "").Trim());
+                    laps = int.Parse(line.Replace("LAPS=", "").Trim());
                 }
 
                 if (line.StartsWith("NAME=", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    this.servername = line.Replace("NAME=", "").Trim();
+                    servername = line.Replace("NAME=", "").Trim();
                 }
 
-                this.iniLines.Add(line);
+                if (readTrackCycle)
+                {
+                    if (line.StartsWith("TRACKS=", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        foreach (string parts in line.Substring(line.IndexOf("=") + 1).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                        {
+                            string[] part = parts.Split(',');
+                            string ctrack = part[0].Trim();
+                            string clayout = string.Empty;
+                            if (part.Length == 3)
+                            {
+                                clayout = part[1].Trim();
+                            }
+                            int claps = int.Parse(part[part.Length - 1]);
+                            sessions.Add(new RaceSession(ctrack, clayout, claps));
+                        }
+                    }
+
+                    iniLines.Add(line);
+                }
                 line = sr.ReadLine();
             }
             sr.Dispose();
+        }
 
-            if (this.Sessions.Count == 0)
-            {
-                this.Sessions.Add(new RaceSession(ctrack, clayout, claps));
-            }
+        private void setAdminCommands(string adminpw)
+        {
+            this.next_trackCommand = "ADMIN COMMAND: /next_track " + adminpw;
+            this.change_trackCommand = "ADMIN COMMAND: /change_track " + adminpw;
+            this.send_chatCommand = "ADMIN COMMAND: /send_chat " + adminpw;
         }
 
         public void StartServer()
         {
             this.StopServer();
+            if (this.plugin != null)
+            {
+                this.plugin.Disconnect();
+            }
 
             if (this.cycle >= this.Sessions.Count)
             {
                 this.cycle = 0;
             }
 
+            string adminpw, track = "nurburgring", layout = "";
+            int laps;
+
+            if (this.Sessions[this.cycle] is RaceSession)
+            {
+                RaceSession session = (RaceSession)this.Sessions[this.cycle];
+                track = session.Track;
+                layout = session.Layout;
+                laps = session.Laps;
+
+                StreamWriter sw = new StreamWriter(Path.Combine(this.serverfolder, @"cfg\server_cfg.ini"));
+                foreach (string line in this.iniLines)
+                {
+                    string outLine = line;
+
+                    if (line.StartsWith("TRACK=", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        outLine = "TRACK=" + track;
+                    }
+
+                    if (line.StartsWith("CONFIG_TRACK=", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        outLine = "CONFIG_TRACK=" + layout;
+                    }
+
+                    if (line.StartsWith("LAPS=", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        outLine = "LAPS=" + laps;
+                    }
+
+                    sw.WriteLine(outLine);
+                }
+
+                sw.Dispose();
+            }
+            else if (this.Sessions[this.cycle] is string)
+            {
+                string cfgDir = (string)this.Sessions[this.cycle];
+                string cfg = Path.Combine(serverfolder, @"cfg\server_cfg.ini");
+                if (Directory.Exists(cfgDir))
+                {
+                    string newcfg = Path.Combine(cfgDir, "server_cfg.ini");
+                    if (File.Exists(newcfg))
+                    {
+                        File.Copy(newcfg, cfg, true);
+                    }
+
+                    string newentrylist = Path.Combine(cfgDir, "entry_list.ini");
+                    if (File.Exists(newcfg))
+                    {
+                        File.Copy(newentrylist, Path.Combine(serverfolder, @"cfg\entry_list.ini"), true);
+                    }
+                }
+
+                List<object> tmpS = new List<object>();
+                List<string> tmpL = new List<string>();
+
+                ReadCfg(cfg, true, out this.servername, out adminpw, out track, out layout, out laps, ref tmpS, ref tmpL);
+                this.setAdminCommands(adminpw);
+            }
+
             if (this.plugin != null)
             {
-                this.plugin.Disconnect();
-
                 this.plugin.ServerName = this.servername;
-                this.plugin.CurrentTrack = this.Sessions[cycle].Track;
-                this.plugin.CurrentTrackLayout = this.Sessions[cycle].Layout;
+                this.plugin.CurrentTrack = track;
+                this.plugin.CurrentTrackLayout = layout;
 
                 this.plugin.Connect();
             }
-
-            StreamWriter sw = new StreamWriter(Path.Combine(this.serverfolder, @"cfg\server_cfg.ini"));
-            foreach (string line in this.iniLines)
-            {
-                string outLine = line;
-
-                if (line.StartsWith("TRACK=", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    outLine = "TRACK=" + this.Sessions[cycle].Track;
-                }
-
-                if (line.StartsWith("CONFIG_TRACK=", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    outLine = "CONFIG_TRACK=" + this.Sessions[cycle].Layout;
-                }
-
-                if (line.StartsWith("LAPS=", StringComparison.InvariantCultureIgnoreCase))
-                {
-                    outLine = "LAPS=" + this.Sessions[cycle].Laps;
-                }
-
-                sw.WriteLine(outLine);
-            }
-
-            sw.Dispose();
 
             this.serverInstance = new Process();
             this.serverInstance.StartInfo.FileName = Path.Combine(serverfolder, "acServer.exe");
@@ -177,7 +246,7 @@ namespace AC_ServerStarter
                         this.logWriter.LogMessage(message);
                     }
 
-                    if (this.AutoChangeTrack && message == "HasSentRaceoverPacket, move to the next session" && this.Sessions.Count > 1)
+                    if (this.AutoChangeTrack && message == "HasSentRaceoverPacket, move to the next session")
                     {
                         this.NextTrack();
                     }
@@ -196,8 +265,7 @@ namespace AC_ServerStarter
 
                     if (message.StartsWith(this.next_trackCommand))
                     {
-                        this.cycle++;
-                        this.StartServer();
+                        this.NextTrack();
                     }
 
                     if (message.StartsWith(this.change_trackCommand))
@@ -211,14 +279,30 @@ namespace AC_ServerStarter
                             track = parts[0];
                             layout = parts[1];
                         }
+                        int index = -1;
                         for (int i = 0; i < this.Sessions.Count; i++)
                         {
-                            if (this.Sessions[i].Track == track && this.Sessions[i].Layout == layout)
+                            if (this.Sessions[i] is RaceSession)
                             {
-                                this.cycle = i;
-                                this.StartServer();
-                                break;
+                                RaceSession session = (RaceSession)this.Sessions[i];
+                                if (session.Track == track && session.Layout == layout)
+                                {
+                                    index = i;
+                                    break;
+                                }
                             }
+                            else if (this.Sessions[i] is string)
+                            {
+                                if ((string)this.Sessions[i] == track)
+                                {
+                                    index = i;
+                                    break;
+                                }
+                            }
+                        }
+                        if (index > -1)
+                        {
+                            this.ChangeTrack(index);
                         }
                     }
 
@@ -246,15 +330,23 @@ namespace AC_ServerStarter
             }
         }
 
+        public void ChangeTrack(int index)
+        {
+            if (this.Sessions.Count > 1)
+            {
+                if (this.plugin != null)
+                {
+                    this.plugin.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
+                    Thread.Sleep(2000);
+                }
+                this.cycle = index;
+                this.StartServer();
+            }
+        }
+
         public void NextTrack()
         {
-            if (this.plugin != null)
-            {
-                this.plugin.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
-                Thread.Sleep(2000);
-            }
-            this.cycle++;
-            this.StartServer();
+            this.ChangeTrack(this.cycle + 1);
         }
 
         public void StopServer()

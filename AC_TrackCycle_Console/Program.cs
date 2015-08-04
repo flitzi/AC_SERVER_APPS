@@ -72,18 +72,9 @@ namespace AC_TrackCycle_Console
 
             trackCycler = new TrackCycler(serverfolder, plugin, logWriter);
 
-            if (trackCycler.Sessions.Count == 0)
-            {
-                Console.Out.WriteLine("No TRACKS in TRACK_CYCLE section found.");
-                return;
-            }
-
             // Some biolerplate to react to close window event, CTRL-C, kill, etc
             _handler += new EventHandler(Handler);
             SetConsoleCtrlHandler(_handler, true);
-
-            //trackCycler.MessageReceived += trackCycler_MessageReceived;
-            //trackCycler.TrackChanged += trackCycler_TrackChanged;          
 
             trackCycler.StartServer();
             Console.Out.WriteLine("Server running...");

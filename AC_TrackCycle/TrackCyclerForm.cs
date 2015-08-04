@@ -49,16 +49,11 @@ namespace AC_TrackCycle_Console
 
             this.trackCycler = new TrackCycler(serverfolder, plugin, plugin.LogWriter);
 
-            if (trackCycler.Sessions.Count < 2)
+            if (trackCycler.HasCycle)
             {
                 this.buttonNextTrack.Enabled = false;
                 this.checkBoxAutoChangeTrack.Checked = false;
                 this.checkBoxAutoChangeTrack.Enabled = false;
-            }
-
-            foreach (RaceSession session in trackCycler.Sessions)
-            {
-                this.textBoxOutput.Text += session + Environment.NewLine;
             }
 
             this.trackCycler.AutoChangeTrack = this.checkBoxAutoChangeTrack.Checked;

@@ -26,17 +26,26 @@ namespace AC_SessionReportPlugin
             }
         }
 
-        public virtual void StartLoggingToFile(SessionReport sessionReport)
+        public virtual void StartLoggingToFile(string fileName)
         {
             lock (lockObject)
             {
                 this.StopLogging();
-                this.currentFile = Path.Combine(this.logDirectory,
-                    sessionReport.TimeStamp.ToString("yyyyMMdd_HHmmss" + "_" + sessionReport.SessionName + ".log"));
+                this.currentFile = Path.Combine(logDirectory, fileName);
             }
         }
 
         public virtual void LogMessage(string message)
+        {
+            this.LogMessageToFile(message);
+        }
+
+        public virtual void LogException(Exception ex)
+        {
+            this.LogMessageToFile("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+        }
+
+        protected void LogMessageToFile(string message)
         {
             lock (lockObject)
             {
@@ -58,11 +67,6 @@ namespace AC_SessionReportPlugin
                     this.log.WriteLine(message);
                 }
             }
-        }
-
-        public virtual void LogException(Exception ex)
-        {
-            this.LogMessage("Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
 
         public virtual void StopLogging()

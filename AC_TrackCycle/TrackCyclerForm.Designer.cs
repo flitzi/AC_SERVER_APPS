@@ -1,4 +1,4 @@
-﻿namespace AC_TrackCycle_Console
+﻿namespace AC_TrackCycle
 {
     partial class TrackCyclerForm
     {

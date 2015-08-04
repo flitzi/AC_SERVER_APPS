@@ -7,15 +7,16 @@ using System.Windows.Forms;
 using System.Configuration;
 using System.Reflection;
 using AC_SessionReport;
+using AC_TrackCycle;
 
-namespace AC_TrackCycle_Console
+namespace AC_TrackCycle
 {
     public partial class TrackCyclerForm : Form
     {
         private readonly GuiLogWriter logWriter;
         private readonly ReportPlugin plugin;
         private readonly TrackCycler trackCycler;
-        
+
         private int logLength = 0;
 
         public TrackCyclerForm()
@@ -23,7 +24,10 @@ namespace AC_TrackCycle_Console
             this.InitializeComponent();
 
             this.logWriter = new GuiLogWriter(this, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"));
-            this.plugin = new ReportPlugin(this.logWriter);
+            this.logWriter.LogMessagesToFile = this.checkBoxCreateLogs.Checked;
+            this.logWriter.StartLoggingToFile(DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log");
+
+            this.plugin = new GuiReportPlugin(this, this.logWriter);
 
             try
             {
@@ -33,8 +37,6 @@ namespace AC_TrackCycle_Console
             {
                 MessageBox.Show("Error", "Could not load SessionReportHandler");
             }
-
-            plugin.Connect();
 
             string serverfolder;
             if (File.Exists(Path.Combine(Application.StartupPath, "acServer.exe")))
@@ -47,7 +49,7 @@ namespace AC_TrackCycle_Console
                 serverfolder = ConfigurationManager.AppSettings["acServerDirectory"];
             }
 
-            this.trackCycler = new TrackCycler(serverfolder, plugin, plugin.LogWriter);
+            this.trackCycler = new TrackCycler(serverfolder, plugin, logWriter);
 
             if (!trackCycler.HasCycle)
             {
@@ -57,20 +59,19 @@ namespace AC_TrackCycle_Console
             }
 
             this.trackCycler.AutoChangeTrack = this.checkBoxAutoChangeTrack.Checked;
-            this.trackCycler.WriteAllMessages = this.checkBoxCreateLogs.Checked;
         }
 
         public void SetSessionInfo(SessionReport newSession)
         {
             if (newSession != null)
             {
-                if (newSession.Type == 3)
+                if (newSession.Type == (byte)MsgNewSession.SessionTypeEnum.Race)
                 {
-                    this.textBox_sessionInfo.Text = newSession.SessionName + " " + newSession.Laps + " laps, " + newSession.Weather + ", ambient " + newSession.AmbientTemp + "°, road " + newSession.RoadTemp + "°";
+                    this.textBox_sessionInfo.Text = newSession.SessionName + " " + newSession.RaceLaps + " laps, " + newSession.Weather + ", ambient " + newSession.AmbientTemp + "°, road " + newSession.RoadTemp + "°";
                 }
                 else
                 {
-                    this.textBox_sessionInfo.Text = newSession.SessionName + " " + newSession.DurationSecs / 60 + " min, " + newSession.Weather + ", ambient " + newSession.AmbientTemp + "°, road " + newSession.RoadTemp + "°";
+                    this.textBox_sessionInfo.Text = newSession.SessionName + " " + newSession.Time + " min, " + newSession.Weather + ", ambient " + newSession.AmbientTemp + "°, road " + newSession.RoadTemp + "°";
                 }
                 this.textBoxCurrentCycle.Text = newSession.TrackName + " " + newSession.TrackConfig;
             }
@@ -113,12 +114,12 @@ namespace AC_TrackCycle_Console
 
         private void checkBoxCreateLogs_CheckedChanged(object sender, EventArgs e)
         {
-            this.trackCycler.WriteAllMessages = this.checkBoxCreateLogs.Checked;
+            this.logWriter.LogMessagesToFile = this.checkBoxCreateLogs.Checked;
         }
 
         private void textBox_chat_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == 13 && !string.IsNullOrEmpty(textBox_chat.Text))
+            if (e.KeyChar == 13 && !string.IsNullOrEmpty(textBox_chat.Text) && this.plugin.IsConnected)
             {
                 this.plugin.BroadcastChatMessage(textBox_chat.Text);
                 textBox_chat.Text = string.Empty;

@@ -22,7 +22,7 @@ namespace AC_DBFillerEF
                     session.Type = report.Type;
                     session.Track = report.TrackName + (string.IsNullOrEmpty(report.TrackConfig) ? string.Empty : (" " + report.TrackConfig));
                     session.LapCount = report.RaceLaps;
-                    session.Time = report.DurationSecs;
+                    session.Time = report.Time;
                     session.Ambient = report.AmbientTemp;
                     session.Road = report.RoadTemp;
                     session.Weather = report.Weather;

@@ -68,8 +68,6 @@ namespace AC_TrackCycle_Console
                 Console.WriteLine("Could not load SessionReportHandler");
             }
 
-            plugin.Connect();
-
             trackCycler = new TrackCycler(serverfolder, plugin, logWriter);
 
             // Some biolerplate to react to close window event, CTRL-C, kill, etc

@@ -15,7 +15,7 @@ namespace AC_ServerStarter
 
     public class TrackCycler
     {
-        private readonly string serverfolder, server_cfg;
+        private readonly string serverfolder, server_cfg, entry_list;
 
         private readonly List<string> iniLines = new List<string>();
         private readonly List<object> Sessions = new List<object>();
@@ -26,8 +26,6 @@ namespace AC_ServerStarter
         //private readonly List<string> admins = new List<string>(); //not used, you have to pass the admin password everytime for /next_track and /change_track, e.g. "/next_track <mypassword>" or /change_track <mypassword> spa
 
         private string next_trackCommand, change_trackCommand, send_chatCommand;
-
-        public bool WriteAllMessages { get; set; }
 
         public bool HasCycle
         {
@@ -44,9 +42,9 @@ namespace AC_ServerStarter
 
         public TrackCycler(string serverfolder, ReportPlugin plugin, LogWriter logWriter)
         {
-            this.WriteAllMessages = true;
             this.serverfolder = serverfolder;
             this.server_cfg = Path.Combine(serverfolder, @"cfg\server_cfg.ini");
+            this.entry_list = Path.Combine(serverfolder, @"cfg\entry_list.ini");
             this.plugin = plugin;
             this.logWriter = logWriter;
             this.AutoChangeTrack = true;
@@ -64,7 +62,11 @@ namespace AC_ServerStarter
                     string[] templates = templatecycle.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string template in templates)
                     {
-                        this.Sessions.Add(Path.Combine(this.serverfolder, "cfg", template));
+                        string dir = Path.Combine(this.serverfolder, "cfg", template);
+                        if (Directory.Exists(dir))
+                        {
+                            this.Sessions.Add(dir);
+                        }
                     }
                 }
             }
@@ -143,7 +145,7 @@ namespace AC_ServerStarter
         public void StartServer()
         {
             this.StopServer();
-            if (this.plugin != null)
+            if (this.plugin != null && this.plugin.IsConnected)
             {
                 this.plugin.Disconnect();
             }
@@ -196,7 +198,7 @@ namespace AC_ServerStarter
                         string newentrylist = Path.Combine(cfgDir, "entry_list.ini");
                         if (File.Exists(newcfg))
                         {
-                            File.Copy(newentrylist, this.server_cfg, true);
+                            File.Copy(newentrylist, this.entry_list, true);
                         }
                     }
                 }
@@ -238,7 +240,7 @@ namespace AC_ServerStarter
 
                 if (!string.IsNullOrEmpty(message) && !message.StartsWith("No car with address"))
                 {
-                    if (this.WriteAllMessages && this.logWriter != null)
+                    if (this.logWriter != null)
                     {
                         this.logWriter.LogMessage(message);
                     }
@@ -311,7 +313,7 @@ namespace AC_ServerStarter
                         {
                             msg = msg.Substring(0, endix);
                         }
-                        if (this.plugin != null)
+                        if (this.plugin != null && this.plugin.IsConnected)
                         {
                             this.plugin.BroadcastChatMessage(msg);
                         }
@@ -331,7 +333,7 @@ namespace AC_ServerStarter
         {
             if (this.HasCycle)
             {
-                if (this.plugin != null)
+                if (this.plugin != null && this.plugin.IsConnected)
                 {
                     this.plugin.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
                     Thread.Sleep(2000);

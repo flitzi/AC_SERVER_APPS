@@ -93,7 +93,7 @@ namespace AC_SessionReport
         public string TrackConfig { get; set; }
         public string SessionName { get; set; }
         public byte Type { get; set; }
-        public int DurationSecs { get; set; }
+        public int Time { get; set; }
         public short RaceLaps { get; set; }
         public long TimeStamp { get; set; }
         public byte AmbientTemp { get; set; }

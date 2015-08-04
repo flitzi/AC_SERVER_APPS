@@ -4,11 +4,13 @@ using System;
 using AC_ServerStarter;
 using AC_SessionReport;
 
-namespace AC_TrackCycle_Console
+namespace AC_TrackCycle
 {
     public class GuiLogWriter : LogWriter
     {
         private readonly TrackCyclerForm form;
+
+        public bool LogMessagesToFile = true;
 
         public GuiLogWriter(TrackCyclerForm form, string logDirectory) : base(logDirectory)
         {
@@ -17,14 +19,17 @@ namespace AC_TrackCycle_Console
 
         public override void LogMessage(string message)
         {
-            base.LogMessage(message);
+            if (LogMessagesToFile)
+            {
+                base.LogMessage(message);
+            }
             this.form.BeginInvoke(new Action<string>(this.form.WriteMessage), message);
         }
 
-        public override void StartLoggingToFile(SessionReport sessionReport)
+        public override void LogException(Exception ex)
         {
-            base.StartLoggingToFile(sessionReport);
-            this.form.BeginInvoke(new Action<SessionReport>(this.form.SetSessionInfo), sessionReport);
+            base.LogException(ex);
+            this.form.BeginInvoke(new Action<string>(this.form.WriteMessage), "Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
         }
     }
 }

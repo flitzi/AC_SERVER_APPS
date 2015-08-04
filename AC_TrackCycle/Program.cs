@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace AC_TrackCycle_Console
+namespace AC_TrackCycle
 {
     static class Program
     {

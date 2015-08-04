@@ -58,10 +58,10 @@ namespace AC_SessionReportPlugin
 
         public int BroadcastResults { get; set; }
 
-        private readonly DuplexUDPClient _UDP = new DuplexUDPClient();
-        private readonly Dictionary<byte, DriverReport> carUsedByDictionary = new Dictionary<byte, DriverReport>();
-        private int nextConnectionId = 1;
-        private SessionReport currentSession = new SessionReport();
+        protected readonly DuplexUDPClient _UDP = new DuplexUDPClient();
+        protected readonly Dictionary<byte, DriverReport> carUsedByDictionary = new Dictionary<byte, DriverReport>();
+        protected int nextConnectionId = 1;
+        protected SessionReport currentSession = new SessionReport();
 
         public ReportPlugin(LogWriter logWriter, IConfigManager config = null)
         {
@@ -76,6 +76,14 @@ namespace AC_SessionReportPlugin
             return this.currentSession.Laps.Count > 0;
         }
 
+        public bool IsConnected
+        {
+            get
+            {
+                return this._UDP.Opened;
+            }
+        }
+
         public virtual void Connect()
         {
             // First we're getting the configured ports (app.config)
@@ -85,34 +93,34 @@ namespace AC_SessionReportPlugin
             _UDP.Open(pluginPort, acServerPort, MessageReceived, LogException);
         }
 
-        private void MessageReceived(byte[] data)
+        protected virtual void MessageReceived(byte[] data)
         {
             var msg = AcMessageParser.Parse(data);
             switch (msg.Type)
             {
                 case ACSProtocol.MessageType.ACSP_NEW_SESSION:
-                    this.OnNewSessionMsg(msg as MsgNewSession);
+                    this.OnNewSessionMsg((MsgNewSession)msg);
                     break;
                 case ACSProtocol.MessageType.ACSP_NEW_CONNECTION:
-                    this.OnNewConnectionMsg(msg as MsgNewConnection);
+                    this.OnNewConnectionMsg((MsgNewConnection)msg);
                     break;
                 case ACSProtocol.MessageType.ACSP_CONNECTION_CLOSED:
-                    this.OnConnectionClosedMsg(msg as MsgConnectionClosed);
+                    this.OnConnectionClosedMsg((MsgConnectionClosed)msg);
                     break;
                 case ACSProtocol.MessageType.ACSP_CAR_UPDATE:
-                    this.OnCarUpdateMsg(msg as MsgCarUpdate);
+                    this.OnCarUpdateMsg((MsgCarUpdate)msg);
                     break;
                 case ACSProtocol.MessageType.ACSP_CAR_INFO:
-                    this.OnCarInfoMsg(msg as MsgCarInfo);
+                    this.OnCarInfoMsg((MsgCarInfo)msg);
                     break;
                 case ACSProtocol.MessageType.ACSP_LAP_COMPLETED:
-                    this.OnLapCompletedMsg(msg as MsgLapCompleted);
+                    this.OnLapCompletedMsg((MsgLapCompleted)msg);
                     break;
                 case ACSProtocol.MessageType.ACSP_END_SESSION:
-                    this.OnSessionEndedMsg(msg as MsgSessionEnded);
+                    this.OnSessionEndedMsg((MsgSessionEnded)msg);
                     break;
                 case ACSProtocol.MessageType.ACSP_CLIENT_EVENT:
-                    this.OnCollisionMsg(msg as MsgClientEvent);
+                    this.OnCollisionMsg((MsgClientEvent)msg);
                     break;
                 case ACSProtocol.MessageType.ACSP_REALTIMEPOS_INTERVAL:
                 case ACSProtocol.MessageType.ACSP_GET_CAR_INFO:
@@ -182,7 +190,7 @@ namespace AC_SessionReportPlugin
                         {
                             connection.BestLap = validLaps.Min(l => l.LapTime);
                         }
-                        else if (currentSession.Type != 3)
+                        else if (currentSession.Type != (byte)MsgNewSession.SessionTypeEnum.Race)
                         {
                             // temporarily set BestLap to MaxValue for easier sorting for qualifying/practice results
                             connection.BestLap = int.MaxValue;
@@ -196,11 +204,11 @@ namespace AC_SessionReportPlugin
                         }
                     }
 
-                    if (currentSession.Type == 3) //if race
+                    if (currentSession.Type == (byte)MsgNewSession.SessionTypeEnum.Race) //if race
                     {
                         short position = 1;
                         int winnerlapcount = 0;
-                        int winnertime = 0;                        
+                        int winnertime = 0;
                         foreach (DriverReport connection in this.currentSession.Connections.OrderByDescending(d => d.LapCount).ThenBy(d => this.currentSession.Laps.Where(l => l.ConnectionId == d.ConnectionId && l.LapNo == d.LapCount).First().TimeStamp))
                         {
                             if (position == 1)
@@ -291,7 +299,7 @@ namespace AC_SessionReportPlugin
                         TrackConfig = oldSession.TrackConfig,
                         SessionName = msg.Name,
                         Type = msg.SessionType,
-                        DurationSecs = msg.TimeOfDay,
+                        Time = msg.TimeOfDay,
                         RaceLaps = (short)msg.Laps,
                         TimeStamp = DateTime.UtcNow.Ticks,
                         AmbientTemp = msg.AmbientTemp,
@@ -344,7 +352,9 @@ namespace AC_SessionReportPlugin
 
                 if (LogWriter != null)
                 {
-                    LogWriter.StartLoggingToFile(this.currentSession);
+                    LogWriter.StartLoggingToFile(
+                        new DateTime(currentSession.TimeStamp, DateTimeKind.Utc).ToString("yyyyMMdd_HHmmss")
+                        + "_" + currentSession.TrackName + "_" + currentSession.SessionName + ".log");
                 }
             }
         }

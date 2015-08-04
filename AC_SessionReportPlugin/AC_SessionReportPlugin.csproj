@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LogWriter.cs" />
     <Compile Include="ReportHandlerLoader.cs" />
     <Compile Include="ReportPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -21,6 +21,7 @@ namespace AC_ServerStarter
         //private readonly List<string> admins = new List<string>(); //not used, you have to pass the admin password everytime for /next_track and /change_track, e.g. "/next_track <mypassword>" or /change_track <mypassword> spa
         private readonly string next_trackCommand, change_trackCommand, send_chatCommand;
         private readonly ReportPlugin plugin;
+        private readonly LogWriter logWriter;
 
         public RaceSession CurrentSession
         {
@@ -30,21 +31,19 @@ namespace AC_ServerStarter
             }
         }
 
-        public bool CreateLogs = true;
-        private StreamWriter logWriter;
+        public bool WriteAllMessages { get; set; }
 
         private int cycle = 0;
         private Process serverInstance;
 
         public bool AutoChangeTrack = true;
 
-        public event MessageReceived MessageReceived;
-        public event TrackChanged TrackChanged;
-
-        public TrackCycler(string serverfolder, ReportPlugin myPlugin)
+        public TrackCycler(string serverfolder, ReportPlugin plugin, LogWriter logWriter)
         {
+            this.WriteAllMessages = true;
             this.serverfolder = serverfolder;
-            this.plugin = myPlugin;
+            this.plugin = plugin;
+            this.logWriter = logWriter;
 
             StreamReader sr = new StreamReader(Path.Combine(serverfolder, @"cfg\server_cfg.ini"));
 
@@ -111,12 +110,6 @@ namespace AC_ServerStarter
 
         public void StartServer()
         {
-            if (this.logWriter != null)
-            {
-                this.logWriter.Close();
-                this.logWriter.Dispose();
-            }
-
             this.StopServer();
 
             if (this.cycle >= this.Sessions.Count)
@@ -124,12 +117,16 @@ namespace AC_ServerStarter
                 this.cycle = 0;
             }
 
-            this.plugin.OnNewSession(null);
-            this.plugin.ResetAll();
+            if (this.plugin != null)
+            {
+                this.plugin.Disconnect();
 
-            this.plugin.ServerName = this.servername;
-            this.plugin.CurrentTrack = this.Sessions[cycle].Track;
-            this.plugin.CurrentTrackLayout = this.Sessions[cycle].Layout;
+                this.plugin.ServerName = this.servername;
+                this.plugin.CurrentTrack = this.Sessions[cycle].Track;
+                this.plugin.CurrentTrackLayout = this.Sessions[cycle].Layout;
+
+                this.plugin.Connect();
+            }
 
             StreamWriter sw = new StreamWriter(Path.Combine(this.serverfolder, @"cfg\server_cfg.ini"));
             foreach (string line in this.iniLines)
@@ -165,18 +162,6 @@ namespace AC_ServerStarter
             this.serverInstance.OutputDataReceived += process_OutputDataReceived;
             this.serverInstance.Start();
             this.serverInstance.BeginOutputReadLine();
-
-            if (this.CreateLogs)
-            {
-                string logFile = Path.Combine(this.serverfolder, "log_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + this.Sessions[cycle].Track + ".txt");
-                this.logWriter = new StreamWriter(logFile, false);
-                this.logWriter.AutoFlush = true;
-            }
-
-            if (this.TrackChanged != null)
-            {
-                this.TrackChanged(this.Sessions[this.cycle]);
-            }
         }
 
         private void process_OutputDataReceived(object sender, DataReceivedEventArgs e)
@@ -187,25 +172,14 @@ namespace AC_ServerStarter
 
                 if (!string.IsNullOrEmpty(message) && !message.StartsWith("No car with address"))
                 {
-                    if (MessageReceived != null)
+                    if (this.WriteAllMessages && this.logWriter != null)
                     {
-                        MessageReceived(message);
-                    }
-
-                    if (this.logWriter != null)
-                    {
-                        this.logWriter.WriteLine(message);
+                        this.logWriter.LogMessage(message);
                     }
 
                     if (this.AutoChangeTrack && message == "HasSentRaceoverPacket, move to the next session" && this.Sessions.Count > 1)
                     {
-                        if (this.plugin != null)
-                        {
-                            this.plugin.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
-                            Thread.Sleep(2000);
-                        }
-                        this.cycle++;
-                        this.StartServer();
+                        this.NextTrack();
                     }
 
                     //this is not secure, someone with the same name can exploit admin rights
@@ -265,15 +239,20 @@ namespace AC_ServerStarter
             }
             catch (Exception ex)
             {
-                if (MessageReceived != null)
+                if (this.logWriter != null)
                 {
-                    MessageReceived(ex.Message + " " + ex.StackTrace + Environment.NewLine);
+                    this.logWriter.LogException(ex);
                 }
             }
         }
 
         public void NextTrack()
         {
+            if (this.plugin != null)
+            {
+                this.plugin.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
+                Thread.Sleep(2000);
+            }
             this.cycle++;
             this.StartServer();
         }

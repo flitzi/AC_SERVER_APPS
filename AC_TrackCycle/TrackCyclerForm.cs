@@ -5,31 +5,36 @@ using System;
 using System.IO;
 using System.Windows.Forms;
 using System.Configuration;
+using System.Reflection;
+using AC_SessionReport;
 
 namespace AC_TrackCycle_Console
 {
     public partial class TrackCyclerForm : Form
     {
+        private readonly GuiLogWriter logWriter;
+        private readonly ReportPlugin plugin;
         private readonly TrackCycler trackCycler;
-        MyPlugin myPlugin;
+        
         private int logLength = 0;
 
         public TrackCyclerForm()
         {
             this.InitializeComponent();
 
-            myPlugin = new MyPlugin(this);
+            this.logWriter = new GuiLogWriter(this, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"));
+            this.plugin = new ReportPlugin(this.logWriter);
 
             try
             {
-                ReportHandlerLoader.LoadHandler(myPlugin);
+                ReportHandlerLoader.LoadHandler(this.plugin);
             }
             catch
             {
                 MessageBox.Show("Error", "Could not load SessionReportHandler");
             }
 
-            myPlugin.Connect();
+            plugin.Connect();
 
             string serverfolder;
             if (File.Exists(Path.Combine(Application.StartupPath, "acServer.exe")))
@@ -42,7 +47,7 @@ namespace AC_TrackCycle_Console
                 serverfolder = ConfigurationManager.AppSettings["acServerDirectory"];
             }
 
-            this.trackCycler = new TrackCycler(serverfolder, myPlugin);
+            this.trackCycler = new TrackCycler(serverfolder, plugin, plugin.LogWriter);
 
             if (trackCycler.Sessions.Count < 2)
             {
@@ -53,39 +58,27 @@ namespace AC_TrackCycle_Console
 
             foreach (RaceSession session in trackCycler.Sessions)
             {
-                this.textBoxOutput.Text += session.ToString() + Environment.NewLine;
+                this.textBoxOutput.Text += session + Environment.NewLine;
             }
 
             this.trackCycler.AutoChangeTrack = this.checkBoxAutoChangeTrack.Checked;
-            this.trackCycler.CreateLogs = this.checkBoxCreateLogs.Checked;
-
-            this.trackCycler.MessageReceived += trackCycler_MessageReceived;
-            this.trackCycler.TrackChanged += trackCycler_TrackChanged;
+            this.trackCycler.WriteAllMessages = this.checkBoxCreateLogs.Checked;
         }
 
-        public void SetSessionInfo(MsgNewSession newSession)
+        public void SetSessionInfo(SessionReport newSession)
         {
             if (newSession != null)
             {
-                if (newSession.SessionType == 3)
+                if (newSession.Type == 3)
                 {
-                    this.textBox_sessionInfo.Text = newSession.Name + " " + newSession.Laps + " laps, " + newSession.Weather + ", ambient " + newSession.AmbientTemp + "°, road " + newSession.RoadTemp + "°";
+                    this.textBox_sessionInfo.Text = newSession.SessionName + " " + newSession.Laps + " laps, " + newSession.Weather + ", ambient " + newSession.AmbientTemp + "°, road " + newSession.RoadTemp + "°";
                 }
                 else
                 {
-                    this.textBox_sessionInfo.Text = newSession.Name + " " + newSession.TimeOfDay + " min, " + newSession.Weather + ", ambient " + newSession.AmbientTemp + "°, road " + newSession.RoadTemp + "°";
+                    this.textBox_sessionInfo.Text = newSession.SessionName + " " + newSession.DurationSecs / 60 + " min, " + newSession.Weather + ", ambient " + newSession.AmbientTemp + "°, road " + newSession.RoadTemp + "°";
                 }
+                this.textBoxCurrentCycle.Text = newSession.TrackName + " " + newSession.TrackConfig;
             }
-        }
-
-        void trackChanged(RaceSession session)
-        {
-            this.textBoxCurrentCycle.Text = session.Track + " " + session.Layout;
-        }
-
-        void trackCycler_TrackChanged(RaceSession session)
-        {
-            BeginInvoke(new TrackChanged(trackChanged), session);
         }
 
         public void WriteMessage(string message)
@@ -100,16 +93,12 @@ namespace AC_TrackCycle_Console
             logLength++;
         }
 
-        void trackCycler_MessageReceived(string message)
-        {
-            BeginInvoke(new MessageReceived(WriteMessage), message);
-        }
-
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
             this.trackCycler.StopServer();
-            this.myPlugin.Disconnect();
+            this.plugin.Disconnect();
+            this.logWriter.StopLogging();
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -129,14 +118,14 @@ namespace AC_TrackCycle_Console
 
         private void checkBoxCreateLogs_CheckedChanged(object sender, EventArgs e)
         {
-            this.trackCycler.CreateLogs = this.checkBoxCreateLogs.Checked;
+            this.trackCycler.WriteAllMessages = this.checkBoxCreateLogs.Checked;
         }
 
         private void textBox_chat_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == 13 && !string.IsNullOrEmpty(textBox_chat.Text))
             {
-                this.myPlugin.BroadcastChatMessage(textBox_chat.Text);
+                this.plugin.BroadcastChatMessage(textBox_chat.Text);
                 textBox_chat.Text = string.Empty;
             }
         }

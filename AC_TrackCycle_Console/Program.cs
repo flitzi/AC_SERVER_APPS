@@ -56,7 +56,8 @@ namespace AC_TrackCycle_Console
                 serverfolder = ConfigurationManager.AppSettings["acServerDirectory"];
             }
 
-            ReportPlugin plugin = new ReportPlugin();
+            LogWriter logWriter = new LogWriter(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"));
+            ReportPlugin plugin = new ReportPlugin(logWriter);
 
             try
             {
@@ -69,7 +70,7 @@ namespace AC_TrackCycle_Console
 
             plugin.Connect();
 
-            trackCycler = new TrackCycler(serverfolder, plugin);
+            trackCycler = new TrackCycler(serverfolder, plugin, logWriter);
 
             if (trackCycler.Sessions.Count == 0)
             {
@@ -108,8 +109,8 @@ namespace AC_TrackCycle_Console
             }
 
             trackCycler.StopServer();
-
             plugin.Disconnect();
+            logWriter.StopLogging();
         }
     }
 }

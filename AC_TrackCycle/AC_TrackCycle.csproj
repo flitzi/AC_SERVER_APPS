@@ -57,7 +57,7 @@
     <Compile Include="TrackCyclerForm.Designer.cs">
       <DependentUpon>TrackCyclerForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="MyPlugin.cs" />
+    <Compile Include="GuiLogWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="TrackCyclerForm.resx">

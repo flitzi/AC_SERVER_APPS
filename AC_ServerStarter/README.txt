@@ -68,7 +68,7 @@ and you can specify the number of result broadcast positions
 the track(and config, separated with comma, but no space!) in /change_track needs to be in the TRACKS=... list
 
 -admin command for sending a message from the server
-/send_chat myPassword
+/send_chat myPassword blablabla
 
 (of course replace "myPassword" with your admin password)
 note: chat started with / is not visible to other players

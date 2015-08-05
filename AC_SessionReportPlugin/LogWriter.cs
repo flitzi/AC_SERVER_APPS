@@ -6,10 +6,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using AC_SessionReport;
+using acPlugins4net.helpers;
 
 namespace AC_SessionReportPlugin
 {
-    public class LogWriter
+    public class LogWriter : ILog
     {
         private readonly object lockObject = new object();
 
@@ -81,6 +82,16 @@ namespace AC_SessionReportPlugin
                     this.currentFile = null;
                 }
             }
+        }
+
+        void ILog.Log(string message)
+        {
+            this.LogMessage(message);
+        }
+
+        void ILog.Log(Exception ex)
+        {
+            this.LogException(ex);
         }
     }
 }

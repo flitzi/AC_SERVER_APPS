@@ -8,13 +8,14 @@ using System.Configuration;
 using System.Reflection;
 using AC_SessionReport;
 using AC_TrackCycle;
+using acPlugins4net;
 
 namespace AC_TrackCycle
 {
     public partial class TrackCyclerForm : Form
     {
         private readonly GuiLogWriter logWriter;
-        private readonly ReportPlugin plugin;
+        private readonly AcServerPluginManager pluginManager;
         private readonly TrackCycler trackCycler;
 
         private int logLength = 0;
@@ -27,16 +28,19 @@ namespace AC_TrackCycle
             this.logWriter.LogMessagesToFile = this.checkBoxCreateLogs.Checked;
             this.logWriter.StartLoggingToFile(DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log");
 
-            this.plugin = new GuiReportPlugin(this, this.logWriter);
+            this.pluginManager = new AcServerPluginManager(this.logWriter);
+            GuiReportPlugin plugin = new GuiReportPlugin(this, this.logWriter);
 
             try
             {
-                ReportHandlerLoader.LoadHandler(this.plugin);
+                ReportHandlerLoader.LoadHandler(plugin);
             }
             catch
             {
                 MessageBox.Show("Error", "Could not load SessionReportHandler");
             }
+
+            pluginManager.AddPlugin(plugin);
 
             string serverfolder;
             if (File.Exists(Path.Combine(Application.StartupPath, "acServer.exe")))
@@ -49,7 +53,7 @@ namespace AC_TrackCycle
                 serverfolder = ConfigurationManager.AppSettings["acServerDirectory"];
             }
 
-            this.trackCycler = new TrackCycler(serverfolder, plugin, logWriter);
+            this.trackCycler = new TrackCycler(serverfolder, pluginManager, logWriter);
 
             if (!trackCycler.HasCycle)
             {
@@ -93,7 +97,6 @@ namespace AC_TrackCycle
         {
             base.OnClosed(e);
             this.trackCycler.StopServer();
-            this.plugin.Disconnect();
             this.logWriter.StopLogging();
         }
 
@@ -119,9 +122,9 @@ namespace AC_TrackCycle
 
         private void textBox_chat_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == 13 && !string.IsNullOrEmpty(textBox_chat.Text) && this.plugin.IsConnected)
+            if (e.KeyChar == 13 && !string.IsNullOrEmpty(textBox_chat.Text) && this.pluginManager.IsConnected)
             {
-                this.plugin.BroadcastChatMessage(textBox_chat.Text);
+                this.pluginManager.BroadcastChatMessage(textBox_chat.Text);
                 textBox_chat.Text = string.Empty;
             }
         }

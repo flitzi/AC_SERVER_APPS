@@ -11,64 +11,27 @@ using System.Linq;
 
 namespace AC_SessionReportPlugin
 {
-    public class ReportPlugin
+    public class ReportPlugin : IAcServerPlugin
     {
-        public readonly IConfigManager Config;
+        public string PluginName { get { return "ReportPlugin"; } }
+
+        protected AcServerPluginManager pluginManager { get; private set; }
+
         public readonly LogWriter LogWriter;
 
         public readonly List<ISessionReportHandler> SessionReportHandlers = new List<ISessionReportHandler>();
-
-        public string ServerName
-        {
-            get
-            {
-                return this.currentSession.ServerName;
-            }
-            set
-            {
-                this.currentSession.ServerName = value;
-            }
-        }
-
-        public string CurrentTrack
-        {
-            get
-            {
-                return this.currentSession.TrackName;
-            }
-            set
-            {
-                this.currentSession.TrackName = value;
-            }
-        }
-
-        public string CurrentTrackLayout
-        {
-            get
-            {
-                return this.currentSession.TrackConfig;
-            }
-            set
-            {
-                this.currentSession.TrackConfig = value;
-            }
-        }
 
         public int BroadcastIncidents { get; set; }
 
         public int BroadcastResults { get; set; }
 
-        protected readonly DuplexUDPClient _UDP = new DuplexUDPClient();
         protected readonly Dictionary<byte, DriverReport> carUsedByDictionary = new Dictionary<byte, DriverReport>();
         protected int nextConnectionId = 1;
         protected SessionReport currentSession = new SessionReport();
 
-        public ReportPlugin(LogWriter logWriter, IConfigManager config = null)
+        public ReportPlugin(LogWriter logWriter)
         {
             this.LogWriter = logWriter;
-            this.Config = config != null ? config : new AppConfigConfigurator();
-            this.BroadcastIncidents = this.Config.GetSettingAsInt("BroadcastIncidents", 0);
-            this.BroadcastResults = this.Config.GetSettingAsInt("BroadcastResults", 0);
         }
 
         public virtual bool SessionHasInfo()
@@ -76,106 +39,35 @@ namespace AC_SessionReportPlugin
             return this.currentSession.Laps.Count > 0;
         }
 
-        public bool IsConnected
+        #region IAcServerPlugin implementation
+
+        public void OnInit(AcServerPluginManager manager)
         {
-            get
-            {
-                return this._UDP.Opened;
-            }
+            this.pluginManager = manager;
+            this.BroadcastIncidents = manager.Config.GetSettingAsInt("BroadcastIncidents", 0);
+            this.BroadcastResults = manager.Config.GetSettingAsInt("BroadcastResults", 0);
         }
 
-        public virtual void Connect()
+        public virtual void OnConnected()
         {
-            // First we're getting the configured ports (app.config)
-            var acServerPort = Config.GetSettingAsInt("acServer_port", 11000);
-            var pluginPort = Config.GetSettingAsInt("plugin_port", 12000);
-
-            _UDP.Open(pluginPort, acServerPort, MessageReceived, LogException);
+            this.currentSession.ServerName = pluginManager.ServerName;
+            this.currentSession.TrackName = pluginManager.Track;
+            this.currentSession.TrackConfig = pluginManager.TrackLayout;
         }
 
-        protected virtual void MessageReceived(byte[] data)
+        public virtual void OnDisconnected()
         {
-            var msg = AcMessageParser.Parse(data);
-            switch (msg.Type)
-            {
-                case ACSProtocol.MessageType.ACSP_NEW_SESSION:
-                    this.OnNewSessionMsg((MsgNewSession)msg);
-                    break;
-                case ACSProtocol.MessageType.ACSP_NEW_CONNECTION:
-                    this.OnNewConnectionMsg((MsgNewConnection)msg);
-                    break;
-                case ACSProtocol.MessageType.ACSP_CONNECTION_CLOSED:
-                    this.OnConnectionClosedMsg((MsgConnectionClosed)msg);
-                    break;
-                case ACSProtocol.MessageType.ACSP_CAR_UPDATE:
-                    this.OnCarUpdateMsg((MsgCarUpdate)msg);
-                    break;
-                case ACSProtocol.MessageType.ACSP_CAR_INFO:
-                    this.OnCarInfoMsg((MsgCarInfo)msg);
-                    break;
-                case ACSProtocol.MessageType.ACSP_LAP_COMPLETED:
-                    this.OnLapCompletedMsg((MsgLapCompleted)msg);
-                    break;
-                case ACSProtocol.MessageType.ACSP_END_SESSION:
-                    this.OnSessionEndedMsg((MsgSessionEnded)msg);
-                    break;
-                case ACSProtocol.MessageType.ACSP_CLIENT_EVENT:
-                    this.OnCollisionMsg((MsgClientEvent)msg);
-                    break;
-                case ACSProtocol.MessageType.ACSP_REALTIMEPOS_INTERVAL:
-                case ACSProtocol.MessageType.ACSP_GET_CAR_INFO:
-                case ACSProtocol.MessageType.ACSP_SEND_CHAT:
-                case ACSProtocol.MessageType.ACSP_BROADCAST_CHAT:
-                    throw new Exception("Received unexpected MessageType (for a plugin): " + msg.Type);
-                case ACSProtocol.MessageType.ACSP_CE_COLLISION_WITH_CAR:
-                case ACSProtocol.MessageType.ACSP_CE_COLLISION_WITH_ENV:
-                case ACSProtocol.MessageType.ERROR:
-                default:
-                    throw new Exception("Received wrong or unknown MessageType: " + msg.Type);
-            }
-        }
-
-        public virtual void Disconnect()
-        {
-            _UDP.Close();
-            this.OnNewSessionMsg(null);
+            this.OnNewSession(null);
             this.carUsedByDictionary.Clear();
             this.currentSession = new SessionReport();
         }
 
-        public virtual void LogException(Exception ex)
+        public virtual bool OnConsoleCommand(string cmd)
         {
-            if (this.LogWriter != null)
-            {
-                this.LogWriter.LogException(ex);
-            }
+            return true;
         }
 
-        #region Requests to the AcServer
-
-        public virtual void BroadcastChatMessage(string msg)
-        {
-            var chatRequest = new RequestBroadcastChat() { ChatMessage = msg };
-            _UDP.TrySend(chatRequest.ToBinary());
-        }
-
-        public virtual void SendChatMessage(byte car_id, string msg)
-        {
-            var chatRequest = new RequestSendChat() { CarId = car_id, ChatMessage = msg };
-            _UDP.TrySend(chatRequest.ToBinary());
-        }
-
-        public virtual void EnableRealtimeReport(UInt16 interval)
-        {
-            var enableRealtimeReportRequest = new RequestRealtimeInfo { Interval = interval };
-            _UDP.TrySend(enableRealtimeReportRequest.ToBinary());
-        }
-
-        #endregion
-
-        #region IAcServerPlugin implementation
-
-        public virtual void OnNewSessionMsg(MsgNewSession msg)
+        public virtual void OnNewSession(MsgNewSession msg)
         {
             try
             {
@@ -262,11 +154,11 @@ namespace AC_SessionReportPlugin
 
                     if (this.BroadcastResults > 0)
                     {
-                        this.BroadcastChatMessage(this.currentSession.SessionName + " Results:");
-                        this.BroadcastChatMessage("Pos  Name\tCar\tGap\tBestLap\tIncidents");
+                        this.pluginManager.BroadcastChatMessage(this.currentSession.SessionName + " Results:");
+                        this.pluginManager.BroadcastChatMessage("Pos  Name\tCar\tGap\tBestLap\tIncidents");
                         foreach (DriverReport d in this.currentSession.Connections.OrderBy(d => d.Position).Take(this.BroadcastResults))
                         {
-                            this.BroadcastChatMessage(string.Format("{0}   {1}\t{2}\t{3}\t{4}\t{5}", d.Position.ToString("00"), d.Name, d.CarModel, d.Gap, FormatTimespan(d.BestLap), d.Incidents));
+                            this.pluginManager.BroadcastChatMessage(string.Format("{0}   {1}\t{2}\t{3}\t{4}\t{5}", d.Position.ToString("00"), d.Name, d.CarModel, d.Gap, FormatTimespan(d.BestLap), d.Incidents));
                         }
                     }
 
@@ -278,14 +170,14 @@ namespace AC_SessionReportPlugin
                         }
                         catch (Exception ex)
                         {
-                            this.LogException(ex);
+                            this.pluginManager.Log.Log(ex);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                this.LogException(ex);
+                this.pluginManager.Log.Log(ex);
             }
             finally
             {
@@ -349,7 +241,7 @@ namespace AC_SessionReportPlugin
 
             if (msg != null)
             {
-                EnableRealtimeReport(1000);
+                this.pluginManager.EnableRealtimeReport(1000);
 
                 if (LogWriter != null)
                 {
@@ -360,17 +252,7 @@ namespace AC_SessionReportPlugin
             }
         }
 
-        private long GetLastLapTimestamp(DriverReport driver)
-        {
-            LapReport lapReport = this.currentSession.Laps.Where(l => l.ConnectionId == driver.ConnectionId && l.LapNo == driver.LapCount).FirstOrDefault();
-            if (lapReport != null)
-            {
-                return lapReport.Timestamp;
-            }
-            return long.MaxValue;
-        }
-
-        public virtual void OnNewConnectionMsg(MsgNewConnection msg)
+        public virtual void OnNewConnection(MsgNewConnection msg)
         {
             DriverReport newConnection = new DriverReport()
             {
@@ -402,19 +284,19 @@ namespace AC_SessionReportPlugin
             else
             {
                 carUsedByDictionary[msg.CarId] = newConnection;
-                this.LogException(new Exception("Car already in used by another driver"));
+                this.pluginManager.Log.Log(new Exception("Car already in used by another driver"));
             }
         }
 
-        public virtual void OnConnectionClosedMsg(MsgConnectionClosed msg)
+        public virtual void OnConnectionClosed(MsgConnectionClosed msg)
         {
             if (!carUsedByDictionary.Remove(msg.CarId))
             {
-                this.LogException(new Exception("Car was not known to be in use"));
+                this.pluginManager.Log.Log(new Exception("Car was not known to be in use"));
             }
         }
 
-        public virtual void OnCarUpdateMsg(MsgCarUpdate msg)
+        public virtual void OnCarUpdate(MsgCarUpdate msg)
         {
             try
             {
@@ -423,11 +305,11 @@ namespace AC_SessionReportPlugin
             }
             catch (Exception ex)
             {
-                LogException(ex);
+                this.pluginManager.Log.Log(ex);
             }
         }
 
-        public virtual void OnCollisionMsg(MsgClientEvent msg)
+        public virtual void OnCollision(MsgClientEvent msg)
         {
             try
             {
@@ -458,21 +340,21 @@ namespace AC_SessionReportPlugin
                 {
                     if (withOtherCar)
                     {
-                        this.BroadcastChatMessage(string.Format("Collision between {0} and {1} with {2}km/h", driver.Name, driver2.Name, Math.Round(msg.RelativeVelocity)));
+                        this.pluginManager.BroadcastChatMessage(string.Format("Collision between {0} and {1} with {2}km/h", driver.Name, driver2.Name, Math.Round(msg.RelativeVelocity)));
                     }
                     else if (this.BroadcastIncidents > 1)
                     {
-                        this.BroadcastChatMessage(string.Format("{0} crashed into wall with {1}km/h", driver.Name, Math.Round(msg.RelativeVelocity)));
+                        this.pluginManager.BroadcastChatMessage(string.Format("{0} crashed into wall with {1}km/h", driver.Name, Math.Round(msg.RelativeVelocity)));
                     }
                 }
             }
             catch (Exception ex)
             {
-                LogException(ex);
+                this.pluginManager.Log.Log(ex);
             }
         }
 
-        public virtual void OnLapCompletedMsg(MsgLapCompleted msg)
+        public virtual void OnLapCompleted(MsgLapCompleted msg)
         {
             try
             {
@@ -503,21 +385,32 @@ namespace AC_SessionReportPlugin
             }
             catch (Exception ex)
             {
-                LogException(ex);
+                this.pluginManager.Log.Log(ex);
             }
         }
 
-        public virtual void OnSessionEndedMsg(MsgSessionEnded msg)
+        public virtual void OnSessionEnded(MsgSessionEnded msg)
         {
         }
 
-        public virtual void OnCarInfoMsg(MsgCarInfo msg)
+        public virtual void OnCarInfo(MsgCarInfo msg)
         {
         }
 
         #endregion
 
-        #region some static helper methods
+
+        #region some helper methods
+
+        private long GetLastLapTimestamp(DriverReport driver)
+        {
+            LapReport lapReport = this.currentSession.Laps.Where(l => l.ConnectionId == driver.ConnectionId && l.LapNo == driver.LapCount).FirstOrDefault();
+            if (lapReport != null)
+            {
+                return lapReport.Timestamp;
+            }
+            return long.MaxValue;
+        }
 
         private static Single3 ToSingle3(MsgClientEvent.Vector3f vec)
         {

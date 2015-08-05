@@ -14,15 +14,15 @@ namespace AC_TrackCycle
     {
         private readonly TrackCyclerForm form;
 
-        public GuiReportPlugin(TrackCyclerForm form, LogWriter logWriter, IConfigManager config = null)
-            : base(logWriter, config)
+        public GuiReportPlugin(TrackCyclerForm form, LogWriter logWriter)
+            : base(logWriter)
         {
             this.form = form;
         }
 
-        public override void OnNewSessionMsg(MsgNewSession msg)
+        public override void OnNewSession(MsgNewSession msg)
         {
-            base.OnNewSessionMsg(msg);
+            base.OnNewSession(msg);
 
             if (msg != null)
             {

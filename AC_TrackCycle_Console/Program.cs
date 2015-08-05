@@ -5,6 +5,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Configuration;
+using acPlugins4net;
 
 namespace AC_TrackCycle_Console
 {
@@ -57,6 +58,7 @@ namespace AC_TrackCycle_Console
             }
 
             LogWriter logWriter = new LogWriter(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"));
+            AcServerPluginManager pluginManager = new AcServerPluginManager();
             ReportPlugin plugin = new ReportPlugin(logWriter);
 
             try
@@ -68,7 +70,8 @@ namespace AC_TrackCycle_Console
                 Console.WriteLine("Could not load SessionReportHandler");
             }
 
-            trackCycler = new TrackCycler(serverfolder, plugin, logWriter);
+            pluginManager.AddPlugin(plugin);
+            trackCycler = new TrackCycler(serverfolder, pluginManager, logWriter);
 
             // Some biolerplate to react to close window event, CTRL-C, kill, etc
             _handler += new EventHandler(Handler);
@@ -93,12 +96,11 @@ namespace AC_TrackCycle_Console
                 }
                 else
                 {
-                    plugin.BroadcastChatMessage(line);
+                    pluginManager.BroadcastChatMessage(line);
                 }
             }
 
             trackCycler.StopServer();
-            plugin.Disconnect();
             logWriter.StopLogging();
         }
     }

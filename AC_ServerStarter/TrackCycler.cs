@@ -1,4 +1,5 @@
 ﻿using AC_SessionReportPlugin;
+using acPlugins4net;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -23,7 +24,7 @@ namespace AC_ServerStarter
         private readonly List<string> iniLines = new List<string>();
         private readonly List<object> Sessions = new List<object>();
 
-        private readonly ReportPlugin plugin;
+        private readonly AcServerPluginManager pluginManager;
         private readonly LogWriter logWriter;
 
         //private readonly List<string> admins = new List<string>(); //not used, you have to pass the admin password everytime for /next_track and /change_track, e.g. "/next_track <mypassword>" or /change_track <mypassword> spa
@@ -43,12 +44,12 @@ namespace AC_ServerStarter
 
         public bool AutoChangeTrack { get; set; }
 
-        public TrackCycler(string serverfolder, ReportPlugin plugin, LogWriter logWriter)
+        public TrackCycler(string serverfolder, AcServerPluginManager pluginManager, LogWriter logWriter)
         {
             this.serverfolder = serverfolder;
             this.server_cfg = Path.Combine(serverfolder, @"cfg\server_cfg.ini");
             this.entry_list = Path.Combine(serverfolder, @"cfg\entry_list.ini");
-            this.plugin = plugin;
+            this.pluginManager = pluginManager;
             this.logWriter = logWriter;
             this.AutoChangeTrack = true;
 
@@ -147,11 +148,7 @@ namespace AC_ServerStarter
 
         public void StartServer()
         {
-            this.StopServer();
-            if (this.plugin != null && this.plugin.IsConnected)
-            {
-                this.plugin.Disconnect();
-            }
+            this.StopServer();            
 
             if (this.HasCycle)
             {
@@ -215,13 +212,14 @@ namespace AC_ServerStarter
             ReadCfg(this.server_cfg, false, out servername, out adminpw, out track, out layout, out laps, ref tmpS, ref tmpL);
             this.setAdminCommands(adminpw);
 
-            if (this.plugin != null)
+            if (this.pluginManager != null)
             {
-                this.plugin.ServerName = servername;
-                this.plugin.CurrentTrack = track;
-                this.plugin.CurrentTrackLayout = layout;
+                this.pluginManager.ServerName = servername;
+                this.pluginManager.Track = track;
+                this.pluginManager.TrackLayout = layout;
+                //this.pluginManager.MaxClients = maxClients;
 
-                this.plugin.Connect();
+                this.pluginManager.Connect();
             }
 
             this.serverInstance = new Process();
@@ -322,9 +320,9 @@ namespace AC_ServerStarter
                             {
                                 msg = msg.Substring(0, endix);
                             }
-                            if (this.plugin != null && this.plugin.IsConnected)
+                            if (this.pluginManager != null && this.pluginManager.IsConnected)
                             {
-                                this.plugin.BroadcastChatMessage(msg);
+                                this.pluginManager.BroadcastChatMessage(msg);
                             }
                         }
                     }
@@ -343,10 +341,10 @@ namespace AC_ServerStarter
         {
             if (this.HasCycle)
             {
-                if (this.plugin != null && this.plugin.IsConnected)
+                if (this.pluginManager != null && this.pluginManager.IsConnected)
                 {
                     Thread.Sleep(1000);
-                    this.plugin.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
+                    this.pluginManager.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
                     Thread.Sleep(2000);
                 }
                 this.cycle = index;
@@ -361,6 +359,11 @@ namespace AC_ServerStarter
 
         public void StopServer()
         {
+            if (this.pluginManager != null && this.pluginManager.IsConnected)
+            {
+                this.pluginManager.Disconnect();
+            }
+
             if (this.serverInstance != null && !this.serverInstance.HasExited)
             {
                 this.serverInstance.Kill();

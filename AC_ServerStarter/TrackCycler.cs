@@ -54,8 +54,8 @@ namespace AC_ServerStarter
                 this.serverExe = "acServer.exe";
             }
 
-            this.server_cfg = Path.Combine(serverfolder, @"cfg\server_cfg.ini");
-            this.entry_list = Path.Combine(serverfolder, @"cfg\entry_list.ini");
+            this.server_cfg = Path.Combine(serverfolder, "cfg", "server_cfg.ini");
+            this.entry_list = Path.Combine(serverfolder, "cfg", "entry_list.ini");
             this.pluginManager = pluginManager;
             this.logWriter = logWriter;
             this.AutoChangeTrack = true;

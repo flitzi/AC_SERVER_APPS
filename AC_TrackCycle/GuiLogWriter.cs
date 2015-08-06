@@ -1,35 +1,33 @@
-﻿using AC_SessionReportPlugin;
-using acPlugins4net.messages;
-using System;
-using AC_ServerStarter;
-using AC_SessionReport;
+﻿using System;
+using acPlugins4net.helpers;
 
 namespace AC_TrackCycle
 {
-    public class GuiLogWriter : LogWriter
+    public class GuiLogWriter : FileLogWriter
     {
         private readonly TrackCyclerForm form;
-
         public bool LogMessagesToFile = true;
 
-        public GuiLogWriter(TrackCyclerForm form, string logDirectory) : base(logDirectory)
+        public GuiLogWriter(TrackCyclerForm form, string defaultLogDirectory, string filePath)
+            : base(defaultLogDirectory, filePath)
         {
             this.form = form;
         }
 
-        public override void LogMessage(string message)
+        public override void Log(string message)
         {
-            if (LogMessagesToFile)
+            if (this.LogMessagesToFile)
             {
-                base.LogMessage(message);
+                base.Log(message);
             }
             this.form.BeginInvoke(new Action<string>(this.form.WriteMessage), message);
         }
 
-        public override void LogException(Exception ex)
+        public override void Log(Exception ex)
         {
-            base.LogException(ex);
-            this.form.BeginInvoke(new Action<string>(this.form.WriteMessage), "Error: " + ex.Message + Environment.NewLine + ex.StackTrace);
+            string str = GetExceptionString(ex);
+            this.LogMessageToFile(str);
+            this.form.BeginInvoke(new Action<string>(this.form.WriteMessage), str);
         }
     }
 }

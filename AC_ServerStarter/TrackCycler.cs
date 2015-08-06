@@ -1,34 +1,28 @@
-﻿using AC_SessionReportPlugin;
-using acPlugins4net;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
+using acPlugins4net;
+using acPlugins4net.helpers;
 
 namespace AC_ServerStarter
 {
     public delegate void MessageReceived(string message);
+
     public delegate void TrackChanged(RaceSession session);
 
     public class TrackCycler
     {
         private readonly string serverfolder, server_cfg, entry_list;
-
         private readonly object lockObject = new object();
-
         private readonly List<string> iniLines = new List<string>();
         private readonly List<object> Sessions = new List<object>();
-
         private readonly AcServerPluginManager pluginManager;
-        private readonly LogWriter logWriter;
+        private readonly IFileLog logWriter;
 
         //private readonly List<string> admins = new List<string>(); //not used, you have to pass the admin password everytime for /next_track and /change_track, e.g. "/next_track <mypassword>" or /change_track <mypassword> spa
-
         private string next_trackCommand, change_trackCommand, send_chatCommand;
 
         public bool HasCycle
@@ -41,10 +35,9 @@ namespace AC_ServerStarter
 
         private int cycle;
         private Process serverInstance;
-
         public bool AutoChangeTrack { get; set; }
 
-        public TrackCycler(string serverfolder, AcServerPluginManager pluginManager, LogWriter logWriter)
+        public TrackCycler(string serverfolder, AcServerPluginManager pluginManager, IFileLog logWriter)
         {
             this.serverfolder = serverfolder;
             this.server_cfg = Path.Combine(serverfolder, @"cfg\server_cfg.ini");
@@ -76,7 +69,16 @@ namespace AC_ServerStarter
             }
         }
 
-        private static void ReadCfg(string cfg, bool readTrackCycle, out string servername, out string adminpw, out string track, out string layout, out int laps, ref List<object> sessions, ref List<string> iniLines)
+        private static void ReadCfg(
+            string cfg,
+            bool readTrackCycle,
+            out string servername,
+            out string adminpw,
+            out string track,
+            out string layout,
+            out int laps,
+            ref List<object> sessions,
+            ref List<string> iniLines)
         {
             servername = "AC server";
             adminpw = "pippo";
@@ -118,7 +120,8 @@ namespace AC_ServerStarter
                 {
                     if (line.StartsWith("TRACKS=", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        foreach (string parts in line.Substring(line.IndexOf("=") + 1).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                        foreach (
+                            string parts in line.Substring(line.IndexOf("=") + 1).Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
                         {
                             string[] part = parts.Split(',');
                             string ctrack = part[0].Trim();
@@ -148,7 +151,7 @@ namespace AC_ServerStarter
 
         public void StartServer()
         {
-            this.StopServer();            
+            this.StopServer();
 
             if (this.HasCycle)
             {
@@ -223,12 +226,12 @@ namespace AC_ServerStarter
             }
 
             this.serverInstance = new Process();
-            this.serverInstance.StartInfo.FileName = Path.Combine(serverfolder, "acServer.exe");
-            this.serverInstance.StartInfo.WorkingDirectory = serverfolder;
+            this.serverInstance.StartInfo.FileName = Path.Combine(this.serverfolder, "acServer.exe");
+            this.serverInstance.StartInfo.WorkingDirectory = this.serverfolder;
             this.serverInstance.StartInfo.RedirectStandardOutput = true;
             this.serverInstance.StartInfo.UseShellExecute = false;
             this.serverInstance.StartInfo.CreateNoWindow = true;
-            this.serverInstance.OutputDataReceived += process_OutputDataReceived;
+            this.serverInstance.OutputDataReceived += this.process_OutputDataReceived;
             this.serverInstance.Start();
             this.serverInstance.BeginOutputReadLine();
         }
@@ -236,12 +239,12 @@ namespace AC_ServerStarter
         private void process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             string message = e.Data;
-            Task.Run(() => processAsync(message));
+            ThreadPool.QueueUserWorkItem(o => this.processAsync(message));
         }
 
         private void processAsync(string message)
         {
-            lock (lockObject)
+            lock (this.lockObject)
             {
                 try
                 {
@@ -249,7 +252,7 @@ namespace AC_ServerStarter
                     {
                         if (this.logWriter != null)
                         {
-                            this.logWriter.LogMessage(message);
+                            this.logWriter.Log(message);
                         }
 
                         if (this.AutoChangeTrack && message == "HasSentRaceoverPacket, move to the next session")
@@ -331,7 +334,7 @@ namespace AC_ServerStarter
                 {
                     if (this.logWriter != null)
                     {
-                        this.logWriter.LogException(ex);
+                        this.logWriter.Log(ex);
                     }
                 }
             }

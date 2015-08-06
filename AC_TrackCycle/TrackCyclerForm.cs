@@ -1,14 +1,12 @@
-﻿using AC_SessionReportPlugin;
+﻿using System;
+using System.Configuration;
+using System.IO;
+using System.Reflection;
+using System.Windows.Forms;
+using acPlugins4net;
 using acPlugins4net.messages;
 using AC_ServerStarter;
-using System;
-using System.IO;
-using System.Windows.Forms;
-using System.Configuration;
-using System.Reflection;
-using AC_SessionReport;
-using AC_TrackCycle;
-using acPlugins4net;
+using AC_SessionReportPlugin;
 
 namespace AC_TrackCycle
 {
@@ -17,30 +15,21 @@ namespace AC_TrackCycle
         private readonly GuiLogWriter logWriter;
         private readonly AcServerPluginManager pluginManager;
         private readonly TrackCycler trackCycler;
-
         private int logLength = 0;
 
         public TrackCyclerForm()
         {
             this.InitializeComponent();
 
-            this.logWriter = new GuiLogWriter(this, Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"));
+            this.logWriter = new GuiLogWriter(
+                this,
+                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"),
+                DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log");
             this.logWriter.LogMessagesToFile = this.checkBoxCreateLogs.Checked;
-            this.logWriter.StartLoggingToFile(DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log");
 
             this.pluginManager = new AcServerPluginManager(this.logWriter);
-            GuiReportPlugin plugin = new GuiReportPlugin(this, this.logWriter);
-
-            try
-            {
-                ReportHandlerLoader.LoadHandler(plugin);
-            }
-            catch
-            {
-                MessageBox.Show("Error", "Could not load SessionReportHandler");
-            }
-
-            pluginManager.AddPlugin(plugin);
+            this.pluginManager.AddPlugin(new ReportPlugin());
+            this.pluginManager.AddPlugin(new GuiTrackCyclePlugin(this));
 
             string serverfolder;
             if (File.Exists(Path.Combine(Application.StartupPath, "acServer.exe")))
@@ -53,9 +42,9 @@ namespace AC_TrackCycle
                 serverfolder = ConfigurationManager.AppSettings["acServerDirectory"];
             }
 
-            this.trackCycler = new TrackCycler(serverfolder, pluginManager, logWriter);
+            this.trackCycler = new TrackCycler(serverfolder, this.pluginManager, this.logWriter);
 
-            if (!trackCycler.HasCycle)
+            if (!this.trackCycler.HasCycle)
             {
                 this.buttonNextTrack.Enabled = false;
                 this.checkBoxAutoChangeTrack.Checked = false;
@@ -65,39 +54,41 @@ namespace AC_TrackCycle
             this.trackCycler.AutoChangeTrack = this.checkBoxAutoChangeTrack.Checked;
         }
 
-        public void SetSessionInfo(SessionReport newSession)
+        public void SetSessionInfo(MsgNewSession msg)
         {
-            if (newSession != null)
+            if (msg != null)
             {
-                if (newSession.Type == (byte)MsgNewSession.SessionTypeEnum.Race)
+                if (msg.SessionType == (byte)MsgNewSession.SessionTypeEnum.Race)
                 {
-                    this.textBox_sessionInfo.Text = newSession.SessionName + " " + newSession.RaceLaps + " laps, " + newSession.Weather + ", ambient " + newSession.AmbientTemp + "°, road " + newSession.RoadTemp + "°";
+                    this.textBox_sessionInfo.Text = msg.Name + " " + msg.Laps + " laps, " + msg.Weather + ", ambient " + msg.AmbientTemp
+                                                    + "°, road " + msg.RoadTemp + "°";
                 }
                 else
                 {
-                    this.textBox_sessionInfo.Text = newSession.SessionName + " " + newSession.Time + " min, " + newSession.Weather + ", ambient " + newSession.AmbientTemp + "°, road " + newSession.RoadTemp + "°";
+                    this.textBox_sessionInfo.Text = msg.Name + " " + msg.TimeOfDay + " min, " + msg.Weather + ", ambient " + msg.AmbientTemp
+                                                    + "°, road " + msg.RoadTemp + "°";
                 }
-                this.textBoxCurrentCycle.Text = newSession.TrackName + " " + newSession.TrackConfig;
+                this.textBoxCurrentCycle.Text = this.pluginManager.Track + " " + this.pluginManager.TrackLayout;
             }
         }
 
         public void WriteMessage(string message)
         {
-            if (logLength > 50000)
+            if (this.logLength > 50000)
             {
                 this.textBoxOutput.Text = string.Empty;
-                logLength = 0;
+                this.logLength = 0;
             }
 
             this.textBoxOutput.AppendText(message + Environment.NewLine);
-            logLength++;
+            this.logLength++;
         }
 
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
             this.trackCycler.StopServer();
-            this.logWriter.StopLogging();
+            this.logWriter.StopLoggingToFile();
         }
 
         private void buttonStart_Click(object sender, EventArgs e)
@@ -122,10 +113,10 @@ namespace AC_TrackCycle
 
         private void textBox_chat_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar == 13 && !string.IsNullOrEmpty(textBox_chat.Text) && this.pluginManager.IsConnected)
+            if (e.KeyChar == 13 && !string.IsNullOrEmpty(this.textBox_chat.Text) && this.pluginManager.IsConnected)
             {
-                this.pluginManager.BroadcastChatMessage(textBox_chat.Text);
-                textBox_chat.Text = string.Empty;
+                this.pluginManager.BroadcastChatMessage(this.textBox_chat.Text);
+                this.textBox_chat.Text = string.Empty;
             }
         }
     }

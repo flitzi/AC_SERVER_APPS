@@ -1,18 +1,18 @@
-﻿using AC_SessionReport;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
+using AC_SessionReport;
 
 namespace AC_DBFillerEF
 {
     public class DBFiller : ISessionReportHandler
     {
         //private static int[] ChampionshipPoints = new int[] { 25, 18, 15, 12, 10, 8, 6, 4, 2, 1 };
-
         public void HandleReport(SessionReport report)
         {
             AC_DBEntities entities = new AC_DBEntities();
-            using (var transaction = entities.Database.BeginTransaction())
+            using (DbContextTransaction transaction = entities.Database.BeginTransaction())
             {
                 try
                 {
@@ -34,7 +34,7 @@ namespace AC_DBFillerEF
                     Dictionary<int, DriverReport> driverReportDict = new Dictionary<int, DriverReport>();
                     foreach (DriverReport connection in report.Connections)
                     {
-                        Driver driver = entities.Drivers.Where(d => d.SteamId == connection.SteamId).FirstOrDefault();
+                        Driver driver = entities.Drivers.FirstOrDefault(d => d.SteamId == connection.SteamId);
                         if (driver == null)
                         {
                             driver = new Driver();

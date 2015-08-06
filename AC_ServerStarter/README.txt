@@ -18,7 +18,7 @@ Features:
 Installation:
 -------------
 -Extract the files into your AC/server directory, next to acServer.exe
--If not already installed you need .NET 4.5.2
+-If not already installed you need .NET 4.0
 
 
 Configuration:
@@ -80,6 +80,10 @@ note: chat started with / is not visible to other players
 
 Changelog:
 ----------
+2.1.0
+- changed to .NET 4.0 (Client Profile is sufficient) instead of .NET 4.5.2
+- updated to new AcServerPluginManager
+
 2.0.0 (2015/08/5)
 -new AC 1.2 server plugin functionality
 

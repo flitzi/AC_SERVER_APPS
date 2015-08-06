@@ -1,8 +1,8 @@
-﻿using AC_SessionReport;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using AC_SessionReport;
+using Newtonsoft.Json;
 
 namespace AC_ServerStarter
 {
@@ -17,7 +17,12 @@ namespace AC_ServerStarter
             {
                 Directory.CreateDirectory(dir);
             }
-            StreamWriter writer = new StreamWriter(Path.Combine(dir, new DateTime(report.Timestamp, DateTimeKind.Utc).ToString("yyyyMMdd_HHmmss") + "_" + report.TrackName + "_" + report.SessionName + ".json"));
+            StreamWriter writer =
+                new StreamWriter(
+                    Path.Combine(
+                        dir,
+                        new DateTime(report.Timestamp, DateTimeKind.Utc).ToString("yyyyMMdd_HHmmss") + "_" + report.TrackName + "_"
+                        + report.SessionName + ".json"));
             writer.Write(output);
             writer.Close();
             writer.Dispose();

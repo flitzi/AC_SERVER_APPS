@@ -11,7 +11,6 @@ namespace AC_SessionReport
     public class DriverReport
     {
         private const double MaxSpeed = 150;
-
         public int ConnectionId { get; set; }
         public long ConnectedTimestamp { get; set; }
         public long DisconnectedTimestamp { get; set; }
@@ -29,21 +28,20 @@ namespace AC_SessionReport
         public string Gap { get; set; }
         public int Incidents { get; set; }
         public double Distance { get; set; }
-
         private int lastTime = -1;
         private double lastPosX, lastPosY, lastPosZ;
 
         public void AddDistance(double x, double y, double z)
         {
             int currTime = Environment.TickCount;
-            if (lastTime > 0)
+            if (this.lastTime > 0)
             {
                 double d =
-                    Math.Sqrt((x - lastPosX) * (x - lastPosX)
-                              + (y - lastPosY) * (y - lastPosY)
-                              + (z - lastPosZ) * (z - lastPosZ));
+                    Math.Sqrt(
+                        (x - this.lastPosX) * (x - this.lastPosX) + (y - this.lastPosY) * (y - this.lastPosY)
+                        + (z - this.lastPosZ) * (z - this.lastPosZ));
 
-                double speed = d / (currTime - lastTime) / 1000;
+                double speed = d / (currTime - this.lastTime) / 1000;
 
                 if (speed < MaxSpeed /*&& (msg.Velocity.x != 0 || msg.Velocity.y != 0 || msg.Velocity.z != 0)*/)
                 {
@@ -99,7 +97,6 @@ namespace AC_SessionReport
         public byte AmbientTemp { get; set; }
         public byte RoadTemp { get; set; }
         public string Weather { get; set; }
-
         public List<DriverReport> Connections { get; set; }
         public List<LapReport> Laps { get; set; }
         public List<IncidentReport> Events { get; set; }

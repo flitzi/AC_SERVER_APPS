@@ -1,26 +1,28 @@
-﻿using AC_SessionReportPlugin;
-using AC_ServerStarter;
-using System;
+﻿using System;
+using System.Configuration;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Configuration;
 using acPlugins4net;
+using acPlugins4net.helpers;
+using AC_ServerStarter;
+using AC_SessionReportPlugin;
 
 namespace AC_TrackCycle_Console
 {
-    static class Program
+    internal static class Program
     {
-        static TrackCycler trackCycler;
+        private static TrackCycler trackCycler;
 
         #region Trap application termination
         [DllImport("Kernel32")]
         private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
 
         private delegate bool EventHandler(CtrlType sig);
-        static EventHandler _handler;
 
-        enum CtrlType
+        private static EventHandler _handler;
+
+        private enum CtrlType
         {
             CTRL_C_EVENT = 0,
             CTRL_BREAK_EVENT = 1,
@@ -44,7 +46,7 @@ namespace AC_TrackCycle_Console
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        static void Main()
+        private static void Main()
         {
             string serverfolder;
             if (File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "acServer.exe")))
@@ -57,20 +59,11 @@ namespace AC_TrackCycle_Console
                 serverfolder = ConfigurationManager.AppSettings["acServerDirectory"];
             }
 
-            LogWriter logWriter = new LogWriter(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"));
+            IFileLog logWriter = new FileLogWriter(
+                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"),
+                DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log");
             AcServerPluginManager pluginManager = new AcServerPluginManager();
-            ReportPlugin plugin = new ReportPlugin(logWriter);
-
-            try
-            {
-                ReportHandlerLoader.LoadHandler(plugin);
-            }
-            catch
-            {
-                Console.WriteLine("Could not load SessionReportHandler");
-            }
-
-            pluginManager.AddPlugin(plugin);
+            pluginManager.AddPlugin(new ReportPlugin());
             trackCycler = new TrackCycler(serverfolder, pluginManager, logWriter);
 
             // Some biolerplate to react to close window event, CTRL-C, kill, etc
@@ -101,7 +94,7 @@ namespace AC_TrackCycle_Console
             }
 
             trackCycler.StopServer();
-            logWriter.StopLogging();
+            logWriter.StopLoggingToFile();
         }
     }
 }

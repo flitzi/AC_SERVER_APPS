@@ -17,21 +17,17 @@ Features:
 
 Installation:
 -------------
--Extract the files into your AC/server directory, next to acServer.exe
+-Extract the files into your AC/server directory, next to acServer executable or extract anywhere else and set ac_server_directory in app.exe.config to folder where acServer executable is located
 -If not already installed you need .NET 4.0
 
 
 Configuration:
 --------------
 Plugin for result, report and server chat functionality
--put these lines in the server_cfg.ini
+-put these lines in the server_cfg.ini (you may adjust the ports, the ports are read from the server_cfg.ini)
 
 UDP_PLUGIN_ADDRESS=127.0.0.1:12000
 UDP_PLUGIN_LOCAL_PORT=11000
-
-if you want different ports, you also need to change them in the app.exe.config
-<add key="acServer_port" value="11000"/>
-<add key="plugin_port" value="12000"/>
 
 
 Track Cycle (optional):
@@ -45,16 +41,16 @@ syntax is like this <trackname>,<lapcount>;<trackname>,<lapcount>,<layout>;<trac
 
 cfg Template Cycle (optional):
 
--fill the name of the cfg template folder that includes a server_cfg.ini and/or entry_list.ini in the app.exe.config key templateCycle, separated with ;
+-fill the name of the cfg template folder that includes a server_cfg.ini and/or entry_list.ini in the app.exe.config key template_cycle, separated with ;
 e.g.
-<add key="templateCycle" value="spa_gt3;nurburgring_street_mix"/>
+<add key="template_cycle" value="spa_gt3;nurburgring_street_mix"/>
 
 
 In the app.exe.config you can also specify which incidents are broadcasted, 0=off, 1=only car with car, 2=all
-<add key="BroadcastIncidents" value="2"/>
+<add key="broadcast_incidents" value="2"/>
 
 and you can specify the number of result broadcast positions
-<add key="BroadcastResults" value="10"/>
+<add key="broadcast_results" value="10"/>
 
 -if you uncheck "Change track after race" the track will not be cycled after the race, you can flip this option while the server is running, so if you like to stay on the track for some races just uncheck, if you have enough, check.
 

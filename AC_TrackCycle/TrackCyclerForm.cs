@@ -6,7 +6,6 @@ using System.Windows.Forms;
 using acPlugins4net;
 using acPlugins4net.messages;
 using AC_ServerStarter;
-using AC_SessionReportPlugin;
 
 namespace AC_TrackCycle
 {
@@ -28,21 +27,11 @@ namespace AC_TrackCycle
             this.logWriter.LogMessagesToFile = this.checkBoxCreateLogs.Checked;
 
             this.pluginManager = new AcServerPluginManager(this.logWriter);
-            this.pluginManager.AddPlugin(new ReportPlugin());
+            this.pluginManager.LoadInfoFromServerConfig();
+            this.pluginManager.LoadPluginsFromAppConfig();
             this.pluginManager.AddPlugin(new GuiTrackCyclePlugin(this));
 
-            string serverfolder;
-            if (File.Exists(Path.Combine(Application.StartupPath, "acServer.exe")))
-            {
-                serverfolder = Application.StartupPath;
-            }
-            else
-            {
-                //not used if acServer.exe is found next to this app
-                serverfolder = ConfigurationManager.AppSettings["acServerDirectory"];
-            }
-
-            this.trackCycler = new TrackCycler(serverfolder, this.pluginManager, this.logWriter);
+            this.trackCycler = new TrackCycler(this.pluginManager, this.logWriter);
 
             if (!this.trackCycler.HasCycle)
             {

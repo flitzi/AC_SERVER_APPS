@@ -4,7 +4,7 @@ using System.Reflection;
 using AC_SessionReport;
 using Newtonsoft.Json;
 
-namespace AC_ServerStarter
+namespace AC_SessionReportPlugin
 {
     public class JsonReportWriter : ISessionReportHandler
     {

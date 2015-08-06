@@ -6,7 +6,6 @@ using System.Runtime.InteropServices;
 using acPlugins4net;
 using acPlugins4net.helpers;
 using AC_ServerStarter;
-using AC_SessionReportPlugin;
 
 namespace AC_TrackCycle_Console
 {
@@ -48,23 +47,14 @@ namespace AC_TrackCycle_Console
         [STAThread]
         private static void Main()
         {
-            string serverfolder;
-            if (File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "acServer.exe")))
-            {
-                serverfolder = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-            }
-            else
-            {
-                //not used if acServer.exe is found next to this app
-                serverfolder = ConfigurationManager.AppSettings["acServerDirectory"];
-            }
-
             IFileLog logWriter = new FileLogWriter(
                 Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"),
                 DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log");
-            AcServerPluginManager pluginManager = new AcServerPluginManager();
-            pluginManager.AddPlugin(new ReportPlugin());
-            trackCycler = new TrackCycler(serverfolder, pluginManager, logWriter);
+
+            AcServerPluginManager pluginManager = new AcServerPluginManager(logWriter);
+            pluginManager.LoadInfoFromServerConfig();
+            pluginManager.LoadPluginsFromAppConfig();
+            trackCycler = new TrackCycler(pluginManager, logWriter);
 
             // Some biolerplate to react to close window event, CTRL-C, kill, etc
             _handler += new EventHandler(Handler);

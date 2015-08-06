@@ -20,22 +20,7 @@ namespace AC_SessionReportPlugin
         protected readonly Dictionary<byte, DriverReport> carUsedByDictionary = new Dictionary<byte, DriverReport>();
         protected int nextConnectionId = 1;
         protected SessionReport currentSession = new SessionReport();
-
-        public ReportPlugin()
-        {
-            string sessionReportHandlerType = ConfigurationManager.AppSettings["SessionReportHandler"];
-            if (!string.IsNullOrEmpty(sessionReportHandlerType))
-            {
-                foreach (string handlerTypeStr in sessionReportHandlerType.Split(';'))
-                {
-                    string[] typeInfo = handlerTypeStr.Split(',');
-                    Assembly assembly = Assembly.Load(typeInfo[1]);
-                    Type type = assembly.GetType(typeInfo[0]);
-                    ISessionReportHandler reportHandler = (ISessionReportHandler)Activator.CreateInstance(type);
-                    this.SessionReportHandlers.Add(reportHandler);
-                }
-            }
-        }
+        protected bool loadedHandlersFromConfig;
 
         public virtual bool SessionHasInfo()
         {
@@ -207,8 +192,25 @@ namespace AC_SessionReportPlugin
         protected override void OnInitBase(AcServerPluginManager manager)
         {
             this.pluginManager = manager;
-            this.BroadcastIncidents = manager.Config.GetSettingAsInt("BroadcastIncidents", 0);
-            this.BroadcastResults = manager.Config.GetSettingAsInt("BroadcastResults", 0);
+            this.BroadcastIncidents = manager.Config.GetSettingAsInt("broadcast_incidents", 0);
+            this.BroadcastResults = manager.Config.GetSettingAsInt("broadcast_results", 0);
+
+            if (!loadedHandlersFromConfig)
+            {
+                loadedHandlersFromConfig = true; // only do this the first time
+                string sessionReportHandlerType = manager.Config.GetSetting("session_report_handlers");
+                if (!string.IsNullOrWhiteSpace(sessionReportHandlerType))
+                {
+                    foreach (string handlerTypeStr in sessionReportHandlerType.Split(';'))
+                    {
+                        string[] typeInfo = handlerTypeStr.Split(',');
+                        Assembly assembly = Assembly.Load(typeInfo[1]);
+                        Type type = assembly.GetType(typeInfo[0]);
+                        ISessionReportHandler reportHandler = (ISessionReportHandler)Activator.CreateInstance(type);
+                        this.SessionReportHandlers.Add(reportHandler);
+                    }
+                }
+            }
         }
 
         protected override void OnConnectedBase()

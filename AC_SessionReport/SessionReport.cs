@@ -6,11 +6,47 @@ namespace AC_SessionReport
     public struct Single3
     {
         public float X, Y, Z;
+
+        public Single3(float x, float y, float z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+
+        public float Length()
+        {
+            return (float)Math.Sqrt(X * X + Y * Y + Z * Z);
+        }
+
+        public static Single3 operator +(Single3 a, Single3 b)
+        {
+            return new Single3(a.X + b.X, a.Y + b.Y, a.Z + b.Z);
+        }
+
+        public static Single3 operator -(Single3 a, Single3 b)
+        {
+            return new Single3(a.X - b.X, a.Y - b.Y, a.Z - b.Z);
+        }
+
+        public override string ToString()
+        {
+            return string.Format("{0}, {1}, {2}", X, Y, Z);
+        }
     }
 
     public class DriverReport
     {
-        private const double MaxSpeed = 150;
+        public DriverReport()
+        {
+            this.StartPosNs = double.MinValue;
+            this.LastPosNs = double.MinValue;
+            this.ConnectedTimestamp = -1;
+        }
+
+        private const double MaxSpeed = 250; // m/s
+        private const double MinSpeed = 1;
+
         public int ConnectionId { get; set; }
         public long ConnectedTimestamp { get; set; }
         public long DisconnectedTimestamp { get; set; }
@@ -24,33 +60,39 @@ namespace AC_SessionReport
         public int BestLap { get; set; }
         public int TotalTime { get; set; }
         public short LapCount { get; set; }
+        public short StartPosition { get; set; } // only set for race session
         public short Position { get; set; }
         public string Gap { get; set; }
         public int Incidents { get; set; }
         public double Distance { get; set; }
-        private int lastTime = -1;
-        private double lastPosX, lastPosY, lastPosZ;
+        public double StartPosNs { get; set; }
+        public double LastPosNs { get; set; }
 
-        public void AddDistance(double x, double y, double z)
+        private int lastTime = -1;
+        private Single3 lastPos;
+
+        public void AddDistance(Single3 pos, Single3 vel, double s)
         {
+            if (StartPosNs == double.MinValue)
+            {
+                StartPosNs = s > 0.5 ? s - 1 : s;
+            }
+
             int currTime = Environment.TickCount;
             if (this.lastTime > 0)
             {
-                double d =
-                    Math.Sqrt(
-                        (x - this.lastPosX) * (x - this.lastPosX) + (y - this.lastPosY) * (y - this.lastPosY)
-                        + (z - this.lastPosZ) * (z - this.lastPosZ));
+                double d = (pos - lastPos).Length();
 
                 double speed = d / (currTime - this.lastTime) / 1000;
 
-                if (speed < MaxSpeed /*&& (msg.Velocity.x != 0 || msg.Velocity.y != 0 || msg.Velocity.z != 0)*/)
+                if (speed < MaxSpeed && vel.Length() > MinSpeed)
                 {
                     this.Distance += d;
+                    this.LastPosNs = s;
                 }
             }
-            this.lastPosX = x;
-            this.lastPosY = y;
-            this.lastPosZ = z;
+            this.lastPos = pos;
+
             this.lastTime = currTime;
         }
     }
@@ -81,6 +123,11 @@ namespace AC_SessionReport
     {
         public SessionReport()
         {
+            this.SessionName = "Unknown";
+            this.Type = 0;
+            this.Timestamp = DateTime.UtcNow.Ticks;
+            this.Weather = "Unknown";
+
             this.Connections = new List<DriverReport>();
             this.Laps = new List<LapReport>();
             this.Events = new List<IncidentReport>();

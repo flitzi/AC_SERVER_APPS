@@ -8,6 +8,8 @@ using acPlugins4net.helpers;
 using acPlugins4net.kunos;
 using acPlugins4net.messages;
 using AC_SessionReport;
+using System.IO;
+using System.Threading;
 
 namespace AC_SessionReportPlugin
 {
@@ -17,14 +19,58 @@ namespace AC_SessionReportPlugin
         public readonly List<ISessionReportHandler> SessionReportHandlers = new List<ISessionReportHandler>();
         public int BroadcastIncidents { get; set; }
         public int BroadcastResults { get; set; }
+        public int BroadcastFastestLap { get; set; }
+        public ushort RealTimeUpdateInterval { get; set; }
+        public string WelcomeMessage { get; set; }
+
         protected readonly Dictionary<byte, DriverReport> carUsedByDictionary = new Dictionary<byte, DriverReport>();
         protected int nextConnectionId = 1;
         protected SessionReport currentSession = new SessionReport();
         protected bool loadedHandlersFromConfig;
 
+        protected DriverReport getDriverReportForCarId(byte carId)
+        {
+            DriverReport driverReport;
+            if (!carUsedByDictionary.TryGetValue(carId, out driverReport))
+            {
+                // it seems we missed the OnNewConnection for this driver
+                driverReport = new DriverReport()
+                {
+                    ConnectionId = this.nextConnectionId++,
+                    ConnectedTimestamp = DateTime.UtcNow.Ticks, //obviously not correct but better than nothing
+                    DisconnectedTimestamp = 0,
+                    SteamId = null,
+                    Name = null,
+                    Team = null,
+                    CarId = carId,
+                    CarModel = null,
+                    CarSkin = null,
+                    BallastKG = 0,
+                    BestLap = 0,
+                    TotalTime = 0,
+                    LapCount = 0,
+                    Position = -1,
+                    Gap = null,
+                    Incidents = 0,
+                    Distance = 0.0
+                };
+
+                this.currentSession.Connections.Add(driverReport);
+                this.carUsedByDictionary.Add(driverReport.CarId, driverReport);
+                this.pluginManager.RequestCarInfo(carId);
+            }
+            else if (string.IsNullOrEmpty(driverReport.SteamId))
+            {
+                // it seems we did not yet receive carInfo yet, request again
+                this.pluginManager.RequestCarInfo(carId);
+            }
+
+            return driverReport;
+        }
+
         public virtual bool SessionHasInfo()
         {
-            return this.currentSession.Laps.Count > 0;
+            return this.currentSession.Laps.Count > 0 || this.currentSession.Events.Count > 0;
         }
 
         protected virtual void FinalizeAndStartNewReport()
@@ -33,6 +79,18 @@ namespace AC_SessionReportPlugin
             {
                 if (this.SessionHasInfo())
                 {
+                    // if for some reason we did not get driver info for certain drivers, remove them and any associated laps and incidents
+                    List<DriverReport> invalidDrivers = this.currentSession.Connections.Where(d => string.IsNullOrEmpty(d.SteamId)).ToList();
+                    if (invalidDrivers.Count > 0)
+                    {
+                        foreach (DriverReport d in invalidDrivers)
+                        {
+                            this.currentSession.Connections.Remove(d);
+                            this.currentSession.Laps.RemoveAll(l => l.ConnectionId == d.ConnectionId);
+                            this.currentSession.Events.RemoveAll(e => e.ConnectionId1 == d.ConnectionId || e.ConnectionId2 == d.ConnectionId);
+                        }
+                    }
+
                     // update PlayerConnections with results
                     foreach (DriverReport connection in this.currentSession.Connections)
                     {
@@ -59,10 +117,29 @@ namespace AC_SessionReportPlugin
                     if (this.currentSession.Type == (byte)MsgNewSession.SessionTypeEnum.Race) //if race
                     {
                         short position = 1;
+
+                        // compute start position
+                        foreach (DriverReport connection in this.currentSession.Connections.Where(d => d.ConnectedTimestamp <= this.currentSession.Timestamp).OrderByDescending(d => d.StartPosNs))
+                        {
+                            connection.StartPosition = position++;
+                        }
+
+                        foreach (DriverReport connection in this.currentSession.Connections.Where(d => d.ConnectedTimestamp > this.currentSession.Timestamp).OrderBy(d => d.ConnectedTimestamp))
+                        {
+                            connection.StartPosition = position++;
+                        }
+
+                        // compute end position
+                        position = 1;
                         int winnerlapcount = 0;
                         int winnertime = 0;
-                        foreach (DriverReport connection in
-                            this.currentSession.Connections.OrderByDescending(d => d.LapCount).ThenBy(this.GetLastLapTimestamp))
+
+                        List<DriverReport> sortedDrivers = new List<DriverReport>(this.currentSession.Connections.Count);
+
+                        sortedDrivers.AddRange(this.currentSession.Connections.Where(d => d.LapCount == currentSession.RaceLaps).OrderBy(this.GetLastLapTimestamp));
+                        sortedDrivers.AddRange(this.currentSession.Connections.Where(d => d.LapCount != currentSession.RaceLaps).OrderByDescending(d => d.LapCount).ThenByDescending(d => d.LastPosNs));
+
+                        foreach (DriverReport connection in sortedDrivers)
                         {
                             if (position == 1)
                             {
@@ -84,7 +161,7 @@ namespace AC_SessionReportPlugin
                                 }
                                 else
                                 {
-                                    connection.Gap = winnerlapcount - connection.LapCount + " laps";
+                                    connection.Gap = (winnerlapcount - connection.LapCount) + " laps";
                                 }
                             }
                         }
@@ -182,18 +259,36 @@ namespace AC_SessionReportPlugin
                         };
 
                         this.currentSession.Connections.Add(recreatedConnection);
-                        this.carUsedByDictionary[recreatedConnection.CarId] = recreatedConnection;
                     }
                 }
+
+                // clear the dictionary of cars currently used
+                this.carUsedByDictionary.Clear();
+                foreach (DriverReport recreatedConnection in this.currentSession.Connections)
+                {
+                    this.carUsedByDictionary[recreatedConnection.CarId] = recreatedConnection;
+                }
             }
+        }
+
+        protected virtual string CreateWelcomeMessage(DriverReport driverReport)
+        {
+            if (!string.IsNullOrWhiteSpace(this.WelcomeMessage))
+            {
+                return this.WelcomeMessage.Replace("$DriverName$", driverReport.Name).Replace("$ServerName$", this.pluginManager.ServerName);
+            }
+            return null;
         }
 
         #region AcServerPluginBase overrides
         protected override void OnInitBase(AcServerPluginManager manager)
         {
             this.pluginManager = manager;
-            this.BroadcastIncidents = manager.Config.GetSettingAsInt("broadcast_incidents", 0);
-            this.BroadcastResults = manager.Config.GetSettingAsInt("broadcast_results", 0);
+            this.BroadcastIncidents = manager.Config.GetSettingAsInt("broadcast_incidents", 2);
+            this.BroadcastResults = manager.Config.GetSettingAsInt("broadcast_results", 10);
+            this.BroadcastFastestLap = manager.Config.GetSettingAsInt("broadcast_fastest_lap", 1);
+            this.RealTimeUpdateInterval = (ushort)manager.Config.GetSettingAsInt("realtime_update_interval", 1000);
+            this.WelcomeMessage = manager.Config.GetSetting("welcome_message");
 
             if (!loadedHandlersFromConfig)
             {
@@ -218,6 +313,9 @@ namespace AC_SessionReportPlugin
             this.currentSession.ServerName = this.pluginManager.ServerName;
             this.currentSession.TrackName = this.pluginManager.Track;
             this.currentSession.TrackConfig = this.pluginManager.TrackLayout;
+
+            // wait 3 seconds before sending request to enabled realtime updates (async)
+            this.pluginManager.EnableRealtimeReportAsync(RealTimeUpdateInterval, 3000);
         }
 
         protected override void OnDisconnectedBase()
@@ -231,23 +329,19 @@ namespace AC_SessionReportPlugin
         {
             this.FinalizeAndStartNewReport();
 
-            if (msg != null)
-            {
-                this.currentSession.ServerName = this.pluginManager.ServerName;
-                this.currentSession.TrackName = this.pluginManager.Track;
-                this.currentSession.TrackConfig = this.pluginManager.TrackLayout;
-                this.currentSession.SessionName = msg.Name;
-                this.currentSession.Type = msg.SessionType;
-                this.currentSession.Time = msg.TimeOfDay;
-                this.currentSession.RaceLaps = (short)msg.Laps;
-                this.currentSession.Timestamp = DateTime.UtcNow.Ticks;
-                this.currentSession.AmbientTemp = msg.AmbientTemp;
-                this.currentSession.RoadTemp = msg.RoadTemp;
-                this.currentSession.Weather = msg.Weather;
-            }
-            ;
+            this.currentSession.ServerName = this.pluginManager.ServerName;
+            this.currentSession.TrackName = this.pluginManager.Track;
+            this.currentSession.TrackConfig = this.pluginManager.TrackLayout;
+            this.currentSession.SessionName = msg.Name;
+            this.currentSession.Type = msg.SessionType;
+            this.currentSession.Time = msg.TimeOfDay;
+            this.currentSession.RaceLaps = (short)msg.Laps;
+            this.currentSession.Timestamp = DateTime.UtcNow.Ticks;
+            this.currentSession.AmbientTemp = msg.AmbientTemp;
+            this.currentSession.RoadTemp = msg.RoadTemp;
+            this.currentSession.Weather = msg.Weather;
 
-            this.pluginManager.EnableRealtimeReport(1000);
+            this.pluginManager.EnableRealtimeReport(RealTimeUpdateInterval);
 
             if (this.pluginManager.Logger is IFileLog)
             {
@@ -262,7 +356,7 @@ namespace AC_SessionReportPlugin
             DriverReport newConnection = new DriverReport()
             {
                 ConnectionId = this.nextConnectionId++,
-                ConnectedTimestamp = DateTime.UtcNow.Ticks,
+                ConnectedTimestamp = -1,
                 DisconnectedTimestamp = 0,
                 SteamId = msg.DriverGuid,
                 Name = msg.DriverName,
@@ -291,11 +385,61 @@ namespace AC_SessionReportPlugin
                 this.carUsedByDictionary[msg.CarId] = newConnection;
                 this.pluginManager.Log(new Exception("Car already in used by another driver"));
             }
+
+            // request car info to get additional info and check when driver really is connected
+            this.pluginManager.RequestCarInfo(msg.CarId);
+        }
+
+        protected override void OnCarInfoBase(MsgCarInfo msg)
+        {
+            DriverReport driverReport;
+            if (carUsedByDictionary.TryGetValue(msg.CarId, out driverReport))
+            {
+                driverReport.CarModel = msg.CarModel;
+                driverReport.CarSkin = msg.CarSkin;
+                driverReport.Name = msg.DriverName;
+                driverReport.Team = msg.DriverTeam;
+                driverReport.SteamId = msg.DriverGuid;
+
+                if (driverReport.ConnectedTimestamp == -1)
+                {
+                    if (msg.IsConnected)
+                    {
+                        driverReport.ConnectedTimestamp = DateTime.UtcNow.Ticks;
+                        string welcome = CreateWelcomeMessage(driverReport);
+                        if (!string.IsNullOrWhiteSpace(welcome))
+                        {
+                            foreach (string line in welcome.Split('|'))
+                            {
+                                this.pluginManager.SendChatMessage(msg.CarId, line);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // wait 3 seconds before sending request to get car info again (async)
+                        this.pluginManager.RequestCarInfoAsync(msg.CarId, 3000);
+                    }
+                }
+            }
         }
 
         protected override void OnConnectionClosedBase(MsgConnectionClosed msg)
         {
-            if (!this.carUsedByDictionary.Remove(msg.CarId))
+            DriverReport driverReport;
+            if (this.carUsedByDictionary.TryGetValue(msg.CarId, out driverReport))
+            {
+                if (msg.DriverGuid == msg.DriverGuid)
+                {
+                    driverReport.DisconnectedTimestamp = DateTime.UtcNow.Ticks;
+                    this.carUsedByDictionary.Remove(msg.CarId);
+                }
+                else
+                {
+                    this.pluginManager.Log(new Exception("MsgOnConnectionClosed DriverGuid does not match Guid of connected driver"));
+                }
+            }
+            else
             {
                 this.pluginManager.Log(new Exception("Car was not known to be in use"));
             }
@@ -305,8 +449,19 @@ namespace AC_SessionReportPlugin
         {
             try
             {
-                DriverReport driver = this.carUsedByDictionary[msg.CarId];
-                driver.AddDistance(msg.WorldPosition.x, msg.WorldPosition.x, msg.WorldPosition.z);
+                // ignore updates in the first 3 seconds of the session
+                if (DateTime.UtcNow.Ticks - currentSession.Timestamp > 3 * 10000000)
+                {
+                    DriverReport driver = this.getDriverReportForCarId(msg.CarId);
+                    driver.AddDistance(ToSingle3(msg.WorldPosition), ToSingle3(msg.Velocity), msg.NormalizedSplinePosition);
+
+                    //if (sw == null)
+                    //{
+                    //    sw = new StreamWriter(@"c:\workspace\positions.csv");
+                    //    sw.AutoFlush = true;
+                    //}
+                    //sw.WriteLine(ToSingle3(msg.WorldPosition).ToString() + ", " + ToSingle3(msg.Velocity).Length());
+                }
             }
             catch (Exception ex)
             {
@@ -318,15 +473,15 @@ namespace AC_SessionReportPlugin
         {
             try
             {
-                DriverReport driver = this.carUsedByDictionary[msg.CarId];
+                DriverReport driver = this.getDriverReportForCarId(msg.CarId);
                 bool withOtherCar = msg.Subtype == (byte)ACSProtocol.MessageType.ACSP_CE_COLLISION_WITH_CAR;
 
                 driver.Incidents += withOtherCar ? 2 : 1; // TODO only if relVel > thresh
 
                 DriverReport driver2 = null;
-                if (withOtherCar)
+                if (withOtherCar && msg.OtherCarId >= 0)
                 {
-                    driver2 = this.carUsedByDictionary[msg.OtherCarId];
+                    driver2 = this.getDriverReportForCarId(msg.OtherCarId);
                     driver2.Incidents += 2; // TODO only if relVel > thresh
                 }
 
@@ -370,8 +525,8 @@ namespace AC_SessionReportPlugin
         {
             try
             {
-                DriverReport driver = this.carUsedByDictionary[msg.CarId];
-
+                DriverReport driver = this.getDriverReportForCarId(msg.CarId);
+                driver.LastPosNs = 0.0;
                 byte position = 0;
                 ushort lapNo = 0;
                 for (int i = 0; i < msg.LeaderboardSize; i++)
@@ -384,17 +539,26 @@ namespace AC_SessionReportPlugin
                     }
                 }
 
-                this.currentSession.Laps.Add(
-                    new LapReport()
-                    {
-                        ConnectionId = driver.ConnectionId,
-                        Timestamp = DateTime.UtcNow.Ticks,
-                        LapTime = (int)msg.Laptime,
-                        LapNo = (short)lapNo,
-                        Position = position,
-                        Cuts = msg.Cuts,
-                        Grip = msg.GripLevel
-                    });
+                LapReport lap = new LapReport()
+                {
+                    ConnectionId = driver.ConnectionId,
+                    Timestamp = DateTime.UtcNow.Ticks,
+                    LapTime = (int)msg.Laptime,
+                    LapNo = (short)lapNo,
+                    Position = position,
+                    Cuts = msg.Cuts,
+                    Grip = msg.GripLevel
+                };
+
+                this.currentSession.Laps.Add(lap);
+
+                // check if this is a new fastst lap for this session
+                if (this.BroadcastFastestLap > 0 && lap.Cuts == 0
+                    && this.currentSession.Laps.FirstOrDefault(l => l.Cuts == 0 && l.LapTime < lap.LapTime) == null)
+                {
+                    this.pluginManager.BroadcastChatMessage(
+                            string.Format("{0} has set a new fastest lap: {1}", driver.Name, FormatTimespan(lap.LapTime)));
+                }
             }
             catch (Exception ex)
             {
@@ -415,12 +579,12 @@ namespace AC_SessionReportPlugin
             return long.MaxValue;
         }
 
-        private static Single3 ToSingle3(PluginMessage.Vector3f vec)
+        public static Single3 ToSingle3(PluginMessage.Vector3f vec)
         {
             return new Single3() { X = vec.x, Y = vec.y, Z = vec.z };
         }
 
-        private static string FormatTimespan(int timespan)
+        public static string FormatTimespan(int timespan)
         {
             int minutes = timespan / 1000 / 60;
             double seconds = (timespan - minutes * 1000 * 60) / 1000.0;

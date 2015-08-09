@@ -49,7 +49,8 @@ namespace AC_TrackCycle_Console
         {
             IFileLog logWriter = new FileLogWriter(
                 Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"),
-                DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log");
+                DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log")
+            { LogWithTimestamp = true };
 
             try
             {

@@ -23,7 +23,8 @@ namespace AC_TrackCycle
             this.logWriter = new GuiLogWriter(
                 this,
                 Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"),
-                DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log");
+                DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log")
+            { LogWithTimestamp = true };
             this.logWriter.LogMessagesToFile = this.checkBoxCreateLogs.Checked;
 
             this.pluginManager = new AcServerPluginManager(this.logWriter);

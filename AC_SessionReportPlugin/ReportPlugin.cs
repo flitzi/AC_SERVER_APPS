@@ -41,18 +41,18 @@ namespace AC_SessionReportPlugin
                     ConnectionId = this.nextConnectionId++,
                     ConnectedTimestamp = DateTime.UtcNow.Ticks, //obviously not correct but better than nothing
                     DisconnectedTimestamp = 0,
-                    SteamId = null,
-                    Name = null,
-                    Team = null,
+                    SteamId = string.Empty,
+                    Name = string.Empty,
+                    Team = string.Empty,
                     CarId = carId,
-                    CarModel = null,
-                    CarSkin = null,
+                    CarModel = string.Empty,
+                    CarSkin = string.Empty,
                     BallastKG = 0,
                     BestLap = 0,
                     TotalTime = 0,
                     LapCount = 0,
                     Position = -1,
-                    Gap = null,
+                    Gap = string.Empty,
                     Incidents = 0,
                     Distance = 0.0
                 };
@@ -202,8 +202,8 @@ namespace AC_SessionReportPlugin
                                 string.Format(
                                     "{0}   {1}\t{2}\t{3}\t{4}\t{5}",
                                     d.Position.ToString("00"),
-                                    d.Name,
-                                    d.CarModel,
+                                    d.Name.Length <= 10 ? d.Name : d.Name.Substring(0, 10),
+                                    d.CarModel.Length <= 10 ? d.CarModel : d.CarModel.Substring(0, 10),
                                     d.Gap,
                                     FormatTimespan(d.BestLap),
                                     d.Incidents));
@@ -251,7 +251,7 @@ namespace AC_SessionReportPlugin
                             TotalTime = 0,
                             LapCount = 0,
                             Position = -1,
-                            Gap = null,
+                            Gap = string.Empty,
                             Incidents = 0,
                             Distance = 0.0
                         };
@@ -282,7 +282,7 @@ namespace AC_SessionReportPlugin
         protected override void OnInitBase(AcServerPluginManager manager)
         {
             this.pluginManager = manager;
-            this.BroadcastIncidents = manager.Config.GetSettingAsInt("broadcast_incidents", 2);
+            this.BroadcastIncidents = manager.Config.GetSettingAsInt("broadcast_incidents", 0);
             this.BroadcastResults = manager.Config.GetSettingAsInt("broadcast_results", 10);
             this.BroadcastFastestLap = manager.Config.GetSettingAsInt("broadcast_fastest_lap", 1);
             this.RealTimeUpdateInterval = (ushort)manager.Config.GetSettingAsInt("realtime_update_interval", 1000);
@@ -358,7 +358,7 @@ namespace AC_SessionReportPlugin
                 DisconnectedTimestamp = 0,
                 SteamId = msg.DriverGuid,
                 Name = msg.DriverName,
-                Team = null, // missing in msg
+                Team = string.Empty, // missing in msg
                 CarId = msg.CarId,
                 CarModel = msg.CarModel,
                 CarSkin = msg.CarSkin,
@@ -367,7 +367,7 @@ namespace AC_SessionReportPlugin
                 TotalTime = 0,
                 LapCount = 0,
                 Position = -1,
-                Gap = null,
+                Gap = string.Empty,
                 Incidents = 0,
                 Distance = 0.0
             };

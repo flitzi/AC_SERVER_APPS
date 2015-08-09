@@ -20,7 +20,7 @@ namespace AC_TrackCycle
             {
                 base.Log(message);
             }
-            else if (this.LogToConsole)
+            else if (this.CopyToConsole)
             {
                 Console.WriteLine(message);
             }
@@ -31,10 +31,6 @@ namespace AC_TrackCycle
         {
             string str = GetExceptionString(ex);
             this.LogMessageToFile(str);
-            if (this.LogToConsole)
-            {
-                Console.WriteLine(str);
-            }
             this.form.BeginInvoke(new Action<string>(this.form.WriteMessage), str);
         }
     }

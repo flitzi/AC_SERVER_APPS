@@ -14,7 +14,7 @@
         <EntityTypeShape EntityType="AC_DBModel.Result" Width="1.5" PointX="4.125" PointY="0.5" IsExpanded="true" />
         <AssociationConnector Association="AC_DBModel.SessionResult" />
         <AssociationConnector Association="AC_DBModel.DriverResult" />
-        <EntityTypeShape EntityType="AC_DBModel.Incident" Width="1.5" PointX="12.125" PointY="2.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="AC_DBModel.Incident" Width="1.5" PointX="8.625" PointY="1.25" IsExpanded="true" />
         <AssociationConnector Association="AC_DBModel.SessionIncidents" />
         <AssociationConnector Association="AC_DBModel.DriverIncident1" />
         <AssociationConnector Association="AC_DBModel.DriverIncidents2" />

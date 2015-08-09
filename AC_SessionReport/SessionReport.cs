@@ -65,6 +65,7 @@ namespace AC_SessionReport
         public string Gap { get; set; }
         public int Incidents { get; set; }
         public double Distance { get; set; }
+        public double TopSpeed { get; set; }
         public double StartPosNs { get; set; }
         public double LastPosNs { get; set; }
 
@@ -78,6 +79,12 @@ namespace AC_SessionReport
                 StartPosNs = s > 0.5 ? s - 1 : s;
             }
 
+            double currentSpeed = vel.Length();
+            if (currentSpeed < MaxSpeed && currentSpeed > TopSpeed)
+            {
+                this.TopSpeed = currentSpeed;
+            }
+
             int currTime = Environment.TickCount;
             if (this.lastTime > 0)
             {
@@ -85,7 +92,7 @@ namespace AC_SessionReport
 
                 double speed = d / (currTime - this.lastTime) / 1000;
 
-                if (speed < MaxSpeed && vel.Length() > MinSpeed)
+                if (speed < MaxSpeed && currentSpeed > MinSpeed)
                 {
                     this.Distance += d;
                     this.LastPosNs = s;
@@ -121,8 +128,11 @@ namespace AC_SessionReport
 
     public class SessionReport
     {
+        public const string Version = "1.1.0";
+
         public SessionReport()
         {
+            this.ReportVersion = Version;
             this.SessionName = "Unknown";
             this.Type = 0;
             this.Timestamp = DateTime.UtcNow.Ticks;
@@ -133,6 +143,7 @@ namespace AC_SessionReport
             this.Events = new List<IncidentReport>();
         }
 
+        public string ReportVersion { get; set; }
         public string ServerName { get; set; }
         public string TrackName { get; set; }
         public string TrackConfig { get; set; }

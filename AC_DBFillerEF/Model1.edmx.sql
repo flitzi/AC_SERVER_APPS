@@ -2,7 +2,7 @@
 -- --------------------------------------------------
 -- Entity Designer DDL Script for SQL Server 2005, 2008, 2012 and Azure
 -- --------------------------------------------------
--- Date Created: 08/04/2015 22:09:18
+-- Date Created: 08/09/2015 10:10:59
 -- Generated from EDMX file: C:\Users\Tom\Documents\GitHub\AC_SERVER_APPS\AC_DBFillerEF\Model1.edmx
 -- --------------------------------------------------
 
@@ -112,11 +112,13 @@ CREATE TABLE [dbo].[Results] (
     [SessionId] int  NOT NULL,
     [DriverId] int  NOT NULL,
     [Car] nvarchar(max)  NOT NULL,
+    [StartPosition] smallint  NOT NULL,
     [Position] smallint  NOT NULL,
     [IncidentCount] int  NOT NULL,
     [Distance] int  NOT NULL,
     [LapCount] smallint  NOT NULL,
-    [Gap] nvarchar(max)  NULL
+    [Gap] nvarchar(max)  NULL,
+    [TopSpeed] smallint  NOT NULL
 );
 GO
 

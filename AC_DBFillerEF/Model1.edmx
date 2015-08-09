@@ -91,11 +91,13 @@
     <Property Name="SessionId" Type="int" Nullable="false" />
     <Property Name="DriverId" Type="int" Nullable="false" />
     <Property Name="Car" Type="nvarchar(max)" Nullable="false" />
+    <Property Name="StartPosition" Type="smallint" Nullable="false" />
     <Property Name="Position" Type="smallint" Nullable="false" />
     <Property Name="IncidentCount" Type="int" Nullable="false" />
     <Property Name="Distance" Type="int" Nullable="false" />
     <Property Name="LapCount" Type="smallint" Nullable="false" />
     <Property Name="Gap" Type="nvarchar(max)" Nullable="true" />
+    <Property Name="TopSpeed" Type="smallint" Nullable="false" />
   </EntityType>
   <EntityType Name="Incidents">
     <Key>
@@ -319,6 +321,7 @@
           <Property Name="SessionId" Type="Int32" Nullable="false" />
           <Property Name="DriverId" Type="Int32" Nullable="false" />
           <Property Name="Car" Type="String" Nullable="false" />
+          <Property Name="StartPosition" Type="Int16" Nullable="false" />
           <Property Name="Position" Type="Int16" Nullable="false" />
           <NavigationProperty Name="Session" Relationship="AC_DBModel.SessionResult" FromRole="Result" ToRole="Session" />
           <NavigationProperty Name="Driver" Relationship="AC_DBModel.DriverResult" FromRole="Result" ToRole="Driver" />
@@ -326,6 +329,7 @@
           <Property Name="Distance" Nullable="false" Type="Int32" />
           <Property Name="LapCount" Type="Int16" Nullable="false" />
           <Property Name="Gap" Type="String" Nullable="true" />
+          <Property Name="TopSpeed" Type="Int16" Nullable="false" />
         </EntityType>
         <Association Name="SessionResult">
           <End Type="AC_DBModel.Session" Role="Session" Multiplicity="1" />
@@ -464,11 +468,13 @@
           <ScalarProperty Name="SessionId" ColumnName="SessionId" />
           <ScalarProperty Name="DriverId" ColumnName="DriverId" />
           <ScalarProperty Name="Car" ColumnName="Car" />
+          <ScalarProperty Name="StartPosition" ColumnName="StartPosition" />
           <ScalarProperty Name="Position" ColumnName="Position" />
           <ScalarProperty Name="IncidentCount" ColumnName="IncidentCount" />
           <ScalarProperty Name="Distance" ColumnName="Distance" />
           <ScalarProperty Name="LapCount" ColumnName="LapCount" />
           <ScalarProperty Name="Gap" ColumnName="Gap" />
+          <ScalarProperty Name="TopSpeed" ColumnName="TopSpeed" />
         </MappingFragment>
       </EntityTypeMapping>
     </EntitySetMapping>

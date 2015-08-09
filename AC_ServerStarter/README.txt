@@ -12,6 +12,8 @@ Features:
 •server chat per admin command (new since 2.0)
 •results displayed as server chat messages including best lap and incidents (new since 2.0)
 •near real-time incident report as server chat message including involved cars and impact speed (new since 2.0)
+•live fastest lap in session broadcast (new since 2.1)
+•driver welcome message (new since 2.1)
 •complete C# source code on https://github.com/flitzi/AC_SERVER_APPS
 
 
@@ -49,8 +51,14 @@ e.g.
 In the app.exe.config you can also specify which incidents are broadcasted, 0=off, 1=only car with car, 2=all
 <add key="broadcast_incidents" value="2"/>
 
-and you can specify the number of result broadcast positions
+You can specify the number of result broadcast positions
 <add key="broadcast_results" value="10"/>
+
+You can specify whether fastest lap set in session should be broadcasted live, 0=off, 1=on
+<add key="broadcast_fastest_lap" value="1"/>
+
+You can specify the welcome message. For multiple lines use the | for line breaks. To disable set to empty string.
+<add key="welcome_message" value="Welcome $DriverName$ to $ServerName$!|Please drive respectfully!"/>
 
 -if you uncheck "Change track after race" the track will not be cycled after the race, you can flip this option while the server is running, so if you like to stay on the track for some races just uncheck, if you have enough, check.
 
@@ -76,23 +84,27 @@ note: chat started with / is not visible to other players
 
 Changelog:
 ----------
-2.1.0
+2.1.0 (2015/08/9)
 - changed to .NET 4.0 (Client Profile is sufficient) instead of .NET 4.5.2
-- updated to new AcServerPluginManager
+- updated to new AcServerPluginManager, allowing multiple internal and external plugins to be configured in exe.config
+- added live fastest lap in session broadcast (new since 2.1)
+- added driver welcome message (new since 2.1)
+- added StartPosition and TopSpeed to SessionReport
+- improved computation of race session position results
 
 2.0.0 (2015/08/5)
--new AC 1.2 server plugin functionality
+- new AC 1.2 server plugin functionality
 
 1.3.0 (2015/05/10)
--added console version
--flushing log file immediately
+- added console version
+- flushing log file immediately
 
 1.2.0 (2015/03/12)
--now possible to use different TRACK_CONFIG
+- now possible to use different TRACK_CONFIG
 
 1.1.0 (2015/03/08)
--option to create logs
--writing log after each track change and flushing log after 50000 lines to prevent high memory usage
+- option to create logs
+- writing log after each track change and flushing log after 50000 lines to prevent high memory usage
 
 1.0.0
--initial release
+- initial release

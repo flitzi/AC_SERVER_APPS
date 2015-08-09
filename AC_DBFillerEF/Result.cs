@@ -18,11 +18,13 @@ namespace AC_DBFillerEF
         public int SessionId { get; set; }
         public int DriverId { get; set; }
         public string Car { get; set; }
+        public short StartPosition { get; set; }
         public short Position { get; set; }
         public int IncidentCount { get; set; }
         public int Distance { get; set; }
         public short LapCount { get; set; }
         public string Gap { get; set; }
+        public short TopSpeed { get; set; }
     
         public virtual Session Session { get; set; }
         public virtual Driver Driver { get; set; }

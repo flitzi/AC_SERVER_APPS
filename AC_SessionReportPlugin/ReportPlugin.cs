@@ -15,6 +15,8 @@ namespace AC_SessionReportPlugin
 {
     public class ReportPlugin : AcServerPluginBase
     {
+        public const string Version = SessionReport.Version; // for now use same version
+
         protected AcServerPluginManager pluginManager { get; private set; }
         public readonly List<ISessionReportHandler> SessionReportHandlers = new List<ISessionReportHandler>();
         public int BroadcastIncidents { get; set; }

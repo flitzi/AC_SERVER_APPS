@@ -8,6 +8,9 @@ namespace AC_DBFillerEF
 {
     public class DBFiller : ISessionReportHandler
     {
+        public const string Version = "0.9.1";
+
+
         //private static int[] ChampionshipPoints = new int[] { 25, 18, 15, 12, 10, 8, 6, 4, 2, 1 };
         public void HandleReport(SessionReport report)
         {
@@ -55,11 +58,13 @@ namespace AC_DBFillerEF
                         result.Session = session;
                         result.Driver = driver;
                         result.Car = connection.CarModel;
+                        result.StartPosition = connection.StartPosition;
                         result.Position = connection.Position;
                         result.IncidentCount = connection.Incidents;
                         result.Distance = (int)connection.Distance;
                         result.LapCount = connection.LapCount;
                         result.Gap = connection.Gap;
+                        result.TopSpeed = (short)Math.Round(connection.TopSpeed);
 
                         entities.Results.Add(result);
                     }

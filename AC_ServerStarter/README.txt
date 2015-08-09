@@ -84,6 +84,12 @@ note: chat started with / is not visible to other players
 
 Changelog:
 ----------
+2.1.1 (2015/08/09)
+- fixed problem with results broadcast sometimes screwed up (duplicate lines)
+- truncating long driver and car names in results broadcast
+- disabled BroadCastIncidents by default
+- fixed problem with startpositions in session report
+
 2.1.0 (2015/08/09)
 - changed to .NET 4.0 (Client Profile is sufficient) instead of .NET 4.5.2
 - updated to new AcServerPluginManager, allowing multiple internal and external plugins to be configured in exe.config

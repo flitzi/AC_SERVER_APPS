@@ -445,8 +445,8 @@ namespace AC_SessionReportPlugin
 
         protected override void OnCarUpdateBase(MsgCarUpdate msg)
         {
-            // ignore updates in the first 3 seconds of the session
-            if (DateTime.UtcNow.Ticks - currentSession.Timestamp > 3 * 10000000)
+            // ignore updates in the first 10 seconds of the session
+            if (DateTime.UtcNow.Ticks - currentSession.Timestamp > 10 * 10000000)
             {
                 DriverReport driver = this.getDriverReportForCarId(msg.CarId);
                 driver.AddDistance(ToSingle3(msg.WorldPosition), ToSingle3(msg.Velocity), msg.NormalizedSplinePosition);

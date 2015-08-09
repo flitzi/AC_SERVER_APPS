@@ -17,7 +17,7 @@ namespace AC_ServerStarter
 
     public class TrackCycler
     {
-        public const string Version = "2.1.0";
+        public const string Version = "2.1.1";
 
         private readonly string serverfolder, serverExe, server_cfg, entry_list;
         private readonly object lockObject = new object();

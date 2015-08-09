@@ -51,39 +51,46 @@ namespace AC_TrackCycle_Console
                 Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"),
                 DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log");
 
-            AcServerPluginManager pluginManager = new AcServerPluginManager(logWriter);
-            pluginManager.LoadInfoFromServerConfig();
-            pluginManager.LoadPluginsFromAppConfig();
-            trackCycler = new TrackCycler(pluginManager, logWriter);
-
-            // Some biolerplate to react to close window event, CTRL-C, kill, etc
-            _handler += new EventHandler(Handler);
-            SetConsoleCtrlHandler(_handler, true);
-
-            trackCycler.StartServer();
-            Console.Out.WriteLine("Server running...");
-
-            Console.Out.WriteLine("Write 'next_track' to cycle to the next track.");
-            Console.Out.WriteLine("Write 'exit' to shut the server down.");
-
-            while (true)
+            try
             {
-                string line = Console.ReadLine();
-                if (line.ToLower() == "exit")
-                {
-                    break;
-                }
-                else if (line.ToLower() == "next_track")
-                {
-                    trackCycler.NextTrack();
-                }
-                else
-                {
-                    pluginManager.BroadcastChatMessage(line);
-                }
-            }
+                AcServerPluginManager pluginManager = new AcServerPluginManager(logWriter);
+                pluginManager.LoadInfoFromServerConfig();
+                pluginManager.LoadPluginsFromAppConfig();
+                trackCycler = new TrackCycler(pluginManager, logWriter);
 
-            trackCycler.StopServer();
+                // Some biolerplate to react to close window event, CTRL-C, kill, etc
+                _handler += new EventHandler(Handler);
+                SetConsoleCtrlHandler(_handler, true);
+
+                trackCycler.StartServer();
+                Console.Out.WriteLine("Server running...");
+
+                Console.Out.WriteLine("Write 'next_track' to cycle to the next track.");
+                Console.Out.WriteLine("Write 'exit' to shut the server down.");
+
+                while (true)
+                {
+                    string line = Console.ReadLine();
+                    if (line.ToLower() == "exit")
+                    {
+                        break;
+                    }
+                    else if (line.ToLower() == "next_track")
+                    {
+                        trackCycler.NextTrack();
+                    }
+                    else
+                    {
+                        pluginManager.BroadcastChatMessage(line);
+                    }
+                }
+
+                trackCycler.StopServer();
+            }
+            catch (Exception ex)
+            {
+                logWriter.Log(ex);
+            }
             logWriter.StopLoggingToFile();
         }
     }

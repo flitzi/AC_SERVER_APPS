@@ -19,7 +19,7 @@ Features:
 
 Installation:
 -------------
--Extract the files into your AC/server directory, next to acServer executable or extract anywhere else and set ac_server_directory in app.exe.config to folder where acServer executable is located
+-Extract the files into your AC/server directory, next to acServer executable or extract anywhere else and set ac_server_directory in exe.config to folder where acServer executable is located
 -If not already installed you need .NET 4.0
 
 
@@ -43,12 +43,12 @@ syntax is like this <trackname>,<lapcount>;<trackname>,<lapcount>,<layout>;<trac
 
 cfg Template Cycle (optional):
 
--fill the name of the cfg template folder that includes a server_cfg.ini and/or entry_list.ini in the app.exe.config key template_cycle, separated with ;
+-fill the name of the cfg template folder that includes a server_cfg.ini and/or entry_list.ini in the exe.config key template_cycle, separated with ;
 e.g.
 <add key="template_cycle" value="spa_gt3;nurburgring_street_mix"/>
 
 
-In the app.exe.config you can also specify which incidents are broadcasted, 0=off, 1=only car with car, 2=all
+In the exe.config you can also specify which incidents are broadcasted, 0=off, 1=only car with car, 2=all
 <add key="broadcast_incidents" value="2"/>
 
 You can specify the number of result broadcast positions
@@ -64,7 +64,7 @@ You can specify the welcome message. For multiple lines use the | for line break
 
 -the "Next Track" button switches the track immediately
 
--you can also use admin commands to change the track, just type in the chat
+-you can also use admin commands to change the track while you are in the game, just type in the chat
 
 /next_track myPassword
 /change_track myPassword spa
@@ -84,7 +84,7 @@ note: chat started with / is not visible to other players
 
 Changelog:
 ----------
-2.1.0 (2015/08/9)
+2.1.0 (2015/08/09)
 - changed to .NET 4.0 (Client Profile is sufficient) instead of .NET 4.5.2
 - updated to new AcServerPluginManager, allowing multiple internal and external plugins to be configured in exe.config
 - added live fastest lap in session broadcast (new since 2.1)
@@ -92,7 +92,7 @@ Changelog:
 - added StartPosition and TopSpeed to SessionReport
 - improved computation of race session position results
 
-2.0.0 (2015/08/5)
+2.0.0 (2015/08/05)
 - new AC 1.2 server plugin functionality
 
 1.3.0 (2015/05/10)

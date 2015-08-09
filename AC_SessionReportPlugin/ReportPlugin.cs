@@ -223,10 +223,6 @@ namespace AC_SessionReportPlugin
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                this.pluginManager.Log(ex);
-            }
             finally
             {
                 SessionReport oldSession = this.currentSession;
@@ -449,31 +445,25 @@ namespace AC_SessionReportPlugin
 
         protected override void OnCarUpdateBase(MsgCarUpdate msg)
         {
-            try
+            // ignore updates in the first 3 seconds of the session
+            if (DateTime.UtcNow.Ticks - currentSession.Timestamp > 3 * 10000000)
             {
-                // ignore updates in the first 3 seconds of the session
-                if (DateTime.UtcNow.Ticks - currentSession.Timestamp > 3 * 10000000)
-                {
-                    DriverReport driver = this.getDriverReportForCarId(msg.CarId);
-                    driver.AddDistance(ToSingle3(msg.WorldPosition), ToSingle3(msg.Velocity), msg.NormalizedSplinePosition);
+                DriverReport driver = this.getDriverReportForCarId(msg.CarId);
+                driver.AddDistance(ToSingle3(msg.WorldPosition), ToSingle3(msg.Velocity), msg.NormalizedSplinePosition);
 
-                    //if (sw == null)
-                    //{
-                    //    sw = new StreamWriter(@"c:\workspace\positions.csv");
-                    //    sw.AutoFlush = true;
-                    //}
-                    //sw.WriteLine(ToSingle3(msg.WorldPosition).ToString() + ", " + ToSingle3(msg.Velocity).Length());
-                }
-            }
-            catch (Exception ex)
-            {
-                this.pluginManager.Log(ex);
+                //if (sw == null)
+                //{
+                //    sw = new StreamWriter(@"c:\workspace\positions.csv");
+                //    sw.AutoFlush = true;
+                //}
+                //sw.WriteLine(ToSingle3(msg.WorldPosition).ToString() + ", " + ToSingle3(msg.Velocity).Length());
             }
         }
 
         protected override void OnCollisionBase(MsgClientEvent msg)
         {
-            try
+            // ignore collisions in the first 5 seconds of the session
+            if (DateTime.UtcNow.Ticks - currentSession.Timestamp > 5 * 10000000)
             {
                 DriverReport driver = this.getDriverReportForCarId(msg.CarId);
                 bool withOtherCar = msg.Subtype == (byte)ACSProtocol.MessageType.ACSP_CE_COLLISION_WITH_CAR;
@@ -517,54 +507,43 @@ namespace AC_SessionReportPlugin
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                this.pluginManager.Log(ex);
-            }
         }
 
         protected override void OnLapCompletedBase(MsgLapCompleted msg)
         {
-            try
+            DriverReport driver = this.getDriverReportForCarId(msg.CarId);
+            driver.LastPosNs = 0.0;
+            byte position = 0;
+            ushort lapNo = 0;
+            for (int i = 0; i < msg.LeaderboardSize; i++)
             {
-                DriverReport driver = this.getDriverReportForCarId(msg.CarId);
-                driver.LastPosNs = 0.0;
-                byte position = 0;
-                ushort lapNo = 0;
-                for (int i = 0; i < msg.LeaderboardSize; i++)
+                if (msg.Leaderboard[i].CarId == msg.CarId)
                 {
-                    if (msg.Leaderboard[i].CarId == msg.CarId)
-                    {
-                        position = (byte)(i + 1);
-                        lapNo = msg.Leaderboard[i].Laps;
-                        break;
-                    }
-                }
-
-                LapReport lap = new LapReport()
-                {
-                    ConnectionId = driver.ConnectionId,
-                    Timestamp = DateTime.UtcNow.Ticks,
-                    LapTime = (int)msg.Laptime,
-                    LapNo = (short)lapNo,
-                    Position = position,
-                    Cuts = msg.Cuts,
-                    Grip = msg.GripLevel
-                };
-
-                this.currentSession.Laps.Add(lap);
-
-                // check if this is a new fastst lap for this session
-                if (this.BroadcastFastestLap > 0 && lap.Cuts == 0
-                    && this.currentSession.Laps.FirstOrDefault(l => l.Cuts == 0 && l.LapTime < lap.LapTime) == null)
-                {
-                    this.pluginManager.BroadcastChatMessage(
-                            string.Format("{0} has set a new fastest lap: {1}", driver.Name, FormatTimespan(lap.LapTime)));
+                    position = (byte)(i + 1);
+                    lapNo = msg.Leaderboard[i].Laps;
+                    break;
                 }
             }
-            catch (Exception ex)
+
+            LapReport lap = new LapReport()
             {
-                this.pluginManager.Log(ex);
+                ConnectionId = driver.ConnectionId,
+                Timestamp = DateTime.UtcNow.Ticks,
+                LapTime = (int)msg.Laptime,
+                LapNo = (short)lapNo,
+                Position = position,
+                Cuts = msg.Cuts,
+                Grip = msg.GripLevel
+            };
+
+            this.currentSession.Laps.Add(lap);
+
+            // check if this is a new fastst lap for this session
+            if (this.BroadcastFastestLap > 0 && lap.Cuts == 0
+                && this.currentSession.Laps.FirstOrDefault(l => l.Cuts == 0 && l.LapTime < lap.LapTime) == null)
+            {
+                this.pluginManager.BroadcastChatMessage(
+                        string.Format("{0} has set a new fastest lap: {1}", driver.Name, FormatTimespan(lap.LapTime)));
             }
         }
         #endregion

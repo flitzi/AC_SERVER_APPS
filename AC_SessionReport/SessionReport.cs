@@ -39,13 +39,13 @@ namespace AC_SessionReport
     {
         public DriverReport()
         {
-            this.StartPosNs = double.MinValue;
-            this.LastPosNs = double.MinValue;
+            this.StartPosNs = -1.0;
+            this.LastPosNs = -1.0;
             this.ConnectedTimestamp = -1;
         }
 
-        private const double MaxSpeed = 250; // m/s
-        private const double MinSpeed = 1;
+        private const double MaxSpeed = 1000; // km/h
+        private const double MinSpeed = 5; // km/h
 
         public int ConnectionId { get; set; }
         public long ConnectedTimestamp { get; set; }
@@ -65,7 +65,7 @@ namespace AC_SessionReport
         public string Gap { get; set; }
         public int Incidents { get; set; }
         public double Distance { get; set; }
-        public double TopSpeed { get; set; }
+        public double TopSpeed { get; set; } // km/h
         public double StartPosNs { get; set; }
         public double LastPosNs { get; set; }
 
@@ -74,12 +74,12 @@ namespace AC_SessionReport
 
         public void AddDistance(Single3 pos, Single3 vel, double s)
         {
-            if (StartPosNs == double.MinValue)
+            if (StartPosNs == -1.0)
             {
-                StartPosNs = s > 0.5 ? s - 1 : s;
+                StartPosNs = s > 0.5 ? s - 1.0 : s;
             }
 
-            double currentSpeed = vel.Length();
+            double currentSpeed = vel.Length() * 3.6;
             if (currentSpeed < MaxSpeed && currentSpeed > TopSpeed)
             {
                 this.TopSpeed = currentSpeed;
@@ -90,7 +90,7 @@ namespace AC_SessionReport
             {
                 double d = (pos - lastPos).Length();
 
-                double speed = d / (currTime - this.lastTime) / 1000;
+                double speed = d / (currTime - this.lastTime) / 1000 * 3.6;
 
                 if (speed < MaxSpeed && currentSpeed > MinSpeed)
                 {

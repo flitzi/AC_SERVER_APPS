@@ -87,8 +87,8 @@ Changelog:
 2.1.0 (2015/08/09)
 - changed to .NET 4.0 (Client Profile is sufficient) instead of .NET 4.5.2
 - updated to new AcServerPluginManager, allowing multiple internal and external plugins to be configured in exe.config
-- added live fastest lap in session broadcast (new since 2.1)
-- added driver welcome message (new since 2.1)
+- added live fastest lap in session broadcast
+- added driver welcome message
 - added StartPosition and TopSpeed to SessionReport
 - improved computation of race session position results
 

@@ -44,11 +44,11 @@ namespace AC_TrackCycle
             this.trackCycler.AutoChangeTrack = this.checkBoxAutoChangeTrack.Checked;
         }
 
-        public void SetSessionInfo(MsgNewSession msg)
+        public void SetSessionInfo(MsgSessionInfo msg)
         {
             if (msg != null)
             {
-                if (msg.SessionType == (byte)MsgNewSession.SessionTypeEnum.Race)
+                if (msg.SessionType == (byte)MsgSessionInfo.SessionTypeEnum.Race)
                 {
                     this.textBox_sessionInfo.Text = msg.Name + " " + msg.Laps + " laps, " + msg.Weather + ", ambient " + msg.AmbientTemp
                                                     + "°, road " + msg.RoadTemp + "°";

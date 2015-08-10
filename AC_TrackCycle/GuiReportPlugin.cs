@@ -13,9 +13,9 @@ namespace AC_TrackCycle
             this.form = form;
         }
 
-        protected override void OnNewSessionBase(MsgNewSession msg)
+        protected override void OnNewSessionBase(MsgSessionInfo msg)
         {
-            this.form.BeginInvoke(new Action<MsgNewSession>(this.form.SetSessionInfo), msg);
+            this.form.BeginInvoke(new Action<MsgSessionInfo>(this.form.SetSessionInfo), msg);
         }
     }
 }

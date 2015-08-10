@@ -102,7 +102,7 @@ namespace AC_SessionReportPlugin
                         {
                             connection.BestLap = validLaps.Min(l => l.LapTime);
                         }
-                        else if (this.currentSession.Type != (byte)MsgNewSession.SessionTypeEnum.Race)
+                        else if (this.currentSession.Type != (byte)MsgSessionInfo.SessionTypeEnum.Race)
                         {
                             // temporarily set BestLap to MaxValue for easier sorting for qualifying/practice results
                             connection.BestLap = int.MaxValue;
@@ -116,7 +116,7 @@ namespace AC_SessionReportPlugin
                         }
                     }
 
-                    if (this.currentSession.Type == (byte)MsgNewSession.SessionTypeEnum.Race) //if race
+                    if (this.currentSession.Type == (byte)MsgSessionInfo.SessionTypeEnum.Race) //if race
                     {
                         short position = 1;
 
@@ -323,7 +323,7 @@ namespace AC_SessionReportPlugin
             this.currentSession = new SessionReport();
         }
 
-        protected override void OnNewSessionBase(MsgNewSession msg)
+        protected override void OnNewSessionBase(MsgSessionInfo msg)
         {
             this.FinalizeAndStartNewReport();
 

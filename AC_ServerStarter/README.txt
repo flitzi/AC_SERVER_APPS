@@ -84,6 +84,9 @@ note: chat started with / is not visible to other players
 
 Changelog:
 ----------
+2.1.2
+- updated to new acServer UDP protocol version
+
 2.1.1 (2015/08/09)
 - fixed problem with results broadcast sometimes screwed up (duplicate lines)
 - truncating long driver and car names in results broadcast

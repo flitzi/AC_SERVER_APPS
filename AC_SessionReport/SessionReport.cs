@@ -128,7 +128,7 @@ namespace AC_SessionReport
 
     public class SessionReport
     {
-        public const string Version = "1.1.1";
+        public const string Version = "1.1.2";
 
         public SessionReport()
         {

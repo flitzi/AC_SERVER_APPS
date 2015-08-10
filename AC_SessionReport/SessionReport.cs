@@ -133,17 +133,18 @@ namespace AC_SessionReport
         public SessionReport()
         {
             this.ReportVersion = Version;
+            this.ProtocolVersion = -1;
             this.SessionName = "Unknown";
             this.Type = 0;
             this.Timestamp = DateTime.UtcNow.Ticks;
             this.Weather = "Unknown";
-
             this.Connections = new List<DriverReport>();
             this.Laps = new List<LapReport>();
             this.Events = new List<IncidentReport>();
         }
 
         public string ReportVersion { get; set; }
+        public short ProtocolVersion { get; set; }
         public string ServerName { get; set; }
         public string TrackName { get; set; }
         public string TrackConfig { get; set; }
@@ -151,6 +152,7 @@ namespace AC_SessionReport
         public byte Type { get; set; }
         public int Time { get; set; }
         public short RaceLaps { get; set; }
+        public int WaitTime { get; set; }
         public long Timestamp { get; set; }
         public byte AmbientTemp { get; set; }
         public byte RoadTemp { get; set; }

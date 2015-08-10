@@ -17,7 +17,7 @@ namespace AC_SessionReportPlugin
     {
         public const string Version = SessionReport.Version; // for now use same version
 
-        protected AcServerPluginManager pluginManager { get; private set; }
+        public AcServerPluginManager PluginManager { get; private set; }
         public readonly List<ISessionReportHandler> SessionReportHandlers = new List<ISessionReportHandler>();
         public int BroadcastIncidents { get; set; }
         public int BroadcastResults { get; set; }
@@ -29,6 +29,8 @@ namespace AC_SessionReportPlugin
         protected int nextConnectionId = 1;
         protected SessionReport currentSession = new SessionReport();
         protected bool loadedHandlersFromConfig;
+
+        protected volatile bool hasReceivedSessionInfo;
 
         protected DriverReport getDriverReportForCarId(byte carId)
         {
@@ -59,12 +61,12 @@ namespace AC_SessionReportPlugin
 
                 this.currentSession.Connections.Add(driverReport);
                 this.carUsedByDictionary.Add(driverReport.CarId, driverReport);
-                this.pluginManager.RequestCarInfo(carId);
+                this.PluginManager.RequestCarInfo(carId);
             }
             else if (string.IsNullOrEmpty(driverReport.SteamId))
             {
                 // it seems we did not yet receive carInfo yet, request again
-                this.pluginManager.RequestCarInfo(carId);
+                this.PluginManager.RequestCarInfo(carId);
             }
 
             return driverReport;
@@ -194,11 +196,11 @@ namespace AC_SessionReportPlugin
 
                     if (this.BroadcastResults > 0)
                     {
-                        this.pluginManager.BroadcastChatMessage(this.currentSession.SessionName + " Results:");
-                        this.pluginManager.BroadcastChatMessage("Pos  Name\tCar\tGap\tBestLap\tIncidents");
+                        this.PluginManager.BroadcastChatMessage(this.currentSession.SessionName + " Results:");
+                        this.PluginManager.BroadcastChatMessage("Pos  Name\tCar\tGap\tBestLap\tIncidents");
                         foreach (DriverReport d in this.currentSession.Connections.OrderBy(d => d.Position).Take(this.BroadcastResults))
                         {
-                            this.pluginManager.BroadcastChatMessage(
+                            this.PluginManager.BroadcastChatMessage(
                                 string.Format(
                                     "{0}   {1}\t{2}\t{3}\t{4}\t{5}",
                                     d.Position.ToString("00"),
@@ -218,7 +220,7 @@ namespace AC_SessionReportPlugin
                         }
                         catch (Exception ex)
                         {
-                            this.pluginManager.Log(ex);
+                            this.PluginManager.Log(ex);
                         }
                     }
                 }
@@ -273,15 +275,41 @@ namespace AC_SessionReportPlugin
         {
             if (!string.IsNullOrWhiteSpace(this.WelcomeMessage))
             {
-                return this.WelcomeMessage.Replace("$DriverName$", driverReport.Name).Replace("$ServerName$", this.pluginManager.ServerName);
+                return this.WelcomeMessage.Replace("$DriverName$", driverReport.Name).Replace("$ServerName$", this.PluginManager.ServerName);
             }
             return null;
+        }
+
+        protected virtual void SetSessionInfo(MsgSessionInfo msg, bool startNewLog)
+        {
+            this.hasReceivedSessionInfo = true;
+
+            this.currentSession.ProtocolVersion = msg.Version;
+            this.currentSession.ServerName = msg.ServerName;
+            this.currentSession.TrackName = msg.Track;
+            this.currentSession.TrackConfig = msg.TrackConfig;
+            this.currentSession.SessionName = msg.Name;
+            this.currentSession.Type = msg.SessionType;
+            this.currentSession.Time = msg.TimeOfDay;
+            this.currentSession.RaceLaps = (short)msg.Laps;
+            this.currentSession.WaitTime = msg.WaitTime;
+            this.currentSession.Timestamp = DateTime.UtcNow.Ticks;
+            this.currentSession.AmbientTemp = msg.AmbientTemp;
+            this.currentSession.RoadTemp = msg.RoadTemp;
+            this.currentSession.Weather = msg.Weather;
+
+            if (startNewLog && this.PluginManager.Logger is IFileLog)
+            {
+                ((IFileLog)this.PluginManager.Logger).StartLoggingToFile(
+                    new DateTime(this.currentSession.Timestamp, DateTimeKind.Utc).ToString("yyyyMMdd_HHmmss") + "_"
+                    + this.currentSession.TrackName + "_" + this.currentSession.SessionName + ".log");
+            }
         }
 
         #region AcServerPluginBase overrides
         protected override void OnInitBase(AcServerPluginManager manager)
         {
-            this.pluginManager = manager;
+            this.PluginManager = manager;
             this.BroadcastIncidents = manager.Config.GetSettingAsInt("broadcast_incidents", 0);
             this.BroadcastResults = manager.Config.GetSettingAsInt("broadcast_results", 10);
             this.BroadcastFastestLap = manager.Config.GetSettingAsInt("broadcast_fastest_lap", 1);
@@ -308,12 +336,15 @@ namespace AC_SessionReportPlugin
 
         protected override void OnConnectedBase()
         {
-            this.currentSession.ServerName = this.pluginManager.ServerName;
-            this.currentSession.TrackName = this.pluginManager.Track;
-            this.currentSession.TrackConfig = this.pluginManager.TrackLayout;
-
-            // wait 3 seconds before sending request to enabled realtime updates (async)
-            this.pluginManager.EnableRealtimeReportAsync(RealTimeUpdateInterval, 3000);
+            // if we do not receive the session Info in the next 3 seconds request info (async)
+            ThreadPool.QueueUserWorkItem(o =>
+            {
+                Thread.Sleep(3000);
+                if (!this.hasReceivedSessionInfo)
+                {
+                    this.PluginManager.RequestSessionInfo(-1);
+                }
+            });
         }
 
         protected override void OnDisconnectedBase()
@@ -327,26 +358,19 @@ namespace AC_SessionReportPlugin
         {
             this.FinalizeAndStartNewReport();
 
-            this.currentSession.ServerName = this.pluginManager.ServerName;
-            this.currentSession.TrackName = this.pluginManager.Track;
-            this.currentSession.TrackConfig = this.pluginManager.TrackLayout;
-            this.currentSession.SessionName = msg.Name;
-            this.currentSession.Type = msg.SessionType;
-            this.currentSession.Time = msg.TimeOfDay;
-            this.currentSession.RaceLaps = (short)msg.Laps;
-            this.currentSession.Timestamp = DateTime.UtcNow.Ticks;
-            this.currentSession.AmbientTemp = msg.AmbientTemp;
-            this.currentSession.RoadTemp = msg.RoadTemp;
-            this.currentSession.Weather = msg.Weather;
+            this.SetSessionInfo(msg, true);
 
-            this.pluginManager.EnableRealtimeReport(RealTimeUpdateInterval);
+            this.PluginManager.EnableRealtimeReport(RealTimeUpdateInterval);
+        }
 
-            if (this.pluginManager.Logger is IFileLog)
+        protected override void OnSessionInfoBase(MsgSessionInfo msg)
+        {
+            if(!hasReceivedSessionInfo)
             {
-                ((IFileLog)this.pluginManager.Logger).StartLoggingToFile(
-                    new DateTime(this.currentSession.Timestamp, DateTimeKind.Utc).ToString("yyyyMMdd_HHmmss") + "_"
-                    + this.currentSession.TrackName + "_" + this.currentSession.SessionName + ".log");
+                // first time we received session info, also enable real time update
+                this.PluginManager.EnableRealtimeReport(RealTimeUpdateInterval);
             }
+            this.SetSessionInfo(msg, !hasReceivedSessionInfo);
         }
 
         protected override void OnNewConnectionBase(MsgNewConnection msg)
@@ -381,11 +405,11 @@ namespace AC_SessionReportPlugin
             else
             {
                 this.carUsedByDictionary[msg.CarId] = newConnection;
-                this.pluginManager.Log(new Exception("Car already in used by another driver"));
+                this.PluginManager.Log(new Exception("Car already in used by another driver"));
             }
 
             // request car info to get additional info and check when driver really is connected
-            this.pluginManager.RequestCarInfo(msg.CarId);
+            this.PluginManager.RequestCarInfo(msg.CarId);
         }
 
         protected override void OnCarInfoBase(MsgCarInfo msg)
@@ -398,28 +422,29 @@ namespace AC_SessionReportPlugin
                 driverReport.Name = msg.DriverName;
                 driverReport.Team = msg.DriverTeam;
                 driverReport.SteamId = msg.DriverGuid;
+            }
+        }
 
-                if (driverReport.ConnectedTimestamp == -1)
+        protected override void OnClientLoadedBase(MsgClientLoaded msg)
+        {
+            DriverReport driverReport;
+            if (carUsedByDictionary.TryGetValue(msg.CarId, out driverReport) && driverReport.ConnectedTimestamp == -1)
+            {
+                driverReport.ConnectedTimestamp = DateTime.UtcNow.Ticks;
+                string welcome = CreateWelcomeMessage(driverReport);
+                if (!string.IsNullOrWhiteSpace(welcome))
                 {
-                    if (msg.IsConnected)
+                    foreach (string line in welcome.Split('|'))
                     {
-                        driverReport.ConnectedTimestamp = DateTime.UtcNow.Ticks;
-                        string welcome = CreateWelcomeMessage(driverReport);
-                        if (!string.IsNullOrWhiteSpace(welcome))
-                        {
-                            foreach (string line in welcome.Split('|'))
-                            {
-                                this.pluginManager.SendChatMessage(msg.CarId, line);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        // wait 3 seconds before sending request to get car info again (async)
-                        this.pluginManager.RequestCarInfoAsync(msg.CarId, 3000);
+                        this.PluginManager.SendChatMessage(msg.CarId, line);
                     }
                 }
             }
+        }
+
+        protected override void OnServerErrorBase(MsgError msg)
+        {
+            this.PluginManager.Log("ServerError: " + msg.ErrorMessage);
         }
 
         protected override void OnConnectionClosedBase(MsgConnectionClosed msg)
@@ -434,12 +459,12 @@ namespace AC_SessionReportPlugin
                 }
                 else
                 {
-                    this.pluginManager.Log(new Exception("MsgOnConnectionClosed DriverGuid does not match Guid of connected driver"));
+                    this.PluginManager.Log(new Exception("MsgOnConnectionClosed DriverGuid does not match Guid of connected driver"));
                 }
             }
             else
             {
-                this.pluginManager.Log(new Exception("Car was not known to be in use"));
+                this.PluginManager.Log(new Exception("Car was not known to be in use"));
             }
         }
 
@@ -493,7 +518,7 @@ namespace AC_SessionReportPlugin
                 {
                     if (withOtherCar)
                     {
-                        this.pluginManager.BroadcastChatMessage(
+                        this.PluginManager.BroadcastChatMessage(
                             string.Format(
                                 "Collision between {0} and {1} with {2}km/h",
                                 driver.Name,
@@ -502,7 +527,7 @@ namespace AC_SessionReportPlugin
                     }
                     else if (this.BroadcastIncidents > 1)
                     {
-                        this.pluginManager.BroadcastChatMessage(
+                        this.PluginManager.BroadcastChatMessage(
                             string.Format("{0} crashed into wall with {1}km/h", driver.Name, Math.Round(msg.RelativeVelocity)));
                     }
                 }
@@ -542,7 +567,7 @@ namespace AC_SessionReportPlugin
             if (this.BroadcastFastestLap > 0 && lap.Cuts == 0
                 && this.currentSession.Laps.FirstOrDefault(l => l.Cuts == 0 && l.LapTime < lap.LapTime) == null)
             {
-                this.pluginManager.BroadcastChatMessage(
+                this.PluginManager.BroadcastChatMessage(
                         string.Format("{0} has set a new fastest lap: {1}", driver.Name, FormatTimespan(lap.LapTime)));
             }
         }

@@ -176,7 +176,7 @@ namespace AC_SessionReport
     [DataContract]
     public class SessionReport
     {
-        public const string Version = "1.1.2";
+        public const string Version = "1.2.0";
 
         public SessionReport()
         {

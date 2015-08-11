@@ -20,7 +20,7 @@ namespace AC_ServerStarter
 
     public class TrackCyclePlugin : ReportPlugin
     {
-        public const string TrackCyclePluginVersion = "2.1.2";
+        public const string TrackCyclePluginVersion = "2.2.0";
 
         private string serverfolder, serverExe, server_cfg, entry_list;
         private object lockObject = new object();

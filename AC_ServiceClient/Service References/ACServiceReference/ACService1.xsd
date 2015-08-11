@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:tns="http://schemas.datacontract.org/2004/07/AC_SessionReport" elementFormDefault="qualified" targetNamespace="http://schemas.datacontract.org/2004/07/AC_SessionReport" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="http://localhost:53366/ACService.svc?xsd=xsd1" namespace="http://schemas.microsoft.com/2003/10/Serialization/" />
+  <xs:complexType name="SessionReport">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="AmbientTemp" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="Connections" nillable="true" type="tns:ArrayOfDriverReport" />
+      <xs:element minOccurs="0" name="Events" nillable="true" type="tns:ArrayOfIncidentReport" />
+      <xs:element minOccurs="0" name="Laps" nillable="true" type="tns:ArrayOfLapReport" />
+      <xs:element minOccurs="0" name="ProtocolVersion" type="xs:short" />
+      <xs:element minOccurs="0" name="RaceLaps" type="xs:short" />
+      <xs:element minOccurs="0" name="ReportVersion" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="RoadTemp" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="ServerName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="SessionName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Time" type="xs:int" />
+      <xs:element minOccurs="0" name="Timestamp" type="xs:long" />
+      <xs:element minOccurs="0" name="TrackConfig" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="TrackName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Type" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="WaitTime" type="xs:int" />
+      <xs:element minOccurs="0" name="Weather" nillable="true" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="SessionReport" nillable="true" type="tns:SessionReport" />
+  <xs:complexType name="ArrayOfDriverReport">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DriverReport" nillable="true" type="tns:DriverReport" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDriverReport" nillable="true" type="tns:ArrayOfDriverReport" />
+  <xs:complexType name="DriverReport">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="BallastKG" type="xs:short" />
+      <xs:element minOccurs="0" name="BestLap" type="xs:int" />
+      <xs:element minOccurs="0" name="CarId" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="CarModel" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="CarSkin" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="ConnectedTimestamp" type="xs:long" />
+      <xs:element minOccurs="0" name="ConnectionId" type="xs:int" />
+      <xs:element minOccurs="0" name="DisconnectedTimestamp" type="xs:long" />
+      <xs:element minOccurs="0" name="Distance" type="xs:double" />
+      <xs:element minOccurs="0" name="Gap" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Incidents" type="xs:int" />
+      <xs:element minOccurs="0" name="LapCount" type="xs:short" />
+      <xs:element minOccurs="0" name="LastPosNs" type="xs:double" />
+      <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Position" type="xs:short" />
+      <xs:element minOccurs="0" name="StartPosNs" type="xs:double" />
+      <xs:element minOccurs="0" name="StartPosition" type="xs:short" />
+      <xs:element minOccurs="0" name="SteamId" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Team" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="TopSpeed" type="xs:double" />
+      <xs:element minOccurs="0" name="TotalTime" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DriverReport" nillable="true" type="tns:DriverReport" />
+  <xs:complexType name="ArrayOfIncidentReport">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="IncidentReport" nillable="true" type="tns:IncidentReport" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfIncidentReport" nillable="true" type="tns:ArrayOfIncidentReport" />
+  <xs:complexType name="IncidentReport">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ConnectionId1" type="xs:int" />
+      <xs:element minOccurs="0" name="ConnectionId2" type="xs:int" />
+      <xs:element minOccurs="0" name="ImpactSpeed" type="xs:float" />
+      <xs:element minOccurs="0" name="RelPosition" type="tns:Single3" />
+      <xs:element minOccurs="0" name="Timestamp" type="xs:long" />
+      <xs:element minOccurs="0" name="Type" type="xs:unsignedByte" />
+      <xs:element minOccurs="0" name="WorldPosition" type="tns:Single3" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="IncidentReport" nillable="true" type="tns:IncidentReport" />
+  <xs:complexType name="Single3">
+    <xs:annotation>
+      <xs:appinfo>
+        <IsValueType xmlns="http://schemas.microsoft.com/2003/10/Serialization/">true</IsValueType>
+      </xs:appinfo>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element minOccurs="0" name="X" type="xs:float" />
+      <xs:element minOccurs="0" name="Y" type="xs:float" />
+      <xs:element minOccurs="0" name="Z" type="xs:float" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="Single3" nillable="true" type="tns:Single3" />
+  <xs:complexType name="ArrayOfLapReport">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="LapReport" nillable="true" type="tns:LapReport" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfLapReport" nillable="true" type="tns:ArrayOfLapReport" />
+  <xs:complexType name="LapReport">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="ConnectionId" type="xs:int" />
+      <xs:element minOccurs="0" name="Cuts" type="xs:short" />
+      <xs:element minOccurs="0" name="Grip" type="xs:float" />
+      <xs:element minOccurs="0" name="LapNo" type="xs:short" />
+      <xs:element minOccurs="0" name="LapTime" type="xs:int" />
+      <xs:element minOccurs="0" name="Position" type="xs:short" />
+      <xs:element minOccurs="0" name="Timestamp" type="xs:long" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="LapReport" nillable="true" type="tns:LapReport" />
+</xs:schema>

@@ -1,11 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace AC_SessionReport
 {
+    [DataContract]
     public struct Single3
     {
-        public float X, Y, Z;
+        [DataMember]
+        public float X { get; set; }
+        [DataMember]
+        public float Y { get; set; }
+        [DataMember]
+        public float Z { get; set; }
 
         public Single3(float x, float y, float z)
         {
@@ -35,6 +42,7 @@ namespace AC_SessionReport
         }
     }
 
+    [DataContract]
     public class DriverReport
     {
         public DriverReport()
@@ -47,26 +55,47 @@ namespace AC_SessionReport
         private const double MaxSpeed = 1000; // km/h
         private const double MinSpeed = 5; // km/h
 
+        [DataMember]
         public int ConnectionId { get; set; }
+        [DataMember]
         public long ConnectedTimestamp { get; set; }
+        [DataMember]
         public long DisconnectedTimestamp { get; set; }
+        [DataMember]
         public string SteamId { get; set; }
+        [DataMember]
         public string Name { get; set; }
+        [DataMember]
         public string Team { get; set; } // currently not set
+        [DataMember]
         public byte CarId { get; set; }
+        [DataMember]
         public string CarModel { get; set; }
+        [DataMember]
         public string CarSkin { get; set; }
+        [DataMember]
         public short BallastKG { get; set; } // currently not set
+        [DataMember]
         public int BestLap { get; set; }
+        [DataMember]
         public int TotalTime { get; set; }
+        [DataMember]
         public short LapCount { get; set; }
+        [DataMember]
         public short StartPosition { get; set; } // only set for race session
+        [DataMember]
         public short Position { get; set; }
+        [DataMember]
         public string Gap { get; set; }
+        [DataMember]
         public int Incidents { get; set; }
+        [DataMember]
         public double Distance { get; set; }
+        [DataMember]
         public double TopSpeed { get; set; } // km/h
+        [DataMember]
         public double StartPosNs { get; set; }
+        [DataMember]
         public double LastPosNs { get; set; }
 
         private int lastTime = -1;
@@ -104,28 +133,45 @@ namespace AC_SessionReport
         }
     }
 
+    [DataContract]
     public class LapReport
     {
+        [DataMember]
         public int ConnectionId { get; set; }
+        [DataMember]
         public long Timestamp { get; set; }
+        [DataMember]
         public int LapTime { get; set; }
+        [DataMember]
         public short LapNo { get; set; }
+        [DataMember]
         public short Position { get; set; }
+        [DataMember]
         public short Cuts { get; set; }
+        [DataMember]
         public float Grip { get; set; }
     }
 
+    [DataContract]
     public class IncidentReport
     {
+        [DataMember]
         public byte Type { get; set; }
+        [DataMember]
         public long Timestamp { get; set; }
+        [DataMember]
         public int ConnectionId1 { get; set; }
+        [DataMember]
         public int ConnectionId2 { get; set; }
+        [DataMember]
         public float ImpactSpeed { get; set; }
+        [DataMember]
         public Single3 WorldPosition { get; set; }
+        [DataMember]
         public Single3 RelPosition { get; set; }
     }
 
+    [DataContract]
     public class SessionReport
     {
         public const string Version = "1.1.2";
@@ -143,22 +189,39 @@ namespace AC_SessionReport
             this.Events = new List<IncidentReport>();
         }
 
+        [DataMember]
         public string ReportVersion { get; set; }
+        [DataMember]
         public short ProtocolVersion { get; set; }
+        [DataMember]
         public string ServerName { get; set; }
+        [DataMember]
         public string TrackName { get; set; }
+        [DataMember]
         public string TrackConfig { get; set; }
+        [DataMember]
         public string SessionName { get; set; }
+        [DataMember]
         public byte Type { get; set; }
+        [DataMember]
         public int Time { get; set; }
+        [DataMember]
         public short RaceLaps { get; set; }
+        [DataMember]
         public int WaitTime { get; set; }
+        [DataMember]
         public long Timestamp { get; set; }
+        [DataMember]
         public byte AmbientTemp { get; set; }
+        [DataMember]
         public byte RoadTemp { get; set; }
+        [DataMember]
         public string Weather { get; set; }
+        [DataMember]
         public List<DriverReport> Connections { get; set; }
+        [DataMember]
         public List<LapReport> Laps { get; set; }
+        [DataMember]
         public List<IncidentReport> Events { get; set; }
     }
 }

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ReferenceGroup xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ID="85dfa581-3806-49b4-b536-d96af1c4a85f" xmlns="urn:schemas-microsoft-com:xml-wcfservicemap">
+  <ClientOptions>
+    <GenerateAsynchronousMethods>false</GenerateAsynchronousMethods>
+    <EnableDataBinding>true</EnableDataBinding>
+    <ExcludedTypes />
+    <ImportXmlTypes>false</ImportXmlTypes>
+    <GenerateInternalTypes>false</GenerateInternalTypes>
+    <GenerateMessageContracts>false</GenerateMessageContracts>
+    <NamespaceMappings />
+    <CollectionMappings>
+      <CollectionMapping TypeName="System.Collections.Generic.List`1" Category="List" />
+    </CollectionMappings>
+    <GenerateSerializableTypes>true</GenerateSerializableTypes>
+    <Serializer>Auto</Serializer>
+    <UseSerializerForFaults>true</UseSerializerForFaults>
+    <ReferenceAllAssemblies>false</ReferenceAllAssemblies>
+    <ReferencedAssemblies>
+      <ReferencedAssembly AssemblyName="AC_SessionReport" />
+    </ReferencedAssemblies>
+    <ReferencedDataContractTypes />
+    <ServiceContractMappings />
+  </ClientOptions>
+  <MetadataSources>
+    <MetadataSource Address="http://localhost:53366/ACService.svc" Protocol="http" SourceId="1" />
+  </MetadataSources>
+  <Metadata>
+    <MetadataFile FileName="ACService.xsd" MetadataType="Schema" ID="75e9f452-049e-465b-8d33-da305f4ff6e2" SourceId="1" SourceUrl="http://localhost:53366/ACService.svc?xsd=xsd0" />
+    <MetadataFile FileName="ACService1.xsd" MetadataType="Schema" ID="6b50c04e-c62d-4b39-8910-8ce4dc8d72eb" SourceId="1" SourceUrl="http://localhost:53366/ACService.svc?xsd=xsd2" />
+    <MetadataFile FileName="ACService.wsdl" MetadataType="Wsdl" ID="69dbc5c3-7b76-43cd-a534-5bb1b4c049ab" SourceId="1" SourceUrl="http://localhost:53366/ACService.svc?wsdl" />
+    <MetadataFile FileName="ACService.disco" MetadataType="Disco" ID="6331562c-b872-4e69-a2af-ec92ea382d43" SourceId="1" SourceUrl="http://localhost:53366/ACService.svc?disco" />
+    <MetadataFile FileName="ACService2.xsd" MetadataType="Schema" ID="25aebab7-7074-4833-a154-78fd092234b6" SourceId="1" SourceUrl="http://localhost:53366/ACService.svc?xsd=xsd1" />
+  </Metadata>
+  <Extensions>
+    <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
+    <ExtensionFile FileName="configuration.svcinfo" Name="configuration.svcinfo" />
+  </Extensions>
+</ReferenceGroup>

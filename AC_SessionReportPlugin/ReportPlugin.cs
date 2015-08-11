@@ -273,7 +273,7 @@ namespace AC_SessionReportPlugin
         {
             if (!string.IsNullOrWhiteSpace(this.WelcomeMessage))
             {
-                return this.WelcomeMessage.Replace("$DriverName$", driverReport.Name).Replace("$ServerName$", this.PluginManager.ServerName);
+                return this.WelcomeMessage.Replace("$DriverName$", driverReport.Name).Replace("$ServerName$", this.currentSession.ServerName);
             }
             return null;
         }

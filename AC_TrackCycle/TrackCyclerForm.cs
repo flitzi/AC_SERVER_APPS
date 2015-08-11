@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using acPlugins4net;
 using acPlugins4net.messages;
 using AC_ServerStarter;
+using AC_SessionReportPlugin;
 
 namespace AC_TrackCycle
 {
@@ -29,6 +30,7 @@ namespace AC_TrackCycle
 
             this.pluginManager = new AcServerPluginManager(this.logWriter);
             this.pluginManager.LoadInfoFromServerConfig();
+            this.pluginManager.AddPlugin(new ReportPlugin());
             this.pluginManager.LoadPluginsFromAppConfig();
             this.pluginManager.AddPlugin(new GuiTrackCyclePlugin(this));
 
@@ -58,7 +60,7 @@ namespace AC_TrackCycle
                     this.textBox_sessionInfo.Text = msg.Name + " " + msg.TimeOfDay + " min, " + msg.Weather + ", ambient " + msg.AmbientTemp
                                                     + "°, road " + msg.RoadTemp + "°";
                 }
-                this.textBoxCurrentCycle.Text = this.pluginManager.Track + " " + this.pluginManager.TrackLayout;
+                this.textBoxCurrentCycle.Text = msg.Track + " " + msg.TrackConfig;
             }
         }
 

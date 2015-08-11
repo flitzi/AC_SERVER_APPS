@@ -220,9 +220,6 @@ namespace AC_ServerStarter
 
             if (this.pluginManager != null)
             {
-                this.pluginManager.ServerName = servername;
-                this.pluginManager.Track = track;
-                this.pluginManager.TrackLayout = layout;
                 //this.pluginManager.MaxClients = maxClients;
 
                 this.pluginManager.Connect();

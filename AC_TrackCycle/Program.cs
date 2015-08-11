@@ -1,5 +1,5 @@
-﻿using acPlugins4net.helpers;
-using System;
+﻿using System;
+using System.Text;
 using System.Windows.Forms;
 
 namespace AC_TrackCycle
@@ -20,7 +20,7 @@ namespace AC_TrackCycle
             }
             catch (Exception ex)
             {
-                MessageBox.Show(FileLogWriter.GetExceptionString(ex));
+                MessageBox.Show(ex.Message);
             }
         }
     }

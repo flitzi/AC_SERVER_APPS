@@ -74,6 +74,10 @@
       <Project>{07e1c444-42f3-4298-9817-e647ed10f7ac}</Project>
       <Name>AC_ServerStarter</Name>
     </ProjectReference>
+    <ProjectReference Include="..\AC_SessionReportPlugin\AC_SessionReportPlugin.csproj">
+      <Project>{9ef78b48-4269-420b-a111-0af4b317b1d2}</Project>
+      <Name>AC_SessionReportPlugin</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

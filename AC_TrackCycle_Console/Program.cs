@@ -13,7 +13,7 @@ namespace AC_TrackCycle_Console
 {
     internal static class Program
     {
-        private static TrackCycler trackCycler;
+        private static TrackCyclePlugin trackCycler;
 
         #region Trap application termination
         [DllImport("Kernel32")]
@@ -59,11 +59,12 @@ namespace AC_TrackCycle_Console
 
                 try
                 {
+                    trackCycler = new TrackCyclePlugin();
+
                     AcServerPluginManager pluginManager = new AcServerPluginManager(logWriter);
                     pluginManager.LoadInfoFromServerConfig();
-                    pluginManager.AddPlugin(new ReportPlugin());
+                    pluginManager.AddPlugin(trackCycler);
                     pluginManager.LoadPluginsFromAppConfig();
-                    trackCycler = new TrackCycler(pluginManager, logWriter);
 
                     // Some biolerplate to react to close window event, CTRL-C, kill, etc
                     _handler += new EventHandler(Handler);

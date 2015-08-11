@@ -14,7 +14,7 @@ namespace AC_TrackCycle
     {
         private readonly GuiLogWriter logWriter;
         private readonly AcServerPluginManager pluginManager;
-        private readonly TrackCycler trackCycler;
+        private readonly TrackCyclePlugin trackCycler;
         private int logLength = 0;
 
         public TrackCyclerForm()
@@ -28,13 +28,12 @@ namespace AC_TrackCycle
             { LogWithTimestamp = true };
             this.logWriter.LogMessagesToFile = this.checkBoxCreateLogs.Checked;
 
+            this.trackCycler = new TrackCyclePlugin();
+
             this.pluginManager = new AcServerPluginManager(this.logWriter);
             this.pluginManager.LoadInfoFromServerConfig();
-            this.pluginManager.AddPlugin(new ReportPlugin());
+            this.pluginManager.AddPlugin(this.trackCycler);
             this.pluginManager.LoadPluginsFromAppConfig();
-            this.pluginManager.AddPlugin(new GuiTrackCyclePlugin(this));
-
-            this.trackCycler = new TrackCycler(this.pluginManager, this.logWriter);
 
             if (!this.trackCycler.HasCycle)
             {

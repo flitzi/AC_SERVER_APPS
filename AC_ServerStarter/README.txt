@@ -4,12 +4,13 @@ AC_TrackCycle
 Features:
 ---------
 - track cycles automatically after race end
-- track cycle per admin command
+- track cycle via admin command
 - complete cfg template cycle (new since 2.0)
 - server message to inform players of incoming track change (new since 2.0)
 - result logging into json, including all players (not only the last connected players), collision events, laps (new since 2.0) (optional upload to database and safety rating based player access will come soon)
-- server chat per server GUI or server command line (new since 2.0)
-- server chat per admin command (new since 2.0)
+- server chat via server GUI or server command line (new since 2.0)
+- server chat via admin command (new since 2.0)
+- server private message via admin command (new since 2.2)
 - results displayed as server chat messages including best lap and incidents (new since 2.0)
 - near real-time incident report as server chat message including involved cars and impact speed (new since 2.0)
 - live fastest lap in session broadcast (new since 2.1)
@@ -64,28 +65,32 @@ You can specify the welcome message. For multiple lines use the | for line break
 
 - the "Next Track" button switches the track immediately
 
-- you can also use admin commands to change the track while you are in the game, just type in the chat
+- you can also use admin commands to change the track while you are in the game, just type in the chat after you authorized yourself as admin with /admin myPassword
 
-/next_track myPassword
-/change_track myPassword spa
-/change_track myPassword ks_nordschleife,endurance
+/next_track
+/change_track spa
+/change_track ks_nordschleife,endurance
 the track(and config, separated with comma, but no space!) in /change_track needs to be in the TRACKS=... list
 
 - admin command for sending a message from the server
-/send_chat myPassword blablabla
+/send_chat blablabla
 
-(of course replace "myPassword" with your admin password)
+- admin command for sending a message from the server to a specific player
+/send_pm carId blablabla
+
 note: chat started with / is not visible to other players
 
-- the server does NOT change the track if restart_session or next_session is voted after the race, so people can prevent track change if they make a successful vote. Only after the RACE_OVER_TIME has passed the server will change the track
+- the server does NOT change the track if restart_session or next_session is voted after the race, so people can prevent the track change if they make a successful vote. Only after the RACE_OVER_TIME has passed the server will change the track
 
 - the result json are saved in the "sessionresults" folder
 
 
 Changelog:
 ----------
-2.1.2
-- updated to new acServer UDP protocol version
+2.2.0 (2015/08/11)
+- updated to new acServer UDP protocol version (AC v1.2.3)
+- no longer needed to provide password for each admin command
+- added "/send_pm carId msg" admin command
 
 2.1.1 (2015/08/09)
 - fixed problem with results broadcast sometimes screwed up (duplicate lines)

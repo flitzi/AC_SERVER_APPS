@@ -97,6 +97,8 @@ namespace AC_SessionReport
         public double StartPosNs { get; set; }
         [DataMember]
         public double LastPosNs { get; set; }
+        [DataMember]
+        public bool IsAdmin { get; set; }
 
         private int lastTime = -1;
         private Single3 lastPos;

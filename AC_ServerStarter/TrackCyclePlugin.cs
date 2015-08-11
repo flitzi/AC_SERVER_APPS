@@ -8,6 +8,9 @@ using acPlugins4net;
 using acPlugins4net.helpers;
 using System.Reflection;
 using acPlugins4net.configuration;
+using AC_SessionReportPlugin;
+using acPlugins4net.messages;
+using AC_SessionReport;
 
 namespace AC_ServerStarter
 {
@@ -15,20 +18,16 @@ namespace AC_ServerStarter
 
     public delegate void TrackChanged(RaceSession session);
 
-    public class TrackCycler
+    public class TrackCyclePlugin : ReportPlugin
     {
-        public const string Version = "2.1.2";
+        public const string TrackCyclePluginVersion = "2.1.2";
 
-        private readonly string serverfolder, serverExe, server_cfg, entry_list;
-        private readonly object lockObject = new object();
-        private readonly string[] iniLines = new string[0];
-        private readonly List<object> Sessions = new List<object>();
-        private readonly AcServerPluginManager pluginManager;
-        private readonly IFileLog logWriter;
+        private string serverfolder, serverExe, server_cfg, entry_list;
+        private object lockObject = new object();
+        private string[] iniLines = new string[0];
+        private List<object> Sessions = new List<object>();
 
         //private readonly List<string> admins = new List<string>(); //not used, you have to pass the admin password everytime for /next_track and /change_track, e.g. "/next_track <mypassword>" or /change_track <mypassword> spa
-        private bool adminpwSet;
-        private string next_trackCommand, change_trackCommand, send_chatCommand;
 
         public bool HasCycle
         {
@@ -42,15 +41,17 @@ namespace AC_ServerStarter
         private Process serverInstance;
         public bool AutoChangeTrack { get; set; }
 
-        public TrackCycler(AcServerPluginManager pluginManager, IFileLog logWriter)
+        protected override void OnInitBase(AcServerPluginManager manager)
         {
-            this.serverfolder = pluginManager.Config.GetSetting("ac_server_directory");
+            base.OnInitBase(manager);
+
+            this.serverfolder = PluginManager.Config.GetSetting("ac_server_directory");
             if (string.IsNullOrWhiteSpace(this.serverfolder))
             {
                 this.serverfolder = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             }
 
-            this.serverExe = pluginManager.Config.GetSetting("ac_server_executable");
+            this.serverExe = PluginManager.Config.GetSetting("ac_server_executable");
             if (string.IsNullOrWhiteSpace(this.serverExe))
             {
                 this.serverExe = "acServer.exe";
@@ -58,18 +59,16 @@ namespace AC_ServerStarter
 
             this.server_cfg = Path.Combine(serverfolder, "cfg", "server_cfg.ini");
             this.entry_list = Path.Combine(serverfolder, "cfg", "entry_list.ini");
-            this.pluginManager = pluginManager;
-            this.logWriter = logWriter;
+
             this.AutoChangeTrack = true;
 
-            string servername, adminpw, track, layout;
+            string servername, track, layout;
             int laps;
-            ReadCfg(pluginManager.Config, true, out servername, out adminpw, out track, out layout, out laps, ref this.Sessions, out this.iniLines);
-            this.setAdminCommands(adminpw);
+            ReadCfg(PluginManager.Config, true, out servername, out track, out layout, out laps, ref this.Sessions, out this.iniLines);
 
             if (this.Sessions.Count == 0)
             {
-                string templatecycle = pluginManager.Config.GetSetting("template_cycle");
+                string templatecycle = PluginManager.Config.GetSetting("template_cycle");
                 if (!string.IsNullOrEmpty(templatecycle))
                 {
                     string[] templates = templatecycle.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
@@ -85,11 +84,45 @@ namespace AC_ServerStarter
             }
         }
 
+        protected override void OnChatMessageBase(MsgChat msg)
+        {
+            base.OnChatMessageBase(msg);
+
+            DriverReport driver = this.getDriverReportForCarId(msg.CarId);
+            if (driver.IsAdmin)
+            {
+                if (msg.Message.StartsWith("/next_track", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    ThreadPool.QueueUserWorkItem(o => this.NextTrack());
+                }
+                else if (msg.Message.StartsWith("/change_track "))
+                {
+                    string track = msg.Message.Substring("/change_track ".Length).Trim();
+                    string layout = string.Empty;
+                    string[] parts = track.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 2)
+                    {
+                        track = parts[0];
+                        layout = parts[1];
+                    }
+
+                    int trackIndex = GetTrackIndex(track, layout);
+                    if (trackIndex > -1)
+                    {
+                        ThreadPool.QueueUserWorkItem(o => this.ChangeTrack(trackIndex));
+                    }
+                    else
+                    {
+                        PluginManager.SendChatMessage(msg.CarId, "Specified track is not in trackcycle");
+                    }
+                }
+            }
+        }
+
         private static void ReadCfg(
             IConfigManager config,
             bool readTrackCycle,
             out string servername,
-            out string adminpw,
             out string track,
             out string layout,
             out int laps,
@@ -99,11 +132,6 @@ namespace AC_ServerStarter
             WorkaroundHelper helper = new WorkaroundHelper(config);
 
             iniLines = helper.ConfigIni;
-
-            if (!helper.TryFindServerConfigEntry("ADMIN_PASSWORD=", out adminpw))
-            {
-                adminpw = "pippo";
-            }
 
             if (!helper.TryFindServerConfigEntry("TRACK=", out track))
             {
@@ -142,14 +170,6 @@ namespace AC_ServerStarter
                     sessions.Add(new RaceSession(ctrack, clayout, claps));
                 }
             }
-        }
-
-        private void setAdminCommands(string adminpw)
-        {
-            this.adminpwSet = !string.IsNullOrWhiteSpace(adminpw);
-            this.next_trackCommand = "ADMIN COMMAND: /next_track " + adminpw;
-            this.change_trackCommand = "ADMIN COMMAND: /change_track " + adminpw;
-            this.send_chatCommand = "ADMIN COMMAND: /send_chat " + adminpw;
         }
 
         public void StartServer()
@@ -210,19 +230,18 @@ namespace AC_ServerStarter
                 }
             }
 
-            string servername, adminpw, track, layout;
+            string servername, track, layout;
             int laps;
             List<object> tmpS = new List<object>();
             string[] tmpL;
 
-            ReadCfg(this.pluginManager.Config, false, out servername, out adminpw, out track, out layout, out laps, ref tmpS, out tmpL);
-            this.setAdminCommands(adminpw);
+            ReadCfg(this.PluginManager.Config, false, out servername, out track, out layout, out laps, ref tmpS, out tmpL);
 
-            if (this.pluginManager != null)
+            if (this.PluginManager != null)
             {
                 //this.pluginManager.MaxClients = maxClients;
 
-                this.pluginManager.Connect();
+                this.PluginManager.Connect();
             }
 
             this.serverInstance = new Process();
@@ -250,10 +269,7 @@ namespace AC_ServerStarter
                 {
                     if (!string.IsNullOrEmpty(message) && !message.StartsWith("No car with address"))
                     {
-                        if (this.logWriter != null)
-                        {
-                            this.logWriter.Log(message);
-                        }
+                        this.PluginManager.Log(message);
 
                         if (this.AutoChangeTrack && message == "HasSentRaceoverPacket, move to the next session")
                         {
@@ -271,86 +287,50 @@ namespace AC_ServerStarter
                         //    cycle++;
                         //    StartServer();
                         //}
-
-                        if (adminpwSet)
-                        {
-                            if (message.StartsWith(this.next_trackCommand))
-                            {
-                                this.NextTrack();
-                            }
-
-                            if (message.StartsWith(this.change_trackCommand))
-                            {
-                                string track = message.Substring(this.change_trackCommand.Length).Trim();
-                                string layout = string.Empty;
-                                track = track.Substring(0, track.IndexOf(" "));
-                                string[] parts = track.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                                if (parts.Length == 2)
-                                {
-                                    track = parts[0];
-                                    layout = parts[1];
-                                }
-                                int index = -1;
-                                for (int i = 0; i < this.Sessions.Count; i++)
-                                {
-                                    if (this.Sessions[i] is RaceSession)
-                                    {
-                                        RaceSession session = (RaceSession)this.Sessions[i];
-                                        if (session.Track == track && session.Layout == layout)
-                                        {
-                                            index = i;
-                                            break;
-                                        }
-                                    }
-                                    else if (this.Sessions[i] is string)
-                                    {
-                                        if ((string)this.Sessions[i] == track)
-                                        {
-                                            index = i;
-                                            break;
-                                        }
-                                    }
-                                }
-                                if (index > -1)
-                                {
-                                    this.ChangeTrack(index);
-                                }
-                            }
-
-                            if (message.StartsWith(this.send_chatCommand))
-                            {
-                                string msg = message.Substring(this.send_chatCommand.Length).Trim();
-                                int endix = msg.IndexOf(" received from ");
-                                if (endix > 0)
-                                {
-                                    msg = msg.Substring(0, endix);
-                                }
-                                if (this.pluginManager != null && this.pluginManager.IsConnected)
-                                {
-                                    this.pluginManager.BroadcastChatMessage(msg);
-                                }
-                            }
-                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    if (this.logWriter != null)
+                    this.PluginManager.Log(ex);
+                }
+            }
+        }
+
+        public int GetTrackIndex(string track, string layout)
+        {
+            int index = -1;
+            for (int i = 0; i < this.Sessions.Count; i++)
+            {
+                if (this.Sessions[i] is RaceSession)
+                {
+                    RaceSession session = (RaceSession)this.Sessions[i];
+                    if (session.Track == track && session.Layout == layout)
                     {
-                        this.logWriter.Log(ex);
+                        index = i;
+                        break;
+                    }
+                }
+                else if (this.Sessions[i] is string)
+                {
+                    if ((string)this.Sessions[i] == track)
+                    {
+                        index = i;
+                        break;
                     }
                 }
             }
+
+            return index;
         }
 
         public void ChangeTrack(int index)
         {
             if (this.HasCycle)
             {
-                if (this.pluginManager != null && this.pluginManager.IsConnected)
+                if (this.PluginManager.IsConnected)
                 {
                     Thread.Sleep(1000);
-                    this.pluginManager.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
+                    this.PluginManager.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
                     Thread.Sleep(2000);
                 }
                 this.cycle = index;
@@ -370,9 +350,9 @@ namespace AC_ServerStarter
                 this.serverInstance.Kill();
             }
 
-            if (this.pluginManager != null && this.pluginManager.IsConnected)
+            if (this.PluginManager.IsConnected)
             {
-                this.pluginManager.Disconnect();
+                this.PluginManager.Disconnect();
             }
         }
     }

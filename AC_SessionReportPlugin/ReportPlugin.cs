@@ -54,7 +54,8 @@ namespace AC_SessionReportPlugin
                     Position = -1,
                     Gap = string.Empty,
                     Incidents = 0,
-                    Distance = 0.0
+                    Distance = 0.0,
+                    IsAdmin = false
                 };
 
                 this.currentSession.Connections.Add(driverReport);
@@ -253,7 +254,8 @@ namespace AC_SessionReportPlugin
                             Position = -1,
                             Gap = string.Empty,
                             Incidents = 0,
-                            Distance = 0.0
+                            Distance = 0.0,
+                            IsAdmin = found.IsAdmin
                         };
 
                         this.currentSession.Connections.Add(recreatedConnection);
@@ -390,7 +392,8 @@ namespace AC_SessionReportPlugin
                 Position = -1,
                 Gap = string.Empty,
                 Incidents = 0,
-                Distance = 0.0
+                Distance = 0.0,
+                IsAdmin = false
             };
 
             this.currentSession.Connections.Add(newConnection);
@@ -566,6 +569,40 @@ namespace AC_SessionReportPlugin
             {
                 this.PluginManager.BroadcastChatMessage(
                         string.Format("{0} has set a new fastest lap: {1}", driver.Name, FormatTimespan(lap.LapTime)));
+            }
+        }
+
+        protected override void OnChatMessageBase(MsgChat msg)
+        {
+            DriverReport driver = this.getDriverReportForCarId(msg.CarId);
+            if (!driver.IsAdmin && !string.IsNullOrWhiteSpace(PluginManager.AdminPassword)
+                && msg.Message.StartsWith("/admin ", StringComparison.InvariantCultureIgnoreCase))
+            {
+                driver.IsAdmin = msg.Message.Substring("/admin ".Length).Equals(PluginManager.AdminPassword);
+            }
+
+            if (driver.IsAdmin)
+            {
+                if (msg.Message.StartsWith("/send_pm ", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    int carIdStartIdx = "/send_pm ".Length;
+                    int carIdEndIdx = msg.Message.IndexOf(' ', carIdStartIdx);
+                    byte carId;
+                    if (carIdEndIdx > carIdStartIdx && byte.TryParse(msg.Message.Substring(carIdStartIdx, carIdEndIdx - carIdStartIdx), out carId))
+                    {
+                        string chatMsg = msg.Message.Substring(carIdEndIdx);
+                        PluginManager.SendChatMessage(carId, chatMsg);
+                    }
+                    else
+                    {
+                        PluginManager.SendChatMessage(msg.CarId, "Invalid car id provided");
+                    }
+                }
+                else if (msg.Message.StartsWith("/send_chat ", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    string broadcastMsg = msg.Message.Substring("/send_chat ".Length);
+                    PluginManager.BroadcastChatMessage(broadcastMsg);
+                }
             }
         }
         #endregion

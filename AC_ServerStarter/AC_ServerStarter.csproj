@@ -43,12 +43,20 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RaceSession.cs" />
-    <Compile Include="TrackCycler.cs" />
+    <Compile Include="TrackCyclePlugin.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\acplugins\acplugins4net\acPlugins4net\acPlugins4net.csproj">
       <Project>{755c6b0d-3ed5-45d3-a06f-1575d26da4d9}</Project>
       <Name>acPlugins4net</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AC_SessionReportPlugin\AC_SessionReportPlugin.csproj">
+      <Project>{9ef78b48-4269-420b-a111-0af4b317b1d2}</Project>
+      <Name>AC_SessionReportPlugin</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\AC_SessionReport\AC_SessionReport.csproj">
+      <Project>{480c57c6-3d1a-4d73-a9e1-7ae6b2d55b6f}</Project>
+      <Name>AC_SessionReport</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

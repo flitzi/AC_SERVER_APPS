@@ -30,8 +30,6 @@ namespace AC_SessionReportPlugin
         protected SessionReport currentSession = new SessionReport();
         protected bool loadedHandlersFromConfig;
 
-        protected volatile bool hasReceivedSessionInfo;
-
         protected DriverReport getDriverReportForCarId(byte carId)
         {
             DriverReport driverReport;
@@ -282,8 +280,6 @@ namespace AC_SessionReportPlugin
 
         protected virtual void SetSessionInfo(MsgSessionInfo msg, bool startNewLog)
         {
-            this.hasReceivedSessionInfo = true;
-
             this.currentSession.ProtocolVersion = msg.Version;
             this.currentSession.ServerName = msg.ServerName;
             this.currentSession.TrackName = msg.Track;
@@ -340,7 +336,7 @@ namespace AC_SessionReportPlugin
             ThreadPool.QueueUserWorkItem(o =>
             {
                 Thread.Sleep(3000);
-                if (!this.hasReceivedSessionInfo)
+                if (this.PluginManager.ProtocolVersion == -1)
                 {
                     this.PluginManager.RequestSessionInfo(-1);
                 }
@@ -365,12 +361,13 @@ namespace AC_SessionReportPlugin
 
         protected override void OnSessionInfoBase(MsgSessionInfo msg)
         {
-            if(!hasReceivedSessionInfo)
+            bool firstSessionInfo = this.currentSession.ProtocolVersion == -1;
+            if (firstSessionInfo)
             {
                 // first time we received session info, also enable real time update
                 this.PluginManager.EnableRealtimeReport(RealTimeUpdateInterval);
             }
-            this.SetSessionInfo(msg, !hasReceivedSessionInfo);
+            this.SetSessionInfo(msg, firstSessionInfo);
         }
 
         protected override void OnNewConnectionBase(MsgNewConnection msg)

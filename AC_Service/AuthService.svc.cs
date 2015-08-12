@@ -4,6 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+using System.ServiceModel.Channels;
 using System.ServiceModel.Web;
 using System.Text;
 using AC_DBFillerEF;
@@ -35,7 +36,10 @@ namespace AC_Service
                     }
                 }
             }
-            finally { }
+            catch
+            {
+                
+            }
             return "Allow";
         }
     }

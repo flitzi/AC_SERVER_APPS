@@ -87,6 +87,12 @@ note: chat started with / is not visible to other players
 
 Changelog:
 ----------
+2.2.1 (2015/08/13)
+- restructured code
+- renamed /send_chat to /broadcast
+- renamed /send_pm to /send_chat
+- fixed issue with DriverInfo not correctly carried over to next session
+
 2.2.0 (2015/08/11)
 - updated to new acServer UDP protocol version (AC v1.2.3)
 - no longer needed to provide password for each admin command

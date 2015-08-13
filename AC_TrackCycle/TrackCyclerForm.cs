@@ -30,7 +30,7 @@ namespace AC_TrackCycle
 
             this.trackCycler = new TrackCyclePlugin();
 
-            this.pluginManager = new AcServerPluginManager(this.logWriter, null, true);
+            this.pluginManager = new AcServerPluginManager(this.logWriter);
             this.pluginManager.LoadInfoFromServerConfig();
             this.pluginManager.AddPlugin(this.trackCycler);
             this.pluginManager.LoadPluginsFromAppConfig();

@@ -53,10 +53,6 @@
       <Project>{755c6b0d-3ed5-45d3-a06f-1575d26da4d9}</Project>
       <Name>acPlugins4net</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AC_SessionReport\AC_SessionReport.csproj">
-      <Project>{480c57c6-3d1a-4d73-a9e1-7ae6b2d55b6f}</Project>
-      <Name>AC_SessionReport</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using AC_SessionReport;
+using acPlugins4net.info;
 
 namespace AC_DBFillerEF
 {
@@ -12,7 +12,7 @@ namespace AC_DBFillerEF
 
 
         //private static int[] ChampionshipPoints = new int[] { 25, 18, 15, 12, 10, 8, 6, 4, 2, 1 };
-        public void HandleReport(SessionReport report)
+        public void HandleReport(SessionInfo report)
         {
             AC_DBEntities entities = new AC_DBEntities();
             using (DbContextTransaction transaction = entities.Database.BeginTransaction())
@@ -22,10 +22,10 @@ namespace AC_DBFillerEF
                     Session session = new Session();
                     session.Server = report.ServerName;
                     session.Name = report.SessionName;
-                    session.Type = report.Type;
+                    session.Type = report.SessionType;
                     session.Track = report.TrackName + (string.IsNullOrEmpty(report.TrackConfig) ? string.Empty : (" " + report.TrackConfig));
-                    session.LapCount = report.RaceLaps;
-                    session.Time = report.Time;
+                    session.LapCount = (short)report.LapCount;
+                    session.Time = report.SessionDuration;
                     session.Ambient = report.AmbientTemp;
                     session.Road = report.RoadTemp;
                     session.Weather = report.Weather;
@@ -34,19 +34,19 @@ namespace AC_DBFillerEF
                     entities.Sessions.Add(session);
 
                     Dictionary<int, Driver> driverDict = new Dictionary<int, Driver>();
-                    Dictionary<int, DriverReport> driverReportDict = new Dictionary<int, DriverReport>();
-                    foreach (DriverReport connection in report.Connections)
+                    Dictionary<int, DriverInfo> driverReportDict = new Dictionary<int, DriverInfo>();
+                    foreach (DriverInfo connection in report.Drivers)
                     {
-                        Driver driver = entities.Drivers.FirstOrDefault(d => d.SteamId == connection.SteamId);
+                        Driver driver = entities.Drivers.FirstOrDefault(d => d.SteamId == connection.DriverGuid);
                         if (driver == null)
                         {
                             driver = new Driver();
-                            driver.SteamId = connection.SteamId;
+                            driver.SteamId = connection.DriverGuid;
                             entities.Drivers.Add(driver);
                         }
 
-                        driver.Name = connection.Name;
-                        driver.Team = connection.Team;
+                        driver.Name = connection.DriverName;
+                        driver.Team = connection.DriverTeam;
                         driver.IncidentCount += connection.Incidents;
                         driver.Distance += (int)connection.Distance;
                         driver.Points += 0; //TODO?
@@ -58,34 +58,34 @@ namespace AC_DBFillerEF
                         result.Session = session;
                         result.Driver = driver;
                         result.Car = connection.CarModel;
-                        result.StartPosition = connection.StartPosition;
-                        result.Position = connection.Position;
+                        result.StartPosition = (short)connection.StartPosition;
+                        result.Position = (short)connection.Position;
                         result.IncidentCount = connection.Incidents;
                         result.Distance = (int)connection.Distance;
-                        result.LapCount = connection.LapCount;
+                        result.LapCount = (short)connection.LapCount;
                         result.Gap = connection.Gap;
                         result.TopSpeed = (short)Math.Round(connection.TopSpeed);
 
                         entities.Results.Add(result);
                     }
 
-                    foreach (LapReport lapReport in report.Laps)
+                    foreach (LapInfo lapReport in report.Laps)
                     {
                         Lap lap = new Lap();
                         lap.Session = session;
                         lap.Driver = driverDict[lapReport.ConnectionId];
                         lap.Car = driverReportDict[lapReport.ConnectionId].CarModel;
-                        lap.LapNo = lapReport.LapNo;
-                        lap.Time = lapReport.LapTime;
+                        lap.LapNo = (short)lapReport.LapNo;
+                        lap.Time = (int)lapReport.LapTime;
                         lap.Cuts = lapReport.Cuts;
-                        lap.Position = lapReport.Position;
-                        lap.Grip = lapReport.Grip;
+                        lap.Position = (short)lapReport.Position;
+                        lap.Grip = lapReport.GripLevel;
                         lap.Timestamp = new DateTime(lapReport.Timestamp, DateTimeKind.Utc);
 
                         entities.Laps.Add(lap);
                     }
 
-                    foreach (IncidentReport incidentReport in report.Events)
+                    foreach (IncidentInfo incidentReport in report.Incidents)
                     {
                         Incident incident = new Incident();
                         incident.Session = session;

@@ -56,7 +56,7 @@ namespace AC_TrackCycle
                 }
                 else
                 {
-                    this.textBox_sessionInfo.Text = msg.Name + " " + msg.TimeOfDay + " min, " + msg.Weather + ", ambient " + msg.AmbientTemp
+                    this.textBox_sessionInfo.Text = msg.Name + " " + msg.SessionDuration + " min, " + msg.Weather + ", ambient " + msg.AmbientTemp
                                                     + "°, road " + msg.RoadTemp + "°";
                 }
                 this.textBoxCurrentCycle.Text = msg.Track + " " + msg.TrackConfig;

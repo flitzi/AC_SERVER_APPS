@@ -54,10 +54,6 @@
       <Project>{9ef78b48-4269-420b-a111-0af4b317b1d2}</Project>
       <Name>AC_SessionReportPlugin</Name>
     </ProjectReference>
-    <ProjectReference Include="..\AC_SessionReport\AC_SessionReport.csproj">
-      <Project>{480c57c6-3d1a-4d73-a9e1-7ae6b2d55b6f}</Project>
-      <Name>AC_SessionReport</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="NOTICES.txt">

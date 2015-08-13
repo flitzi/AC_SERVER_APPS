@@ -10,7 +10,7 @@ using System.Reflection;
 using acPlugins4net.configuration;
 using AC_SessionReportPlugin;
 using acPlugins4net.messages;
-using AC_SessionReport;
+using acPlugins4net.info;
 
 namespace AC_ServerStarter
 {
@@ -20,8 +20,6 @@ namespace AC_ServerStarter
 
     public class TrackCyclePlugin : ReportPlugin
     {
-        public const string TrackCyclePluginVersion = "2.2.0";
-
         private string serverfolder, serverExe, server_cfg, entry_list;
         private object lockObject = new object();
         private string[] iniLines = new string[0];
@@ -41,9 +39,9 @@ namespace AC_ServerStarter
         private Process serverInstance;
         public bool AutoChangeTrack { get; set; }
 
-        protected override void OnInitBase(AcServerPluginManager manager)
+        protected override void OnInit()
         {
-            base.OnInitBase(manager);
+            base.OnInit();
 
             this.serverfolder = PluginManager.Config.GetSetting("ac_server_directory");
             if (string.IsNullOrWhiteSpace(this.serverfolder))
@@ -84,12 +82,12 @@ namespace AC_ServerStarter
             }
         }
 
-        protected override void OnChatMessageBase(MsgChat msg)
+        protected override void OnChatMessage(MsgChat msg)
         {
-            base.OnChatMessageBase(msg);
+            base.OnChatMessage(msg);
 
-            DriverReport driver = this.getDriverReportForCarId(msg.CarId);
-            if (driver.IsAdmin)
+            DriverInfo driver;
+            if (this.PluginManager.TryGetDriverInfo(msg.CarId, out driver) && driver.IsAdmin)
             {
                 if (msg.Message.StartsWith("/next_track", StringComparison.InvariantCultureIgnoreCase))
                 {

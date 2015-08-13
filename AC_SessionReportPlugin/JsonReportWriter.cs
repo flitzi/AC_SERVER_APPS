@@ -1,14 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using AC_SessionReport;
 using Newtonsoft.Json;
+using acPlugins4net.info;
 
 namespace AC_SessionReportPlugin
 {
     public class JsonReportWriter : ISessionReportHandler
     {
-        public void HandleReport(SessionReport report)
+        public void HandleReport(SessionInfo report)
         {
             string output = JsonConvert.SerializeObject(report, Formatting.Indented);
             string dir = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "sessionresults");

@@ -36,5 +36,5 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion(TrackCyclePlugin.TrackCyclePluginVersion)]
-[assembly: AssemblyFileVersion(TrackCyclePlugin.TrackCyclePluginVersion)]
+[assembly: AssemblyVersion(AC_SessionReportPlugin.ReportPlugin.Version)]
+[assembly: AssemblyFileVersion(AC_SessionReportPlugin.ReportPlugin.Version)]

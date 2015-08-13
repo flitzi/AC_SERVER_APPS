@@ -72,11 +72,11 @@ You can specify the welcome message. For multiple lines use the | for line break
 /change_track ks_nordschleife,endurance
 the track(and config, separated with comma, but no space!) in /change_track needs to be in the TRACKS=... list
 
-- admin command for sending a message from the server
-/send_chat blablabla
+- admin command for broadcasting a message from the server
+/broadcast blablabla
 
 - admin command for sending a message from the server to a specific player
-/send_pm carId blablabla
+/send_chat carId blablabla
 
 note: chat started with / is not visible to other players
 

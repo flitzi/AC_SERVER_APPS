@@ -77,7 +77,7 @@ namespace AC_DBFillerEF
                         lap.Driver = driverDict[lapReport.ConnectionId];
                         lap.Car = driverReportDict[lapReport.ConnectionId].CarModel;
                         lap.LapNo = (short)lapReport.LapNo;
-                        lap.Time = (int)lapReport.LapTime;
+                        lap.Time = (int)lapReport.Laptime;
                         lap.Cuts = lapReport.Cuts;
                         lap.Position = (short)lapReport.Position;
                         lap.Grip = lapReport.GripLevel;

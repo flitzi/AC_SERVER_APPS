@@ -16,7 +16,7 @@ namespace AC_SessionReportPlugin
     public class ReportPlugin : AcServerPlugin
     {
         public const string Version = "2.2.0"; // for now use same version
-        
+
         public int BroadcastIncidents { get; set; }
         public int BroadcastResults { get; set; }
         public int BroadcastFastestLap { get; set; }
@@ -36,7 +36,7 @@ namespace AC_SessionReportPlugin
 
         #region AcServerPluginBase overrides
         protected override void OnInit()
-        {     
+        {
             this.BroadcastIncidents = this.PluginManager.Config.GetSettingAsInt("broadcast_incidents", 0);
             this.BroadcastResults = this.PluginManager.Config.GetSettingAsInt("broadcast_results", 10);
             this.BroadcastFastestLap = this.PluginManager.Config.GetSettingAsInt("broadcast_fastest_lap", 1);
@@ -46,7 +46,7 @@ namespace AC_SessionReportPlugin
         protected override void OnClientLoaded(MsgClientLoaded msg)
         {
             DriverInfo driverReport;
-            if (this.PluginManager.TryGetDriverInfo(msg.CarId, out driverReport) && driverReport.ConnectedTimestamp == -1)
+            if (this.PluginManager.TryGetDriverInfo(msg.CarId, out driverReport))
             {
                 driverReport.ConnectedTimestamp = DateTime.UtcNow.Ticks;
                 string welcome = CreateWelcomeMessage(driverReport);
@@ -61,33 +61,25 @@ namespace AC_SessionReportPlugin
         }
 
 
-        protected override void OnCollision(MsgClientEvent msg)
+        protected override void OnCollision(IncidentInfo incident)
         {
-            // ignore collisions in the first 5 seconds of the session
-            if (this.BroadcastIncidents > 0 && DateTime.UtcNow.Ticks - this.PluginManager.CurrentSession.Timestamp > 5 * 10000000)
+            DriverInfo driver = this.PluginManager.GetDriver(incident.ConnectionId1);
+
+            if (incident.Type == (byte)ACSProtocol.MessageType.ACSP_CE_COLLISION_WITH_CAR)
             {
-                DriverInfo driver;
-                if (this.PluginManager.TryGetDriverInfo(msg.CarId, out driver))
-                {
-                    if (msg.Subtype == (byte)ACSProtocol.MessageType.ACSP_CE_COLLISION_WITH_CAR)
-                    {
-                        DriverInfo driver2;
-                        if (this.PluginManager.TryGetDriverInfo(msg.OtherCarId, out driver2))
-                        {
-                            this.PluginManager.BroadcastChatMessage(
-                            string.Format(
-                                "Collision between {0} and {1} with {2}km/h",
-                                driver.DriverName,
-                                driver2.DriverName,
-                                Math.Round(msg.RelativeVelocity)));
-                        }
-                    }
-                    else if (this.BroadcastIncidents > 1)
-                    {
-                        this.PluginManager.BroadcastChatMessage(
-                            string.Format("{0} crashed into wall with {1}km/h", driver.DriverName, Math.Round(msg.RelativeVelocity)));
-                    }
-                }
+                DriverInfo driver2 = this.PluginManager.GetDriver(incident.ConnectionId2);
+
+                this.PluginManager.BroadcastChatMessage(
+                    string.Format(
+                        "Collision between {0} and {1} with {2}km/h",
+                        driver.DriverName,
+                        driver2.DriverName,
+                        Math.Round(incident.ImpactSpeed)));
+            }
+            else if (this.BroadcastIncidents > 1)
+            {
+                this.PluginManager.BroadcastChatMessage(
+                    string.Format("{0} crashed into wall with {1}km/h", driver.DriverName, Math.Round(incident.ImpactSpeed)));
             }
         }
 
@@ -105,8 +97,8 @@ namespace AC_SessionReportPlugin
                         string.Format(
                             "{0}   {1}\t{2}\t{3}\t{4}\t{5}",
                             d.Position.ToString("00"),
-                            d.DriverName.Length <= 10 ? d.DriverName : d.DriverName.Substring(0, 10),
-                            d.CarModel.Length <= 10 ? d.CarModel : d.CarModel.Substring(0, 10),
+                            (d.DriverName == null || d.DriverName.Length <= 10) ? d.DriverName : d.DriverName.Substring(0, 10),
+                            (d.CarModel == null || d.CarModel.Length <= 10) ? d.CarModel : d.CarModel.Substring(0, 10),
                             d.Gap,
                             AcServerPluginManager.FormatTimespan((int)d.BestLap),
                             d.Incidents));
@@ -114,16 +106,16 @@ namespace AC_SessionReportPlugin
             }
         }
 
-        protected override void OnLapCompleted(MsgLapCompleted msg)
-        {
-            DriverInfo driver;
-            if (this.BroadcastFastestLap > 0 && msg.Cuts == 0 && this.PluginManager.TryGetDriverInfo(msg.CarId, out driver))
+        protected override void OnLapCompleted(LapInfo lap)
+        {            
+            if (this.BroadcastFastestLap > 0 && lap.Cuts == 0)
             {
+                DriverInfo driver = PluginManager.GetDriver(lap.ConnectionId);
                 // check if this is a new fastest lap for this session
-                if (this.PluginManager.CurrentSession.Laps.FirstOrDefault(l => l.Cuts == 0 && l.LapTime < msg.Laptime) == null)
+                if (this.PluginManager.CurrentSession.Laps.FirstOrDefault(l => l.Cuts == 0 && l.Laptime < lap.Laptime) == null)
                 {
                     this.PluginManager.BroadcastChatMessage(
-                            string.Format("{0} has set a new fastest lap: {1}", driver.DriverName, AcServerPluginManager.FormatTimespan((int)msg.Laptime)));
+                            string.Format("{0} has set a new fastest lap: {1}", driver.DriverName, AcServerPluginManager.FormatTimespan((int)lap.Laptime)));
                 }
             }
         }

@@ -92,6 +92,7 @@ Changelog:
 - renamed /send_chat to /broadcast
 - renamed /send_pm to /send_chat
 - fixed issue with DriverInfo not correctly carried over to next session
+- some changes and additions to written session results (e.g. LapLength)
 
 2.2.0 (2015/08/11)
 - updated to new acServer UDP protocol version (AC v1.2.3)

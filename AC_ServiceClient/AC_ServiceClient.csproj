@@ -54,12 +54,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AC_SessionReport\AC_SessionReport.csproj">
-      <Project>{480c57c6-3d1a-4d73-a9e1-7ae6b2d55b6f}</Project>
-      <Name>AC_SessionReport</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>

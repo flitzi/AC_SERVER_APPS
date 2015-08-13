@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using acPlugins4net.info;
+using acPlugins4net.helpers;
 
 namespace AC_DBFillerEF
 {

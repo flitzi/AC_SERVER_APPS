@@ -61,7 +61,7 @@ namespace AC_TrackCycle_Console
                 {
                     trackCycler = new TrackCyclePlugin();
 
-                    AcServerPluginManager pluginManager = new AcServerPluginManager(logWriter);
+                    AcServerPluginManager pluginManager = new AcServerPluginManager(logWriter, null, true);
                     pluginManager.LoadInfoFromServerConfig();
                     pluginManager.AddPlugin(trackCycler);
                     pluginManager.LoadPluginsFromAppConfig();

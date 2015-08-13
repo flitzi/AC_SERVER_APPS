@@ -3,6 +3,7 @@ using System.IO;
 using System.Reflection;
 using Newtonsoft.Json;
 using acPlugins4net.info;
+using acPlugins4net.helpers;
 
 namespace AC_SessionReportPlugin
 {

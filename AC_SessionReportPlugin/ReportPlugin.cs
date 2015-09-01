@@ -63,23 +63,26 @@ namespace AC_SessionReportPlugin
 
         protected override void OnCollision(IncidentInfo incident)
         {
-            DriverInfo driver = this.PluginManager.GetDriver(incident.ConnectionId1);
-
-            if (incident.Type == (byte)ACSProtocol.MessageType.ACSP_CE_COLLISION_WITH_CAR)
+            if (this.BroadcastIncidents > 0)
             {
-                DriverInfo driver2 = this.PluginManager.GetDriver(incident.ConnectionId2);
+                DriverInfo driver = this.PluginManager.GetDriver(incident.ConnectionId1);
 
-                this.PluginManager.BroadcastChatMessage(
-                    string.Format(
-                        "Collision between {0} and {1} with {2}km/h",
-                        driver.DriverName,
-                        driver2.DriverName,
-                        Math.Round(incident.ImpactSpeed)));
-            }
-            else if (this.BroadcastIncidents > 1)
-            {
-                this.PluginManager.BroadcastChatMessage(
-                    string.Format("{0} crashed into wall with {1}km/h", driver.DriverName, Math.Round(incident.ImpactSpeed)));
+                if (incident.Type == (byte)ACSProtocol.MessageType.ACSP_CE_COLLISION_WITH_CAR)
+                {
+                    DriverInfo driver2 = this.PluginManager.GetDriver(incident.ConnectionId2);
+
+                    this.PluginManager.BroadcastChatMessage(
+                        string.Format(
+                            "Collision between {0} and {1} with {2}km/h",
+                            driver.DriverName,
+                            driver2.DriverName,
+                            Math.Round(incident.ImpactSpeed)));
+                }
+                else if (this.BroadcastIncidents > 1)
+                {
+                    this.PluginManager.BroadcastChatMessage(
+                        string.Format("{0} crashed into wall with {1}km/h", driver.DriverName, Math.Round(incident.ImpactSpeed)));
+                }
             }
         }
 
@@ -107,7 +110,7 @@ namespace AC_SessionReportPlugin
         }
 
         protected override void OnLapCompleted(LapInfo lap)
-        {            
+        {
             if (this.BroadcastFastestLap > 0 && lap.Cuts == 0)
             {
                 DriverInfo driver = PluginManager.GetDriver(lap.ConnectionId);

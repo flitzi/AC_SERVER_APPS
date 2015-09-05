@@ -87,6 +87,11 @@ note: chat started with / is not visible to other players
 
 Changelog:
 ----------
+2.2.2 (2015/09/05)
+- fixed bug with broadcast_incidents = 0 not disabling broadcast of car collisions
+- fixed session info in GUI not being set
+- session report: warp detection improvement
+
 2.2.1 (2015/08/13)
 - restructured code
 - renamed /send_chat to /broadcast

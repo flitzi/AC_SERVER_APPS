@@ -48,7 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GuiReportPlugin.cs" />
+    <Compile Include="GuiTrackCyclePlugin.cs" />
     <Compile Include="TrackCyclerForm.cs">
       <SubType>Form</SubType>
     </Compile>

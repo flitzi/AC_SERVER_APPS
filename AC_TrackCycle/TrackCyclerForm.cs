@@ -28,7 +28,7 @@ namespace AC_TrackCycle
             { LogWithTimestamp = true };
             this.logWriter.LogMessagesToFile = this.checkBoxCreateLogs.Checked;
 
-            this.trackCycler = new TrackCyclePlugin();
+            this.trackCycler = new GuiTrackCyclePlugin(this);
 
             this.pluginManager = new AcServerPluginManager(this.logWriter);
             this.pluginManager.LoadInfoFromServerConfig();

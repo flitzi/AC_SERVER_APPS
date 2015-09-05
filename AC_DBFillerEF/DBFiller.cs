@@ -9,7 +9,7 @@ namespace AC_DBFillerEF
 {
     public class DBFiller : ISessionReportHandler
     {
-        public const string Version = "0.9.1";
+        public const string Version = "0.9.2";
 
 
         //private static int[] ChampionshipPoints = new int[] { 25, 18, 15, 12, 10, 8, 6, 4, 2, 1 };

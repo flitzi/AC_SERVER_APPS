@@ -87,6 +87,9 @@ note: chat started with / is not visible to other players
 
 Changelog:
 ----------
+2.2.3 (2015/09/07)
+- added change_track_after_every_loop config option that enables track change after "server looping" message (useful if not having race sessions)
+
 2.2.2 (2015/09/05)
 - fixed bug with broadcast_incidents = 0 not disabling broadcast of car collisions
 - fixed session info in GUI not being set

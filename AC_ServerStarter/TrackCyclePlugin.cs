@@ -24,6 +24,7 @@ namespace AC_ServerStarter
         private object lockObject = new object();
         private string[] iniLines = new string[0];
         private List<object> Sessions = new List<object>();
+        private bool changeTrackAfterEveryLoop = false;
 
         //private readonly List<string> admins = new List<string>(); //not used, you have to pass the admin password everytime for /next_track and /change_track, e.g. "/next_track <mypassword>" or /change_track <mypassword> spa
 
@@ -57,6 +58,8 @@ namespace AC_ServerStarter
 
             this.server_cfg = Path.Combine(serverfolder, "cfg", "server_cfg.ini");
             this.entry_list = Path.Combine(serverfolder, "cfg", "entry_list.ini");
+            
+            this.changeTrackAfterEveryLoop = PluginManager.Config.GetSettingAsInt("change_track_after_every_loop", 0) == 1;
 
             this.AutoChangeTrack = true;
 
@@ -274,17 +277,10 @@ namespace AC_ServerStarter
                             this.NextTrack();
                         }
 
-                        //this is not secure, someone with the same name can exploit admin rights
-                        //if (e.Data.StartsWith("Making") && e.Data.EndsWith("admin"))
-                        //{
-                        //    admins.Add(e.Data.Replace("Making", "").Replace("admin", "").Trim());
-                        //}
-
-                        //if (e.Data.StartsWith("ADMIN COMMAND: /next_track received from") && admins.Contains(e.Data.Replace("ADMIN COMMAND: /next_track received from", "").Trim()))
-                        //{
-                        //    cycle++;
-                        //    StartServer();
-                        //}
+                        if (this.AutoChangeTrack && this.changeTrackAfterEveryLoop && message == "Server looping")
+                        {
+                            this.NextTrack();
+                        }
                     }
                 }
                 catch (Exception ex)

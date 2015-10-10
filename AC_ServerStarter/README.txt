@@ -87,6 +87,9 @@ note: chat started with / is not visible to other players
 
 Changelog:
 ----------
+2.3.0 (2015/10/10)
+- updated to new acServer UDP protocol version (AC v1.3)
+
 2.2.3 (2015/09/07)
 - added change_track_after_every_loop config option that enables track change after "server looping" message (useful if not having race sessions)
 

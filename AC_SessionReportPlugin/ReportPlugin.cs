@@ -15,7 +15,7 @@ namespace AC_SessionReportPlugin
 {
     public class ReportPlugin : AcServerPlugin
     {
-        public const string Version = "2.2.3"; // for now use same version
+        public const string Version = "2.3.0"; // for now use same version
 
         public int BroadcastIncidents { get; set; }
         public int BroadcastResults { get; set; }
@@ -65,11 +65,11 @@ namespace AC_SessionReportPlugin
         {
             if (this.BroadcastIncidents > 0)
             {
-                DriverInfo driver = this.PluginManager.GetDriver(incident.ConnectionId1);
+                DriverInfo driver = this.PluginManager.GetDriverByConnectionId(incident.ConnectionId1);
 
                 if (incident.Type == (byte)ACSProtocol.MessageType.ACSP_CE_COLLISION_WITH_CAR)
                 {
-                    DriverInfo driver2 = this.PluginManager.GetDriver(incident.ConnectionId2);
+                    DriverInfo driver2 = this.PluginManager.GetDriverByConnectionId(incident.ConnectionId2);
 
                     this.PluginManager.BroadcastChatMessage(
                         string.Format(
@@ -113,7 +113,7 @@ namespace AC_SessionReportPlugin
         {
             if (this.BroadcastFastestLap > 0 && lap.Cuts == 0)
             {
-                DriverInfo driver = PluginManager.GetDriver(lap.ConnectionId);
+                DriverInfo driver = PluginManager.GetDriverByConnectionId(lap.ConnectionId);
                 // check if this is a new fastest lap for this session
                 if (this.PluginManager.CurrentSession.Laps.FirstOrDefault(l => l.Cuts == 0 && l.Laptime < lap.Laptime) == null)
                 {

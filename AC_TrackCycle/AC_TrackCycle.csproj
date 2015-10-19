@@ -48,6 +48,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GetStringForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GetStringForm.Designer.cs">
+      <DependentUpon>GetStringForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="GuiTrackCyclePlugin.cs" />
     <Compile Include="TrackCyclerForm.cs">
       <SubType>Form</SubType>
@@ -58,6 +64,9 @@
     <Compile Include="GuiLogWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="GetStringForm.resx">
+      <DependentUpon>GetStringForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="TrackCyclerForm.resx">
       <DependentUpon>TrackCyclerForm.cs</DependentUpon>
     </EmbeddedResource>

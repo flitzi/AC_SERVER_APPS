@@ -23,7 +23,7 @@ namespace AC_ServerStarter
         private string serverfolder, serverExe, server_cfg, entry_list;
         private object lockObject = new object();
         private string[] iniLines = new string[0];
-        private List<object> Sessions = new List<object>();
+        public List<object> Sessions = new List<object>();
         private bool changeTrackAfterEveryLoop = false;
 
         //private readonly List<string> admins = new List<string>(); //not used, you have to pass the admin password everytime for /next_track and /change_track, e.g. "/next_track <mypassword>" or /change_track <mypassword> spa
@@ -58,7 +58,7 @@ namespace AC_ServerStarter
 
             this.server_cfg = Path.Combine(serverfolder, "cfg", "server_cfg.ini");
             this.entry_list = Path.Combine(serverfolder, "cfg", "entry_list.ini");
-            
+
             this.changeTrackAfterEveryLoop = PluginManager.Config.GetSettingAsInt("change_track_after_every_loop", 0) == 1;
 
             this.AutoChangeTrack = true;
@@ -272,7 +272,7 @@ namespace AC_ServerStarter
                     {
                         this.PluginManager.Log(message);
 
-                        if (this.AutoChangeTrack && message == "HasSentRaceoverPacket, move to the next session")
+                        if (this.AutoChangeTrack && !this.changeTrackAfterEveryLoop && message == "HasSentRaceoverPacket, move to the next session")
                         {
                             this.NextTrack();
                         }
@@ -321,14 +321,31 @@ namespace AC_ServerStarter
         {
             if (this.HasCycle)
             {
-                if (this.PluginManager.IsConnected)
+                bool restartNeeded = true;
+                if (index >= this.Sessions.Count)
                 {
-                    Thread.Sleep(1000);
-                    this.PluginManager.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
-                    Thread.Sleep(2000);
+                    index = 0;
                 }
+                if (this.Sessions[this.cycle] is RaceSession && this.Sessions[index] is RaceSession
+                    && ((RaceSession)this.Sessions[this.cycle]).Track == ((RaceSession)this.Sessions[index]).Track
+                    && ((RaceSession)this.Sessions[this.cycle]).Layout == ((RaceSession)this.Sessions[index]).Layout
+                    && ((RaceSession)this.Sessions[this.cycle]).Laps == ((RaceSession)this.Sessions[index]).Laps)
+                {
+                    restartNeeded = false;
+                }
+
                 this.cycle = index;
-                this.StartServer();
+
+                if (restartNeeded)
+                {
+                    if (this.PluginManager.IsConnected)
+                    {
+                        Thread.Sleep(1000);
+                        this.PluginManager.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
+                        Thread.Sleep(2000);
+                    }
+                    this.StartServer();
+                }
             }
         }
 

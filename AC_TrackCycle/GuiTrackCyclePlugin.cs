@@ -1,5 +1,6 @@
 ﻿using System;
 using acPlugins4net;
+using acPlugins4net.info;
 using acPlugins4net.messages;
 using AC_SessionReportPlugin;
 using AC_ServerStarter;
@@ -19,6 +20,24 @@ namespace AC_TrackCycle
         {
             base.OnNewSession(msg);
             this.form.BeginInvoke(new Action<MsgSessionInfo>(this.form.SetSessionInfo), msg);
+        }
+
+        protected override void OnNewConnection(MsgNewConnection msg)
+        {
+            base.OnNewConnection(msg);
+            this.form.BeginInvoke(new Action(this.form.UpdateGui), null);
+        }
+
+        protected override void OnConnectionClosed(MsgConnectionClosed msg)
+        {
+            base.OnConnectionClosed(msg);
+            this.form.BeginInvoke(new Action(this.form.UpdateGui), null);
+        }
+
+        protected override void OnBulkCarUpdateFinished()
+        {
+            base.OnBulkCarUpdateFinished();
+            this.form.BeginInvoke(new Action(this.form.UpdatePositionGraph), null);
         }
     }
 }

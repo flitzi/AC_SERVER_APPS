@@ -22,9 +22,9 @@ namespace AC_TrackCycle
             this.form.BeginInvoke(new Action<MsgSessionInfo>(this.form.SetSessionInfo), msg);
         }
 
-        protected override void OnNewConnection(MsgNewConnection msg)
+        protected override void OnClientLoaded(MsgClientLoaded msg)
         {
-            base.OnNewConnection(msg);
+            base.OnClientLoaded(msg);
             this.form.BeginInvoke(new Action(this.form.UpdateGui), null);
         }
 
@@ -32,6 +32,7 @@ namespace AC_TrackCycle
         {
             base.OnConnectionClosed(msg);
             this.form.BeginInvoke(new Action(this.form.UpdateGui), null);
+            this.form.BeginInvoke(new Action(this.form.UpdatePositionGraph), null);
         }
 
         protected override void OnBulkCarUpdateFinished()

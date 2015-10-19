@@ -79,40 +79,44 @@ namespace AC_TrackCycle
                     this.trackMap.Dispose();
                     this.trackMap = null;
                 }
-                string trackName = msg.Track;
-                if (!string.IsNullOrWhiteSpace(msg.TrackConfig))
-                {
-                    trackName += "-" + msg.TrackConfig;
-                }
-                if (File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Data", trackName + ".png")) &&
-                    File.Exists(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Data", trackName + ".ini")))
-                {
-                    this.trackMap = Bitmap.FromFile(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Data",
-                            trackName + ".png"));
 
-                    this.pictureBox_positionGraph.Image = this.trackMap;
+                string[] possibleFolders = new string[]
+                {
+                    Path.Combine(this.trackCycler.ServerFolder,"content", "tracks", msg.Track, msg.TrackConfig),
+                    Path.Combine(Path.GetDirectoryName(this.trackCycler.ServerFolder.Substring(0, this.trackCycler.ServerFolder.Length - 1)),"content", "tracks", msg.Track, msg.TrackConfig),
+                };
 
-                    StreamReader reader = new StreamReader(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Data", trackName + ".ini"));
-                    string line = reader.ReadLine();
-                    while (line != null)
+                foreach (string possibleFolder in possibleFolders)
+                {
+                    if (File.Exists(Path.Combine(possibleFolder, "map.png")) &&
+                        File.Exists(Path.Combine(possibleFolder, "Data", "map.ini")))
                     {
-                        if (line.StartsWith("SCALE_FACTOR="))
-                        {
-                            this.trackMapScale = double.Parse(line.Replace("SCALE_FACTOR=", ""), CultureInfo.InvariantCulture);
-                        }
-                        if (line.StartsWith("X_OFFSET="))
-                        {
-                            this.trackMapOffsetX = double.Parse(line.Replace("X_OFFSET=", ""), CultureInfo.InvariantCulture);
-                        }
-                        if (line.StartsWith("Z_OFFSET="))
-                        {
-                            this.trackMapOffsetY = double.Parse(line.Replace("Z_OFFSET=", ""), CultureInfo.InvariantCulture);
-                        }
+                        this.trackMap = Bitmap.FromFile(Path.Combine(possibleFolder, "map.png"));
 
-                        line = reader.ReadLine();
+                        StreamReader reader = new StreamReader(Path.Combine(possibleFolder, "Data", "map.ini"));
+                        string line = reader.ReadLine();
+                        while (line != null)
+                        {
+                            if (line.StartsWith("SCALE_FACTOR="))
+                            {
+                                this.trackMapScale = double.Parse(line.Replace("SCALE_FACTOR=", ""), CultureInfo.InvariantCulture);
+                            }
+                            if (line.StartsWith("X_OFFSET="))
+                            {
+                                this.trackMapOffsetX = double.Parse(line.Replace("X_OFFSET=", ""), CultureInfo.InvariantCulture);
+                            }
+                            if (line.StartsWith("Z_OFFSET="))
+                            {
+                                this.trackMapOffsetY = double.Parse(line.Replace("Z_OFFSET=", ""), CultureInfo.InvariantCulture);
+                            }
+
+                            line = reader.ReadLine();
+                        }
+                        reader.Dispose();
+                        break;
                     }
-                    reader.Dispose();
                 }
+                this.UpdatePositionGraph();
             }
         }
 
@@ -166,55 +170,71 @@ namespace AC_TrackCycle
 
         public void UpdateGui()
         {
-            List<DriverInfo> connectedDrivers = this.pluginManager.CurrentSession.Drivers.Where(d => d.IsConnected).ToList();
-            this.textBox_ConnectionCount.Text = connectedDrivers.Count + " drivers currently connected";
+            List<DriverInfo> connectedDrivers = this.pluginManager.GetDriverInfos().Where(d => d.IsConnected).ToList();
+            this.textBox_ConnectionCount.Text = connectedDrivers.Count + " driver(s) currently connected";
             this.dataGridView_connections.DataSource = connectedDrivers;
         }
 
         public void UpdatePositionGraph()
         {
-            if (tabControl1.SelectedIndex == 3)
+            if (this.tabControl1.SelectedTab == this.tabPage_PositionGraph)
             {
+                Bitmap bitmap = new Bitmap(this.pictureBox_positionGraph.Width, this.pictureBox_positionGraph.Height);
+                Graphics graphics = Graphics.FromImage(bitmap);
+                graphics.Clear(Color.White);
+                graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+                graphics.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAliasGridFit;
                 if (this.trackMap == null)
                 {
-                    Bitmap bitmap = new Bitmap(this.pictureBox_positionGraph.Width, this.pictureBox_positionGraph.Height);
-                    Graphics graphics = Graphics.FromImage(bitmap);
-                    graphics.Clear(Color.White);
                     float radius = Math.Min(bitmap.Width, bitmap.Height) * 0.9f / 2.0f;
                     PointF center = new PointF(bitmap.Width / 2.0f, bitmap.Height / 2.0f);
-                    graphics.DrawEllipse(new Pen(Color.DarkGray, 15f), center.X - radius, center.Y - radius, radius * 2, radius * 2);
+                    graphics.DrawEllipse(new Pen(Color.DarkGray, 10f), center.X - radius, center.Y - radius, radius * 2, radius * 2);
 
-                    foreach (DriverInfo driver in this.pluginManager.CurrentSession.Drivers.Where(d => d.IsConnected))
+                    foreach (DriverInfo driver in this.pluginManager.GetDriverInfos().Where(d => d.IsConnected))
                     {
-                        PointF pos = new PointF((float)(center.X - Math.Sin(driver.LastSplinePosition * Math.PI * 2)) * radius,
-                            (float)(center.Y + Math.Cos(driver.LastSplinePosition * Math.PI * 2) * radius));
+                        Point pos = new Point((int)(center.X + Math.Sin(driver.LastSplinePosition * Math.PI * 2) * radius),
+                            (int)(center.Y - Math.Cos(driver.LastSplinePosition * Math.PI * 2) * radius));
 
                         DrawDriverPos(pos, driver.CarId.ToString(), graphics);
                     }
-
-                    graphics.Dispose();
-                    this.pictureBox_positionGraph.Image = bitmap;
                 }
                 else
                 {
-                    Bitmap bitmap = new Bitmap(trackMap, trackMap.Width, trackMap.Height);
-                    Graphics graphics = Graphics.FromImage(bitmap);
-
-                    foreach (DriverInfo driver in this.pluginManager.CurrentSession.Drivers.Where(d => d.IsConnected))
+                    float screenRatio = (float)bitmap.Width / bitmap.Height;
+                    float mapRatio = (float)trackMap.Width / trackMap.Height;
+                    float mapScreenScale;
+                    if (screenRatio > mapRatio)
                     {
-                        PointF pos = new PointF((float)(driver.LastPosition.X / trackMapScale + trackMapOffsetX), (float)(driver.LastPosition.Z / trackMapScale + trackMapOffsetY));
-                        DrawDriverPos(pos, driver.CarId.ToString(), graphics);
+                        mapScreenScale = (float)bitmap.Height / trackMap.Height * 0.95f;
+
+                    }
+                    else
+                    {
+                        mapScreenScale = (float)bitmap.Width / trackMap.Width * 0.95f;
+
                     }
 
-                    graphics.Dispose();
-                    this.pictureBox_positionGraph.Image = bitmap;
+                    float mapScreenOffsetX = (bitmap.Width - trackMap.Width * mapScreenScale) / 2;
+                    float mapScreenOffsetY = (bitmap.Height - trackMap.Height * mapScreenScale) / 2;
+
+                    graphics.DrawImage(this.trackMap, mapScreenOffsetX, mapScreenOffsetY, trackMap.Width * mapScreenScale, trackMap.Height * mapScreenScale);
+
+                    foreach (DriverInfo driver in this.pluginManager.GetDriverInfos().Where(d => d.IsConnected))
+                    {
+                        Point pos = new Point(
+                            (int)((driver.LastPosition.X + trackMapOffsetX) / trackMapScale * mapScreenScale + mapScreenOffsetX),
+                            (int)((driver.LastPosition.Z + trackMapOffsetY) / trackMapScale * mapScreenScale + mapScreenOffsetY));
+                        DrawDriverPos(pos, driver.CarId.ToString(), graphics);
+                    }
                 }
+                graphics.Dispose();
+                this.pictureBox_positionGraph.Image = bitmap;
             }
         }
 
-        private static void DrawDriverPos(PointF pos, string id, Graphics graphics)
+        private static void DrawDriverPos(Point pos, string id, Graphics graphics)
         {
-            graphics.FillEllipse(Brushes.DarkRed, pos.X - 20, pos.Y - 20, 40, 40);
+            graphics.FillEllipse(Brushes.DarkRed, pos.X - 10, pos.Y - 10, 20, 20);
             SizeF labelSize = graphics.MeasureString(id, DefaultFont);
 
             graphics.DrawString(id, DefaultFont, Brushes.White, pos.X - labelSize.Width / 2,
@@ -231,31 +251,23 @@ namespace AC_TrackCycle
 
         private void button_RestartSession_Click(object sender, EventArgs e)
         {
-            this.pluginManager.BroadcastChatMessage("/RESTART_SESSION");
+            this.pluginManager.RestartSession();
         }
 
         private void button_NextSession_Click(object sender, EventArgs e)
         {
-            this.pluginManager.BroadcastChatMessage("/NEXT_SESSION");
+            this.pluginManager.NextSession();
         }
 
         private void dataGridView_connections_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
         {
-            if (this.dataGridView_connections.SelectedRows.Count == 1)
+            if (e.Button == MouseButtons.Right && this.dataGridView_connections.SelectedRows.Count == 1 && e.RowIndex == this.dataGridView_connections.SelectedRows[0].Index)
             {
                 this.contextMenuStrip_driver.Show(Cursor.Position);
             }
         }
 
         private void sendChatToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (this.dataGridView_connections.SelectedRows.Count == 1)
-            {
-                this.pluginManager.RequestKickDriverById(((DriverInfo)this.dataGridView_connections.SelectedRows[0].DataBoundItem).CarId);
-            }
-        }
-
-        private void kickDriverToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (this.dataGridView_connections.SelectedRows.Count == 1)
             {
@@ -267,6 +279,22 @@ namespace AC_TrackCycle
             }
         }
 
+        private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.tabControl1.SelectedTab == this.tabPage_PositionGraph)
+            {
+                UpdatePositionGraph();
+            }
+        }
+
+        private void kickDriverToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.dataGridView_connections.SelectedRows.Count == 1)
+            {
+                this.pluginManager.RequestKickDriverById(((DriverInfo)this.dataGridView_connections.SelectedRows[0].DataBoundItem).CarId);
+            }
+        }
+
         private void button_SetLength_Click(object sender, EventArgs e)
         {
             if (this.currentSessionInfo != null)
@@ -275,6 +303,7 @@ namespace AC_TrackCycle
                 requestSetSession.Time = (uint)this.numericUpDown_Length.Value;
                 requestSetSession.Laps = (uint)this.numericUpDown_Length.Value;
                 this.pluginManager.RequestSetSession(requestSetSession);
+                this.pluginManager.RestartSession();
             }
         }
     }

@@ -40,34 +40,34 @@
             this.label2 = new System.Windows.Forms.Label();
             this.textBox_sessionInfo = new System.Windows.Forms.TextBox();
             this.tabControl1 = new System.Windows.Forms.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
-            this.dataGridView_connections = new System.Windows.Forms.DataGridView();
-            this.textBox_ConnectionCount = new System.Windows.Forms.TextBox();
-            this.Column_CarId = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_DriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_CarModel = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.tabPage3 = new System.Windows.Forms.TabPage();
-            this.pictureBox_positionGraph = new System.Windows.Forms.PictureBox();
-            this.tabPage4 = new System.Windows.Forms.TabPage();
-            this.listBox_CycleSessions = new System.Windows.Forms.ListBox();
-            this.button_ChangeTrack = new System.Windows.Forms.Button();
-            this.button_RestartSession = new System.Windows.Forms.Button();
+            this.tabPage_ServerLog = new System.Windows.Forms.TabPage();
+            this.tabPage_SessionControl = new System.Windows.Forms.TabPage();
+            this.numericUpDown_Length = new System.Windows.Forms.NumericUpDown();
+            this.button_SetLength = new System.Windows.Forms.Button();
             this.button_NextSession = new System.Windows.Forms.Button();
+            this.button_RestartSession = new System.Windows.Forms.Button();
+            this.button_ChangeTrack = new System.Windows.Forms.Button();
+            this.listBox_CycleSessions = new System.Windows.Forms.ListBox();
+            this.tabPage_ConnectedDrivers = new System.Windows.Forms.TabPage();
+            this.dataGridView_connections = new System.Windows.Forms.DataGridView();
+            this.tabPage_PositionGraph = new System.Windows.Forms.TabPage();
+            this.pictureBox_positionGraph = new System.Windows.Forms.PictureBox();
+            this.textBox_ConnectionCount = new System.Windows.Forms.TextBox();
             this.contextMenuStrip_driver = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.sendChatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.kickDriverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.button_SetLength = new System.Windows.Forms.Button();
-            this.numericUpDown_Length = new System.Windows.Forms.NumericUpDown();
+            this.Column_CarId = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_DriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_CarModel = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1.SuspendLayout();
-            this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_connections)).BeginInit();
-            this.tabPage3.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_positionGraph)).BeginInit();
-            this.tabPage4.SuspendLayout();
-            this.contextMenuStrip_driver.SuspendLayout();
+            this.tabPage_ServerLog.SuspendLayout();
+            this.tabPage_SessionControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Length)).BeginInit();
+            this.tabPage_ConnectedDrivers.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_connections)).BeginInit();
+            this.tabPage_PositionGraph.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_positionGraph)).BeginInit();
+            this.contextMenuStrip_driver.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonStart
@@ -184,192 +184,45 @@
             // 
             // tabControl1
             // 
-            this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage4);
-            this.tabControl1.Controls.Add(this.tabPage2);
-            this.tabControl1.Controls.Add(this.tabPage3);
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl1.Controls.Add(this.tabPage_ServerLog);
+            this.tabControl1.Controls.Add(this.tabPage_SessionControl);
+            this.tabControl1.Controls.Add(this.tabPage_ConnectedDrivers);
+            this.tabControl1.Controls.Add(this.tabPage_PositionGraph);
             this.tabControl1.Location = new System.Drawing.Point(15, 90);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(487, 404);
             this.tabControl1.TabIndex = 10;
+            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
-            // tabPage1
+            // tabPage_ServerLog
             // 
-            this.tabPage1.Controls.Add(this.textBoxOutput);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(479, 378);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Server Log";
-            this.tabPage1.UseVisualStyleBackColor = true;
+            this.tabPage_ServerLog.Controls.Add(this.textBoxOutput);
+            this.tabPage_ServerLog.Location = new System.Drawing.Point(4, 22);
+            this.tabPage_ServerLog.Name = "tabPage_ServerLog";
+            this.tabPage_ServerLog.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage_ServerLog.Size = new System.Drawing.Size(479, 378);
+            this.tabPage_ServerLog.TabIndex = 0;
+            this.tabPage_ServerLog.Text = "Server Log";
+            this.tabPage_ServerLog.UseVisualStyleBackColor = true;
             // 
-            // tabPage2
+            // tabPage_SessionControl
             // 
-            this.tabPage2.Controls.Add(this.dataGridView_connections);
-            this.tabPage2.Location = new System.Drawing.Point(4, 22);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(479, 378);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Connected Drivers";
-            this.tabPage2.UseVisualStyleBackColor = true;
-            // 
-            // dataGridView_connections
-            // 
-            this.dataGridView_connections.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView_connections.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column_CarId,
-            this.Column_DriverName,
-            this.Column_CarModel});
-            this.dataGridView_connections.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView_connections.Location = new System.Drawing.Point(3, 3);
-            this.dataGridView_connections.Name = "dataGridView_connections";
-            this.dataGridView_connections.ReadOnly = true;
-            this.dataGridView_connections.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView_connections.Size = new System.Drawing.Size(473, 372);
-            this.dataGridView_connections.TabIndex = 0;
-            this.dataGridView_connections.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView_connections_CellMouseDown);
-            // 
-            // textBox_ConnectionCount
-            // 
-            this.textBox_ConnectionCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_ConnectionCount.Location = new System.Drawing.Point(107, 64);
-            this.textBox_ConnectionCount.Name = "textBox_ConnectionCount";
-            this.textBox_ConnectionCount.ReadOnly = true;
-            this.textBox_ConnectionCount.Size = new System.Drawing.Size(395, 20);
-            this.textBox_ConnectionCount.TabIndex = 11;
-            // 
-            // Column_CarId
-            // 
-            this.Column_CarId.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
-            this.Column_CarId.HeaderText = "CarId";
-            this.Column_CarId.Name = "Column_CarId";
-            this.Column_CarId.ReadOnly = true;
-            this.Column_CarId.Width = 57;
-            // 
-            // Column_DriverName
-            // 
-            this.Column_DriverName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Column_DriverName.DataPropertyName = "DriverName";
-            this.Column_DriverName.HeaderText = "DriverName";
-            this.Column_DriverName.Name = "Column_DriverName";
-            this.Column_DriverName.ReadOnly = true;
-            // 
-            // Column_CarModel
-            // 
-            this.Column_CarModel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Column_CarModel.DataPropertyName = "CarModel";
-            this.Column_CarModel.HeaderText = "CarModel";
-            this.Column_CarModel.Name = "Column_CarModel";
-            this.Column_CarModel.ReadOnly = true;
-            // 
-            // tabPage3
-            // 
-            this.tabPage3.Controls.Add(this.pictureBox_positionGraph);
-            this.tabPage3.Location = new System.Drawing.Point(4, 22);
-            this.tabPage3.Name = "tabPage3";
-            this.tabPage3.Size = new System.Drawing.Size(479, 378);
-            this.tabPage3.TabIndex = 2;
-            this.tabPage3.Text = "Position Graph";
-            this.tabPage3.UseVisualStyleBackColor = true;
-            // 
-            // pictureBox_positionGraph
-            // 
-            this.pictureBox_positionGraph.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox_positionGraph.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox_positionGraph.Name = "pictureBox_positionGraph";
-            this.pictureBox_positionGraph.Size = new System.Drawing.Size(479, 378);
-            this.pictureBox_positionGraph.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox_positionGraph.TabIndex = 3;
-            this.pictureBox_positionGraph.TabStop = false;
-            // 
-            // tabPage4
-            // 
-            this.tabPage4.Controls.Add(this.numericUpDown_Length);
-            this.tabPage4.Controls.Add(this.button_SetLength);
-            this.tabPage4.Controls.Add(this.button_NextSession);
-            this.tabPage4.Controls.Add(this.button_RestartSession);
-            this.tabPage4.Controls.Add(this.button_ChangeTrack);
-            this.tabPage4.Controls.Add(this.listBox_CycleSessions);
-            this.tabPage4.Location = new System.Drawing.Point(4, 22);
-            this.tabPage4.Name = "tabPage4";
-            this.tabPage4.Size = new System.Drawing.Size(479, 378);
-            this.tabPage4.TabIndex = 3;
-            this.tabPage4.Text = "Session Control";
-            this.tabPage4.UseVisualStyleBackColor = true;
-            // 
-            // listBox_CycleSessions
-            // 
-            this.listBox_CycleSessions.FormattingEnabled = true;
-            this.listBox_CycleSessions.Location = new System.Drawing.Point(11, 12);
-            this.listBox_CycleSessions.Name = "listBox_CycleSessions";
-            this.listBox_CycleSessions.Size = new System.Drawing.Size(177, 160);
-            this.listBox_CycleSessions.TabIndex = 0;
-            // 
-            // button_ChangeTrack
-            // 
-            this.button_ChangeTrack.Location = new System.Drawing.Point(40, 178);
-            this.button_ChangeTrack.Name = "button_ChangeTrack";
-            this.button_ChangeTrack.Size = new System.Drawing.Size(110, 23);
-            this.button_ChangeTrack.TabIndex = 1;
-            this.button_ChangeTrack.Text = "Change Track";
-            this.button_ChangeTrack.UseVisualStyleBackColor = true;
-            this.button_ChangeTrack.Click += new System.EventHandler(this.button_ChangeTrack_Click);
-            // 
-            // button_RestartSession
-            // 
-            this.button_RestartSession.Location = new System.Drawing.Point(258, 69);
-            this.button_RestartSession.Name = "button_RestartSession";
-            this.button_RestartSession.Size = new System.Drawing.Size(142, 23);
-            this.button_RestartSession.TabIndex = 2;
-            this.button_RestartSession.Text = "Restart Session";
-            this.button_RestartSession.UseVisualStyleBackColor = true;
-            this.button_RestartSession.Click += new System.EventHandler(this.button_RestartSession_Click);
-            // 
-            // button_NextSession
-            // 
-            this.button_NextSession.Location = new System.Drawing.Point(258, 98);
-            this.button_NextSession.Name = "button_NextSession";
-            this.button_NextSession.Size = new System.Drawing.Size(142, 23);
-            this.button_NextSession.TabIndex = 3;
-            this.button_NextSession.Text = "Next Session";
-            this.button_NextSession.UseVisualStyleBackColor = true;
-            this.button_NextSession.Click += new System.EventHandler(this.button_NextSession_Click);
-            // 
-            // contextMenuStrip_driver
-            // 
-            this.contextMenuStrip_driver.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.sendChatToolStripMenuItem,
-            this.kickDriverToolStripMenuItem});
-            this.contextMenuStrip_driver.Name = "contextMenuStrip_driver";
-            this.contextMenuStrip_driver.Size = new System.Drawing.Size(131, 48);
-            // 
-            // sendChatToolStripMenuItem
-            // 
-            this.sendChatToolStripMenuItem.Name = "sendChatToolStripMenuItem";
-            this.sendChatToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
-            this.sendChatToolStripMenuItem.Text = "Send Chat";
-            this.sendChatToolStripMenuItem.Click += new System.EventHandler(this.sendChatToolStripMenuItem_Click);
-            // 
-            // kickDriverToolStripMenuItem
-            // 
-            this.kickDriverToolStripMenuItem.Name = "kickDriverToolStripMenuItem";
-            this.kickDriverToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
-            this.kickDriverToolStripMenuItem.Text = "Kick Driver";
-            this.kickDriverToolStripMenuItem.Click += new System.EventHandler(this.kickDriverToolStripMenuItem_Click);
-            // 
-            // button_SetLength
-            // 
-            this.button_SetLength.Location = new System.Drawing.Point(242, 244);
-            this.button_SetLength.Name = "button_SetLength";
-            this.button_SetLength.Size = new System.Drawing.Size(172, 23);
-            this.button_SetLength.TabIndex = 4;
-            this.button_SetLength.Text = "Set Length of Current Session";
-            this.button_SetLength.UseVisualStyleBackColor = true;
-            this.button_SetLength.Click += new System.EventHandler(this.button_SetLength_Click);
+            this.tabPage_SessionControl.Controls.Add(this.numericUpDown_Length);
+            this.tabPage_SessionControl.Controls.Add(this.button_SetLength);
+            this.tabPage_SessionControl.Controls.Add(this.button_NextSession);
+            this.tabPage_SessionControl.Controls.Add(this.button_RestartSession);
+            this.tabPage_SessionControl.Controls.Add(this.button_ChangeTrack);
+            this.tabPage_SessionControl.Controls.Add(this.listBox_CycleSessions);
+            this.tabPage_SessionControl.Location = new System.Drawing.Point(4, 22);
+            this.tabPage_SessionControl.Name = "tabPage_SessionControl";
+            this.tabPage_SessionControl.Size = new System.Drawing.Size(479, 378);
+            this.tabPage_SessionControl.TabIndex = 3;
+            this.tabPage_SessionControl.Text = "Session Control";
+            this.tabPage_SessionControl.UseVisualStyleBackColor = true;
             // 
             // numericUpDown_Length
             // 
@@ -393,6 +246,162 @@
             0,
             0});
             // 
+            // button_SetLength
+            // 
+            this.button_SetLength.Location = new System.Drawing.Point(258, 244);
+            this.button_SetLength.Name = "button_SetLength";
+            this.button_SetLength.Size = new System.Drawing.Size(142, 35);
+            this.button_SetLength.TabIndex = 4;
+            this.button_SetLength.Text = "Set Length of Current Session and Restart";
+            this.button_SetLength.UseVisualStyleBackColor = true;
+            this.button_SetLength.Click += new System.EventHandler(this.button_SetLength_Click);
+            // 
+            // button_NextSession
+            // 
+            this.button_NextSession.Location = new System.Drawing.Point(258, 98);
+            this.button_NextSession.Name = "button_NextSession";
+            this.button_NextSession.Size = new System.Drawing.Size(142, 23);
+            this.button_NextSession.TabIndex = 3;
+            this.button_NextSession.Text = "Next Session";
+            this.button_NextSession.UseVisualStyleBackColor = true;
+            this.button_NextSession.Click += new System.EventHandler(this.button_NextSession_Click);
+            // 
+            // button_RestartSession
+            // 
+            this.button_RestartSession.Location = new System.Drawing.Point(258, 69);
+            this.button_RestartSession.Name = "button_RestartSession";
+            this.button_RestartSession.Size = new System.Drawing.Size(142, 23);
+            this.button_RestartSession.TabIndex = 2;
+            this.button_RestartSession.Text = "Restart Session";
+            this.button_RestartSession.UseVisualStyleBackColor = true;
+            this.button_RestartSession.Click += new System.EventHandler(this.button_RestartSession_Click);
+            // 
+            // button_ChangeTrack
+            // 
+            this.button_ChangeTrack.Location = new System.Drawing.Point(40, 178);
+            this.button_ChangeTrack.Name = "button_ChangeTrack";
+            this.button_ChangeTrack.Size = new System.Drawing.Size(110, 23);
+            this.button_ChangeTrack.TabIndex = 1;
+            this.button_ChangeTrack.Text = "Change Track";
+            this.button_ChangeTrack.UseVisualStyleBackColor = true;
+            this.button_ChangeTrack.Click += new System.EventHandler(this.button_ChangeTrack_Click);
+            // 
+            // listBox_CycleSessions
+            // 
+            this.listBox_CycleSessions.FormattingEnabled = true;
+            this.listBox_CycleSessions.Location = new System.Drawing.Point(11, 12);
+            this.listBox_CycleSessions.Name = "listBox_CycleSessions";
+            this.listBox_CycleSessions.Size = new System.Drawing.Size(177, 160);
+            this.listBox_CycleSessions.TabIndex = 0;
+            // 
+            // tabPage_ConnectedDrivers
+            // 
+            this.tabPage_ConnectedDrivers.Controls.Add(this.dataGridView_connections);
+            this.tabPage_ConnectedDrivers.Location = new System.Drawing.Point(4, 22);
+            this.tabPage_ConnectedDrivers.Name = "tabPage_ConnectedDrivers";
+            this.tabPage_ConnectedDrivers.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage_ConnectedDrivers.Size = new System.Drawing.Size(479, 378);
+            this.tabPage_ConnectedDrivers.TabIndex = 1;
+            this.tabPage_ConnectedDrivers.Text = "Connected Drivers";
+            this.tabPage_ConnectedDrivers.UseVisualStyleBackColor = true;
+            // 
+            // dataGridView_connections
+            // 
+            this.dataGridView_connections.AllowUserToAddRows = false;
+            this.dataGridView_connections.AllowUserToDeleteRows = false;
+            this.dataGridView_connections.AllowUserToResizeRows = false;
+            this.dataGridView_connections.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView_connections.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column_CarId,
+            this.Column_DriverName,
+            this.Column_CarModel});
+            this.dataGridView_connections.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dataGridView_connections.Location = new System.Drawing.Point(3, 3);
+            this.dataGridView_connections.Name = "dataGridView_connections";
+            this.dataGridView_connections.ReadOnly = true;
+            this.dataGridView_connections.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridView_connections.Size = new System.Drawing.Size(473, 372);
+            this.dataGridView_connections.TabIndex = 0;
+            this.dataGridView_connections.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView_connections_CellMouseDown);
+            // 
+            // tabPage_PositionGraph
+            // 
+            this.tabPage_PositionGraph.Controls.Add(this.pictureBox_positionGraph);
+            this.tabPage_PositionGraph.Location = new System.Drawing.Point(4, 22);
+            this.tabPage_PositionGraph.Name = "tabPage_PositionGraph";
+            this.tabPage_PositionGraph.Size = new System.Drawing.Size(479, 378);
+            this.tabPage_PositionGraph.TabIndex = 2;
+            this.tabPage_PositionGraph.Text = "Position Graph";
+            this.tabPage_PositionGraph.UseVisualStyleBackColor = true;
+            // 
+            // pictureBox_positionGraph
+            // 
+            this.pictureBox_positionGraph.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox_positionGraph.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox_positionGraph.Name = "pictureBox_positionGraph";
+            this.pictureBox_positionGraph.Size = new System.Drawing.Size(479, 378);
+            this.pictureBox_positionGraph.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox_positionGraph.TabIndex = 3;
+            this.pictureBox_positionGraph.TabStop = false;
+            // 
+            // textBox_ConnectionCount
+            // 
+            this.textBox_ConnectionCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_ConnectionCount.Location = new System.Drawing.Point(107, 64);
+            this.textBox_ConnectionCount.Name = "textBox_ConnectionCount";
+            this.textBox_ConnectionCount.ReadOnly = true;
+            this.textBox_ConnectionCount.Size = new System.Drawing.Size(395, 20);
+            this.textBox_ConnectionCount.TabIndex = 11;
+            this.textBox_ConnectionCount.Text = "0 drivers currently connected";
+            // 
+            // contextMenuStrip_driver
+            // 
+            this.contextMenuStrip_driver.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.sendChatToolStripMenuItem,
+            this.kickDriverToolStripMenuItem});
+            this.contextMenuStrip_driver.Name = "contextMenuStrip_driver";
+            this.contextMenuStrip_driver.Size = new System.Drawing.Size(131, 48);
+            // 
+            // sendChatToolStripMenuItem
+            // 
+            this.sendChatToolStripMenuItem.Name = "sendChatToolStripMenuItem";
+            this.sendChatToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.sendChatToolStripMenuItem.Text = "Send Chat";
+            this.sendChatToolStripMenuItem.Click += new System.EventHandler(this.sendChatToolStripMenuItem_Click);
+            // 
+            // kickDriverToolStripMenuItem
+            // 
+            this.kickDriverToolStripMenuItem.Name = "kickDriverToolStripMenuItem";
+            this.kickDriverToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.kickDriverToolStripMenuItem.Text = "Kick Driver";
+            this.kickDriverToolStripMenuItem.Click += new System.EventHandler(this.kickDriverToolStripMenuItem_Click);
+            // 
+            // Column_CarId
+            // 
+            this.Column_CarId.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Column_CarId.DataPropertyName = "CarId";
+            this.Column_CarId.HeaderText = "CarId";
+            this.Column_CarId.Name = "Column_CarId";
+            this.Column_CarId.ReadOnly = true;
+            this.Column_CarId.Width = 57;
+            // 
+            // Column_DriverName
+            // 
+            this.Column_DriverName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Column_DriverName.DataPropertyName = "DriverName";
+            this.Column_DriverName.HeaderText = "DriverName";
+            this.Column_DriverName.Name = "Column_DriverName";
+            this.Column_DriverName.ReadOnly = true;
+            // 
+            // Column_CarModel
+            // 
+            this.Column_CarModel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Column_CarModel.DataPropertyName = "CarModel";
+            this.Column_CarModel.HeaderText = "CarModel";
+            this.Column_CarModel.Name = "Column_CarModel";
+            this.Column_CarModel.ReadOnly = true;
+            // 
             // TrackCyclerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -414,15 +423,15 @@
             this.ShowIcon = false;
             this.Text = "AC Track Cycle";
             this.tabControl1.ResumeLayout(false);
-            this.tabPage1.ResumeLayout(false);
-            this.tabPage1.PerformLayout();
-            this.tabPage2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_connections)).EndInit();
-            this.tabPage3.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_positionGraph)).EndInit();
-            this.tabPage4.ResumeLayout(false);
-            this.contextMenuStrip_driver.ResumeLayout(false);
+            this.tabPage_ServerLog.ResumeLayout(false);
+            this.tabPage_ServerLog.PerformLayout();
+            this.tabPage_SessionControl.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Length)).EndInit();
+            this.tabPage_ConnectedDrivers.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView_connections)).EndInit();
+            this.tabPage_PositionGraph.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_positionGraph)).EndInit();
+            this.contextMenuStrip_driver.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -441,16 +450,13 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox_sessionInfo;
         private System.Windows.Forms.TabControl tabControl1;
-        private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage tabPage_ServerLog;
+        private System.Windows.Forms.TabPage tabPage_ConnectedDrivers;
         private System.Windows.Forms.DataGridView dataGridView_connections;
         private System.Windows.Forms.TextBox textBox_ConnectionCount;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarId;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_DriverName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarModel;
-        private System.Windows.Forms.TabPage tabPage3;
+        private System.Windows.Forms.TabPage tabPage_PositionGraph;
         private System.Windows.Forms.PictureBox pictureBox_positionGraph;
-        private System.Windows.Forms.TabPage tabPage4;
+        private System.Windows.Forms.TabPage tabPage_SessionControl;
         private System.Windows.Forms.Button button_ChangeTrack;
         private System.Windows.Forms.ListBox listBox_CycleSessions;
         private System.Windows.Forms.Button button_NextSession;
@@ -460,6 +466,9 @@
         private System.Windows.Forms.ToolStripMenuItem kickDriverToolStripMenuItem;
         private System.Windows.Forms.NumericUpDown numericUpDown_Length;
         private System.Windows.Forms.Button button_SetLength;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarId;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_DriverName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarModel;
     }
 }
 

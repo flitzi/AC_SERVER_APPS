@@ -26,7 +26,13 @@ namespace AC_ServerStarter
         public List<object> Sessions = new List<object>();
         private bool changeTrackAfterEveryLoop = false;
 
-        //private readonly List<string> admins = new List<string>(); //not used, you have to pass the admin password everytime for /next_track and /change_track, e.g. "/next_track <mypassword>" or /change_track <mypassword> spa
+        public string ServerFolder
+        {
+            get
+            {
+                return this.serverfolder;
+            }
+        }
 
         public bool HasCycle
         {

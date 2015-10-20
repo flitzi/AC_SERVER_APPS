@@ -48,6 +48,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AHSV.cs" />
     <Compile Include="GetStringForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -55,6 +56,11 @@
       <DependentUpon>GetStringForm.cs</DependentUpon>
     </Compile>
     <Compile Include="GuiTrackCyclePlugin.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="TrackCyclerForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -66,6 +72,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="GetStringForm.resx">
       <DependentUpon>GetStringForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="TrackCyclerForm.resx">
       <DependentUpon>TrackCyclerForm.cs</DependentUpon>
@@ -87,6 +97,9 @@
       <Project>{9ef78b48-4269-420b-a111-0af4b317b1d2}</Project>
       <Name>AC_SessionReportPlugin</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AC_logo_small.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

@@ -20,6 +20,7 @@ namespace AC_TrackCycle
         {
             base.OnNewSession(msg);
             this.form.BeginInvoke(new Action<MsgSessionInfo>(this.form.SetSessionInfo), msg);
+            this.form.BeginInvoke(new Action(this.form.UpdateGui), null);
         }
 
         protected override void OnClientLoaded(MsgClientLoaded msg)

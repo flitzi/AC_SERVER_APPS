@@ -18,6 +18,7 @@ namespace AC_TrackCycle
         private readonly GuiLogWriter logWriter;
         private readonly AcServerPluginManager pluginManager;
         private readonly GuiTrackCyclePlugin trackCycler;
+        private readonly Dictionary<byte, SolidBrush> carColors = new Dictionary<byte, SolidBrush>();
         private int logLength = 0;
         private MsgSessionInfo currentSessionInfo;
         private Image trackMap;
@@ -174,6 +175,28 @@ namespace AC_TrackCycle
             List<DriverInfo> connectedDrivers = this.pluginManager.GetDriverInfos().Where(d => d.IsConnected).ToList();
             this.textBox_ConnectionCount.Text = connectedDrivers.Count + " driver(s) currently connected";
             this.dataGridView_connections.DataSource = connectedDrivers;
+            foreach (DataGridViewRow row in this.dataGridView_connections.Rows)
+            {
+                row.DefaultCellStyle.BackColor = this.getCarColor(((DriverInfo)row.DataBoundItem).CarId).Color;
+            }
+        }
+
+        private SolidBrush getCarColor(byte carId)
+        {
+            SolidBrush color;
+            if (!this.carColors.TryGetValue(carId, out color))
+            {
+                color = new SolidBrush(getRandomColor(carId));
+                this.carColors.Add(carId, color);
+            }
+            return color;
+        }
+
+        public static Color getRandomColor(int seed)
+        {
+            Random random = new Random(seed);
+            AHSV hsv = new AHSV(255, random.Next(360), 0.5f + random.Next(50) / 100f, 0.5f + random.Next(50) / 100f);
+            return hsv.ToColor();
         }
 
         public void UpdatePositionGraph()
@@ -196,7 +219,7 @@ namespace AC_TrackCycle
                         Point pos = new Point((int)(center.X + Math.Sin(driver.LastSplinePosition * Math.PI * 2) * radius),
                             (int)(center.Y - Math.Cos(driver.LastSplinePosition * Math.PI * 2) * radius));
 
-                        DrawDriverPos(pos, driver.CarId.ToString(), graphics);
+                        DrawDriverPos(pos, driver.CarId, graphics);
                     }
                 }
                 else
@@ -225,7 +248,7 @@ namespace AC_TrackCycle
                         Point pos = new Point(
                             (int)((driver.LastPosition.X + trackMapOffsetX) / trackMapScale * mapScreenScale + mapScreenOffsetX),
                             (int)((driver.LastPosition.Z + trackMapOffsetY) / trackMapScale * mapScreenScale + mapScreenOffsetY));
-                        DrawDriverPos(pos, driver.CarId.ToString(), graphics);
+                        DrawDriverPos(pos, driver.CarId, graphics);
                     }
                 }
                 graphics.Dispose();
@@ -233,12 +256,12 @@ namespace AC_TrackCycle
             }
         }
 
-        private static void DrawDriverPos(Point pos, string id, Graphics graphics)
+        private void DrawDriverPos(Point pos, byte carId, Graphics graphics)
         {
-            graphics.FillEllipse(Brushes.DarkRed, pos.X - 10, pos.Y - 10, 20, 20);
-            SizeF labelSize = graphics.MeasureString(id, DefaultFont);
+            graphics.FillEllipse(this.getCarColor(carId), pos.X - 10, pos.Y - 10, 20, 20);
+            SizeF labelSize = graphics.MeasureString(carId.ToString(), DefaultFont);
 
-            graphics.DrawString(id, DefaultFont, Brushes.White, pos.X - labelSize.Width / 2,
+            graphics.DrawString(carId.ToString(), DefaultFont, Brushes.White, pos.X - labelSize.Width / 2,
                 pos.Y - labelSize.Height / 2);
         }
 

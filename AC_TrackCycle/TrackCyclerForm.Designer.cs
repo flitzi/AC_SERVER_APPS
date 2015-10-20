@@ -42,6 +42,7 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage_ServerLog = new System.Windows.Forms.TabPage();
             this.tabPage_SessionControl = new System.Windows.Forms.TabPage();
+            this.label3 = new System.Windows.Forms.Label();
             this.numericUpDown_Length = new System.Windows.Forms.NumericUpDown();
             this.button_SetLength = new System.Windows.Forms.Button();
             this.button_NextSession = new System.Windows.Forms.Button();
@@ -50,15 +51,16 @@
             this.listBox_CycleSessions = new System.Windows.Forms.ListBox();
             this.tabPage_ConnectedDrivers = new System.Windows.Forms.TabPage();
             this.dataGridView_connections = new System.Windows.Forms.DataGridView();
+            this.Column_CarId = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_DriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_CarModel = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage_PositionGraph = new System.Windows.Forms.TabPage();
             this.pictureBox_positionGraph = new System.Windows.Forms.PictureBox();
             this.textBox_ConnectionCount = new System.Windows.Forms.TextBox();
             this.contextMenuStrip_driver = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.sendChatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.kickDriverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.Column_CarId = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_DriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_CarModel = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.pictureBox_logo = new System.Windows.Forms.PictureBox();
             this.tabControl1.SuspendLayout();
             this.tabPage_ServerLog.SuspendLayout();
             this.tabPage_SessionControl.SuspendLayout();
@@ -68,12 +70,13 @@
             this.tabPage_PositionGraph.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_positionGraph)).BeginInit();
             this.contextMenuStrip_driver.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_logo)).BeginInit();
             this.SuspendLayout();
             // 
             // buttonStart
             // 
             this.buttonStart.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
-            this.buttonStart.Location = new System.Drawing.Point(218, 566);
+            this.buttonStart.Location = new System.Drawing.Point(219, 587);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(75, 23);
             this.buttonStart.TabIndex = 0;
@@ -83,23 +86,24 @@
             // 
             // textBoxOutput
             // 
-            this.textBoxOutput.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBoxOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxOutput.Location = new System.Drawing.Point(3, 3);
             this.textBoxOutput.MaxLength = 327670000;
             this.textBoxOutput.Multiline = true;
             this.textBoxOutput.Name = "textBoxOutput";
             this.textBoxOutput.ReadOnly = true;
             this.textBoxOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBoxOutput.Size = new System.Drawing.Size(473, 372);
+            this.textBoxOutput.Size = new System.Drawing.Size(473, 410);
             this.textBoxOutput.TabIndex = 1;
             this.textBoxOutput.WordWrap = false;
             // 
             // buttonNextTrack
             // 
-            this.buttonNextTrack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonNextTrack.Location = new System.Drawing.Point(427, 566);
+            this.buttonNextTrack.Location = new System.Drawing.Point(11, 215);
             this.buttonNextTrack.Name = "buttonNextTrack";
-            this.buttonNextTrack.Size = new System.Drawing.Size(75, 23);
+            this.buttonNextTrack.Size = new System.Drawing.Size(177, 23);
             this.buttonNextTrack.TabIndex = 2;
             this.buttonNextTrack.Text = "Next Track";
             this.buttonNextTrack.UseVisualStyleBackColor = true;
@@ -126,11 +130,10 @@
             // 
             // checkBoxAutoChangeTrack
             // 
-            this.checkBoxAutoChangeTrack.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.checkBoxAutoChangeTrack.AutoSize = true;
             this.checkBoxAutoChangeTrack.Checked = true;
             this.checkBoxAutoChangeTrack.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxAutoChangeTrack.Location = new System.Drawing.Point(12, 570);
+            this.checkBoxAutoChangeTrack.Location = new System.Drawing.Point(11, 254);
             this.checkBoxAutoChangeTrack.Name = "checkBoxAutoChangeTrack";
             this.checkBoxAutoChangeTrack.Size = new System.Drawing.Size(138, 17);
             this.checkBoxAutoChangeTrack.TabIndex = 5;
@@ -144,7 +147,7 @@
             this.checkBoxCreateLogs.AutoSize = true;
             this.checkBoxCreateLogs.Checked = true;
             this.checkBoxCreateLogs.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxCreateLogs.Location = new System.Drawing.Point(12, 547);
+            this.checkBoxCreateLogs.Location = new System.Drawing.Point(6, 417);
             this.checkBoxCreateLogs.Name = "checkBoxCreateLogs";
             this.checkBoxCreateLogs.Size = new System.Drawing.Size(79, 17);
             this.checkBoxCreateLogs.TabIndex = 6;
@@ -156,7 +159,7 @@
             // 
             this.textBox_chat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_chat.Location = new System.Drawing.Point(47, 500);
+            this.textBox_chat.Location = new System.Drawing.Point(47, 560);
             this.textBox_chat.Name = "textBox_chat";
             this.textBox_chat.Size = new System.Drawing.Size(455, 20);
             this.textBox_chat.TabIndex = 7;
@@ -166,7 +169,7 @@
             // 
             this.label2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 503);
+            this.label2.Location = new System.Drawing.Point(12, 563);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(29, 13);
             this.label2.TabIndex = 8;
@@ -194,39 +197,52 @@
             this.tabControl1.Location = new System.Drawing.Point(15, 90);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(487, 404);
+            this.tabControl1.Size = new System.Drawing.Size(487, 463);
             this.tabControl1.TabIndex = 10;
             this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
             // tabPage_ServerLog
             // 
             this.tabPage_ServerLog.Controls.Add(this.textBoxOutput);
+            this.tabPage_ServerLog.Controls.Add(this.checkBoxCreateLogs);
             this.tabPage_ServerLog.Location = new System.Drawing.Point(4, 22);
             this.tabPage_ServerLog.Name = "tabPage_ServerLog";
             this.tabPage_ServerLog.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_ServerLog.Size = new System.Drawing.Size(479, 378);
+            this.tabPage_ServerLog.Size = new System.Drawing.Size(479, 437);
             this.tabPage_ServerLog.TabIndex = 0;
             this.tabPage_ServerLog.Text = "Server Log";
             this.tabPage_ServerLog.UseVisualStyleBackColor = true;
             // 
             // tabPage_SessionControl
             // 
+            this.tabPage_SessionControl.Controls.Add(this.label3);
             this.tabPage_SessionControl.Controls.Add(this.numericUpDown_Length);
             this.tabPage_SessionControl.Controls.Add(this.button_SetLength);
             this.tabPage_SessionControl.Controls.Add(this.button_NextSession);
             this.tabPage_SessionControl.Controls.Add(this.button_RestartSession);
             this.tabPage_SessionControl.Controls.Add(this.button_ChangeTrack);
             this.tabPage_SessionControl.Controls.Add(this.listBox_CycleSessions);
+            this.tabPage_SessionControl.Controls.Add(this.buttonNextTrack);
+            this.tabPage_SessionControl.Controls.Add(this.checkBoxAutoChangeTrack);
             this.tabPage_SessionControl.Location = new System.Drawing.Point(4, 22);
             this.tabPage_SessionControl.Name = "tabPage_SessionControl";
-            this.tabPage_SessionControl.Size = new System.Drawing.Size(479, 378);
+            this.tabPage_SessionControl.Size = new System.Drawing.Size(479, 437);
             this.tabPage_SessionControl.TabIndex = 3;
             this.tabPage_SessionControl.Text = "Session Control";
             this.tabPage_SessionControl.UseVisualStyleBackColor = true;
             // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(305, 214);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(134, 26);
+            this.label3.TabIndex = 12;
+            this.label3.Text = "minutes for practice/qualify\r\nlaps for race";
+            // 
             // numericUpDown_Length
             // 
-            this.numericUpDown_Length.Location = new System.Drawing.Point(303, 218);
+            this.numericUpDown_Length.Location = new System.Drawing.Point(253, 218);
             this.numericUpDown_Length.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -239,7 +255,7 @@
             0});
             this.numericUpDown_Length.Name = "numericUpDown_Length";
             this.numericUpDown_Length.Size = new System.Drawing.Size(46, 20);
-            this.numericUpDown_Length.TabIndex = 5;
+            this.numericUpDown_Length.TabIndex = 13;
             this.numericUpDown_Length.Value = new decimal(new int[] {
             10,
             0,
@@ -248,7 +264,7 @@
             // 
             // button_SetLength
             // 
-            this.button_SetLength.Location = new System.Drawing.Point(258, 244);
+            this.button_SetLength.Location = new System.Drawing.Point(253, 244);
             this.button_SetLength.Name = "button_SetLength";
             this.button_SetLength.Size = new System.Drawing.Size(142, 35);
             this.button_SetLength.TabIndex = 4;
@@ -258,7 +274,7 @@
             // 
             // button_NextSession
             // 
-            this.button_NextSession.Location = new System.Drawing.Point(258, 98);
+            this.button_NextSession.Location = new System.Drawing.Point(253, 98);
             this.button_NextSession.Name = "button_NextSession";
             this.button_NextSession.Size = new System.Drawing.Size(142, 23);
             this.button_NextSession.TabIndex = 3;
@@ -268,7 +284,7 @@
             // 
             // button_RestartSession
             // 
-            this.button_RestartSession.Location = new System.Drawing.Point(258, 69);
+            this.button_RestartSession.Location = new System.Drawing.Point(253, 69);
             this.button_RestartSession.Name = "button_RestartSession";
             this.button_RestartSession.Size = new System.Drawing.Size(142, 23);
             this.button_RestartSession.TabIndex = 2;
@@ -278,11 +294,11 @@
             // 
             // button_ChangeTrack
             // 
-            this.button_ChangeTrack.Location = new System.Drawing.Point(40, 178);
+            this.button_ChangeTrack.Location = new System.Drawing.Point(11, 178);
             this.button_ChangeTrack.Name = "button_ChangeTrack";
-            this.button_ChangeTrack.Size = new System.Drawing.Size(110, 23);
+            this.button_ChangeTrack.Size = new System.Drawing.Size(177, 23);
             this.button_ChangeTrack.TabIndex = 1;
-            this.button_ChangeTrack.Text = "Change Track";
+            this.button_ChangeTrack.Text = "Change to Selected Track";
             this.button_ChangeTrack.UseVisualStyleBackColor = true;
             this.button_ChangeTrack.Click += new System.EventHandler(this.button_ChangeTrack_Click);
             // 
@@ -300,7 +316,7 @@
             this.tabPage_ConnectedDrivers.Location = new System.Drawing.Point(4, 22);
             this.tabPage_ConnectedDrivers.Name = "tabPage_ConnectedDrivers";
             this.tabPage_ConnectedDrivers.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_ConnectedDrivers.Size = new System.Drawing.Size(479, 378);
+            this.tabPage_ConnectedDrivers.Size = new System.Drawing.Size(479, 437);
             this.tabPage_ConnectedDrivers.TabIndex = 1;
             this.tabPage_ConnectedDrivers.Text = "Connected Drivers";
             this.tabPage_ConnectedDrivers.UseVisualStyleBackColor = true;
@@ -320,62 +336,9 @@
             this.dataGridView_connections.Name = "dataGridView_connections";
             this.dataGridView_connections.ReadOnly = true;
             this.dataGridView_connections.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView_connections.Size = new System.Drawing.Size(473, 372);
+            this.dataGridView_connections.Size = new System.Drawing.Size(473, 431);
             this.dataGridView_connections.TabIndex = 0;
             this.dataGridView_connections.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView_connections_CellMouseDown);
-            // 
-            // tabPage_PositionGraph
-            // 
-            this.tabPage_PositionGraph.Controls.Add(this.pictureBox_positionGraph);
-            this.tabPage_PositionGraph.Location = new System.Drawing.Point(4, 22);
-            this.tabPage_PositionGraph.Name = "tabPage_PositionGraph";
-            this.tabPage_PositionGraph.Size = new System.Drawing.Size(479, 378);
-            this.tabPage_PositionGraph.TabIndex = 2;
-            this.tabPage_PositionGraph.Text = "Position Graph";
-            this.tabPage_PositionGraph.UseVisualStyleBackColor = true;
-            // 
-            // pictureBox_positionGraph
-            // 
-            this.pictureBox_positionGraph.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox_positionGraph.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox_positionGraph.Name = "pictureBox_positionGraph";
-            this.pictureBox_positionGraph.Size = new System.Drawing.Size(479, 378);
-            this.pictureBox_positionGraph.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox_positionGraph.TabIndex = 3;
-            this.pictureBox_positionGraph.TabStop = false;
-            // 
-            // textBox_ConnectionCount
-            // 
-            this.textBox_ConnectionCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.textBox_ConnectionCount.Location = new System.Drawing.Point(107, 64);
-            this.textBox_ConnectionCount.Name = "textBox_ConnectionCount";
-            this.textBox_ConnectionCount.ReadOnly = true;
-            this.textBox_ConnectionCount.Size = new System.Drawing.Size(395, 20);
-            this.textBox_ConnectionCount.TabIndex = 11;
-            this.textBox_ConnectionCount.Text = "0 drivers currently connected";
-            // 
-            // contextMenuStrip_driver
-            // 
-            this.contextMenuStrip_driver.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.sendChatToolStripMenuItem,
-            this.kickDriverToolStripMenuItem});
-            this.contextMenuStrip_driver.Name = "contextMenuStrip_driver";
-            this.contextMenuStrip_driver.Size = new System.Drawing.Size(131, 48);
-            // 
-            // sendChatToolStripMenuItem
-            // 
-            this.sendChatToolStripMenuItem.Name = "sendChatToolStripMenuItem";
-            this.sendChatToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
-            this.sendChatToolStripMenuItem.Text = "Send Chat";
-            this.sendChatToolStripMenuItem.Click += new System.EventHandler(this.sendChatToolStripMenuItem_Click);
-            // 
-            // kickDriverToolStripMenuItem
-            // 
-            this.kickDriverToolStripMenuItem.Name = "kickDriverToolStripMenuItem";
-            this.kickDriverToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
-            this.kickDriverToolStripMenuItem.Text = "Kick Driver";
-            this.kickDriverToolStripMenuItem.Click += new System.EventHandler(this.kickDriverToolStripMenuItem_Click);
             // 
             // Column_CarId
             // 
@@ -402,22 +365,82 @@
             this.Column_CarModel.Name = "Column_CarModel";
             this.Column_CarModel.ReadOnly = true;
             // 
+            // tabPage_PositionGraph
+            // 
+            this.tabPage_PositionGraph.Controls.Add(this.pictureBox_positionGraph);
+            this.tabPage_PositionGraph.Location = new System.Drawing.Point(4, 22);
+            this.tabPage_PositionGraph.Name = "tabPage_PositionGraph";
+            this.tabPage_PositionGraph.Size = new System.Drawing.Size(479, 437);
+            this.tabPage_PositionGraph.TabIndex = 2;
+            this.tabPage_PositionGraph.Text = "Track Graph";
+            this.tabPage_PositionGraph.UseVisualStyleBackColor = true;
+            // 
+            // pictureBox_positionGraph
+            // 
+            this.pictureBox_positionGraph.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBox_positionGraph.Location = new System.Drawing.Point(0, 0);
+            this.pictureBox_positionGraph.Name = "pictureBox_positionGraph";
+            this.pictureBox_positionGraph.Size = new System.Drawing.Size(479, 437);
+            this.pictureBox_positionGraph.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBox_positionGraph.TabIndex = 3;
+            this.pictureBox_positionGraph.TabStop = false;
+            // 
+            // textBox_ConnectionCount
+            // 
+            this.textBox_ConnectionCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_ConnectionCount.Location = new System.Drawing.Point(107, 64);
+            this.textBox_ConnectionCount.Name = "textBox_ConnectionCount";
+            this.textBox_ConnectionCount.ReadOnly = true;
+            this.textBox_ConnectionCount.Size = new System.Drawing.Size(395, 20);
+            this.textBox_ConnectionCount.TabIndex = 11;
+            // 
+            // contextMenuStrip_driver
+            // 
+            this.contextMenuStrip_driver.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.sendChatToolStripMenuItem,
+            this.kickDriverToolStripMenuItem});
+            this.contextMenuStrip_driver.Name = "contextMenuStrip_driver";
+            this.contextMenuStrip_driver.Size = new System.Drawing.Size(131, 48);
+            // 
+            // sendChatToolStripMenuItem
+            // 
+            this.sendChatToolStripMenuItem.Name = "sendChatToolStripMenuItem";
+            this.sendChatToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.sendChatToolStripMenuItem.Text = "Send Chat";
+            this.sendChatToolStripMenuItem.Click += new System.EventHandler(this.sendChatToolStripMenuItem_Click);
+            // 
+            // kickDriverToolStripMenuItem
+            // 
+            this.kickDriverToolStripMenuItem.Name = "kickDriverToolStripMenuItem";
+            this.kickDriverToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.kickDriverToolStripMenuItem.Text = "Kick Driver";
+            this.kickDriverToolStripMenuItem.Click += new System.EventHandler(this.kickDriverToolStripMenuItem_Click);
+            // 
+            // pictureBox_logo
+            // 
+            this.pictureBox_logo.Image = global::AC_TrackCycle.Properties.Resources.AC_logo_small;
+            this.pictureBox_logo.Location = new System.Drawing.Point(25, 38);
+            this.pictureBox_logo.Name = "pictureBox_logo";
+            this.pictureBox_logo.Size = new System.Drawing.Size(50, 41);
+            this.pictureBox_logo.TabIndex = 1;
+            this.pictureBox_logo.TabStop = false;
+            // 
             // TrackCyclerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(514, 601);
+            this.ClientSize = new System.Drawing.Size(514, 618);
+            this.Controls.Add(this.pictureBox_logo);
             this.Controls.Add(this.textBox_ConnectionCount);
             this.Controls.Add(this.tabControl1);
             this.Controls.Add(this.textBox_sessionInfo);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox_chat);
-            this.Controls.Add(this.checkBoxCreateLogs);
-            this.Controls.Add(this.checkBoxAutoChangeTrack);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxCurrentCycle);
-            this.Controls.Add(this.buttonNextTrack);
             this.Controls.Add(this.buttonStart);
+            this.DoubleBuffered = true;
             this.MinimumSize = new System.Drawing.Size(480, 240);
             this.Name = "TrackCyclerForm";
             this.ShowIcon = false;
@@ -426,12 +449,14 @@
             this.tabPage_ServerLog.ResumeLayout(false);
             this.tabPage_ServerLog.PerformLayout();
             this.tabPage_SessionControl.ResumeLayout(false);
+            this.tabPage_SessionControl.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Length)).EndInit();
             this.tabPage_ConnectedDrivers.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_connections)).EndInit();
             this.tabPage_PositionGraph.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_positionGraph)).EndInit();
             this.contextMenuStrip_driver.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_logo)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -469,6 +494,8 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarId;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_DriverName;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarModel;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.PictureBox pictureBox_logo;
     }
 }
 

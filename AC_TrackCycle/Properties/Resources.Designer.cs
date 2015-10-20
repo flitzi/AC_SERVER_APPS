@@ -69,5 +69,15 @@ namespace AC_TrackCycle.Properties {
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap AC_logo_small_grey {
+            get {
+                object obj = ResourceManager.GetObject("AC_logo_small_grey", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
     }
 }

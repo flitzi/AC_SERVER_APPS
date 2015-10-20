@@ -100,7 +100,7 @@ namespace AC_ServerStarter
             {
                 if (msg.Message.StartsWith("/next_track", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    ThreadPool.QueueUserWorkItem(o => this.NextTrack());
+                    this.NextTrackAsync(true);
                 }
                 else if (msg.Message.StartsWith("/change_track "))
                 {
@@ -116,7 +116,7 @@ namespace AC_ServerStarter
                     int trackIndex = GetTrackIndex(track, layout);
                     if (trackIndex > -1)
                     {
-                        ThreadPool.QueueUserWorkItem(o => this.ChangeTrack(trackIndex));
+                        ThreadPool.QueueUserWorkItem(o => this.ChangeTrack(trackIndex, true));
                     }
                     else
                     {
@@ -280,12 +280,12 @@ namespace AC_ServerStarter
 
                         if (this.AutoChangeTrack && !this.changeTrackAfterEveryLoop && message == "HasSentRaceoverPacket, move to the next session")
                         {
-                            this.NextTrack();
+                            this.NextTrackAsync(false);
                         }
 
                         if (this.AutoChangeTrack && this.changeTrackAfterEveryLoop && message == "Server looping")
                         {
-                            this.NextTrack();
+                            this.NextTrackAsync(false);
                         }
                     }
                 }
@@ -323,7 +323,7 @@ namespace AC_ServerStarter
             return index;
         }
 
-        public void ChangeTrack(int index)
+        public virtual void ChangeTrack(int index, bool broadcastResults)
         {
             if (this.HasCycle)
             {
@@ -346,19 +346,27 @@ namespace AC_ServerStarter
                 {
                     if (this.PluginManager.IsConnected)
                     {
+                        if (broadcastResults)
+                        {
+                            this.PluginManager.RestartSession();
+                        }
                         Thread.Sleep(this.PluginManager.NewSessionStartDelay + 1000);
                         this.PluginManager.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
                         Thread.Sleep(2000);
                     }
                     this.StartServer();
                 }
+                else
+                {
+                    Thread.Sleep(1000);
+                }
             }
         }
 
-        public void NextTrack()
+        public void NextTrackAsync(bool broadcastResults)
         {
             int trackIndex = this.cycle + 1;
-            ThreadPool.QueueUserWorkItem(o => this.ChangeTrack(trackIndex));
+            ThreadPool.QueueUserWorkItem(o => this.ChangeTrack(trackIndex, broadcastResults));
         }
 
         public void StopServer()

@@ -42,6 +42,9 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage_ServerLog = new System.Windows.Forms.TabPage();
             this.tabPage_SessionControl = new System.Windows.Forms.TabPage();
+            this.checkBox_BroadcastFastestLap = new System.Windows.Forms.CheckBox();
+            this.checkBox_BroadcastIncidents = new System.Windows.Forms.CheckBox();
+            this.checkBox_BroadcastResults = new System.Windows.Forms.CheckBox();
             this.label3 = new System.Windows.Forms.Label();
             this.numericUpDown_Length = new System.Windows.Forms.NumericUpDown();
             this.button_SetLength = new System.Windows.Forms.Button();
@@ -55,11 +58,11 @@
             this.Column_DriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column_CarModel = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage_PositionGraph = new System.Windows.Forms.TabPage();
-            this.pictureBox_positionGraph = new System.Windows.Forms.PictureBox();
             this.textBox_ConnectionCount = new System.Windows.Forms.TextBox();
             this.contextMenuStrip_driver = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.sendChatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.kickDriverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.trackMapControl = new AC_TrackCycle.TrackMapControl();
             this.pictureBox_logo = new System.Windows.Forms.PictureBox();
             this.tabControl1.SuspendLayout();
             this.tabPage_ServerLog.SuspendLayout();
@@ -68,7 +71,6 @@
             this.tabPage_ConnectedDrivers.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_connections)).BeginInit();
             this.tabPage_PositionGraph.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_positionGraph)).BeginInit();
             this.contextMenuStrip_driver.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_logo)).BeginInit();
             this.SuspendLayout();
@@ -79,7 +81,7 @@
             this.buttonStart.Location = new System.Drawing.Point(219, 587);
             this.buttonStart.Name = "buttonStart";
             this.buttonStart.Size = new System.Drawing.Size(75, 23);
-            this.buttonStart.TabIndex = 0;
+            this.buttonStart.TabIndex = 1;
             this.buttonStart.Text = "Start";
             this.buttonStart.UseVisualStyleBackColor = true;
             this.buttonStart.Click += new System.EventHandler(this.buttonStart_Click);
@@ -89,6 +91,8 @@
             this.textBoxOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxOutput.BackColor = System.Drawing.SystemColors.Window;
+            this.textBoxOutput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.textBoxOutput.Location = new System.Drawing.Point(3, 3);
             this.textBoxOutput.MaxLength = 327670000;
             this.textBoxOutput.Multiline = true;
@@ -101,7 +105,7 @@
             // 
             // buttonNextTrack
             // 
-            this.buttonNextTrack.Location = new System.Drawing.Point(11, 215);
+            this.buttonNextTrack.Location = new System.Drawing.Point(11, 220);
             this.buttonNextTrack.Name = "buttonNextTrack";
             this.buttonNextTrack.Size = new System.Drawing.Size(177, 23);
             this.buttonNextTrack.TabIndex = 2;
@@ -113,6 +117,7 @@
             // 
             this.textBoxCurrentCycle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxCurrentCycle.BackColor = System.Drawing.SystemColors.Window;
             this.textBoxCurrentCycle.Location = new System.Drawing.Point(107, 12);
             this.textBoxCurrentCycle.Name = "textBoxCurrentCycle";
             this.textBoxCurrentCycle.ReadOnly = true;
@@ -133,11 +138,11 @@
             this.checkBoxAutoChangeTrack.AutoSize = true;
             this.checkBoxAutoChangeTrack.Checked = true;
             this.checkBoxAutoChangeTrack.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxAutoChangeTrack.Location = new System.Drawing.Point(11, 254);
+            this.checkBoxAutoChangeTrack.Location = new System.Drawing.Point(11, 249);
             this.checkBoxAutoChangeTrack.Name = "checkBoxAutoChangeTrack";
-            this.checkBoxAutoChangeTrack.Size = new System.Drawing.Size(138, 17);
+            this.checkBoxAutoChangeTrack.Size = new System.Drawing.Size(148, 17);
             this.checkBoxAutoChangeTrack.TabIndex = 5;
-            this.checkBoxAutoChangeTrack.Text = "Change track after race";
+            this.checkBoxAutoChangeTrack.Text = "Change Track After Race";
             this.checkBoxAutoChangeTrack.UseVisualStyleBackColor = true;
             this.checkBoxAutoChangeTrack.CheckedChanged += new System.EventHandler(this.checkBoxAutoChangeTrack_CheckedChanged);
             // 
@@ -149,9 +154,9 @@
             this.checkBoxCreateLogs.CheckState = System.Windows.Forms.CheckState.Checked;
             this.checkBoxCreateLogs.Location = new System.Drawing.Point(6, 417);
             this.checkBoxCreateLogs.Name = "checkBoxCreateLogs";
-            this.checkBoxCreateLogs.Size = new System.Drawing.Size(79, 17);
+            this.checkBoxCreateLogs.Size = new System.Drawing.Size(95, 17);
             this.checkBoxCreateLogs.TabIndex = 6;
-            this.checkBoxCreateLogs.Text = "Create logs";
+            this.checkBoxCreateLogs.Text = "Create log files";
             this.checkBoxCreateLogs.UseVisualStyleBackColor = true;
             this.checkBoxCreateLogs.CheckedChanged += new System.EventHandler(this.checkBoxCreateLogs_CheckedChanged);
             // 
@@ -162,7 +167,7 @@
             this.textBox_chat.Location = new System.Drawing.Point(47, 560);
             this.textBox_chat.Name = "textBox_chat";
             this.textBox_chat.Size = new System.Drawing.Size(455, 20);
-            this.textBox_chat.TabIndex = 7;
+            this.textBox_chat.TabIndex = 0;
             this.textBox_chat.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox_chat_KeyPress);
             // 
             // label2
@@ -179,6 +184,7 @@
             // 
             this.textBox_sessionInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_sessionInfo.BackColor = System.Drawing.SystemColors.Window;
             this.textBox_sessionInfo.Location = new System.Drawing.Point(107, 38);
             this.textBox_sessionInfo.Name = "textBox_sessionInfo";
             this.textBox_sessionInfo.ReadOnly = true;
@@ -199,7 +205,6 @@
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(487, 463);
             this.tabControl1.TabIndex = 10;
-            this.tabControl1.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
             // 
             // tabPage_ServerLog
             // 
@@ -215,6 +220,9 @@
             // 
             // tabPage_SessionControl
             // 
+            this.tabPage_SessionControl.Controls.Add(this.checkBox_BroadcastFastestLap);
+            this.tabPage_SessionControl.Controls.Add(this.checkBox_BroadcastIncidents);
+            this.tabPage_SessionControl.Controls.Add(this.checkBox_BroadcastResults);
             this.tabPage_SessionControl.Controls.Add(this.label3);
             this.tabPage_SessionControl.Controls.Add(this.numericUpDown_Length);
             this.tabPage_SessionControl.Controls.Add(this.button_SetLength);
@@ -231,18 +239,52 @@
             this.tabPage_SessionControl.Text = "Session Control";
             this.tabPage_SessionControl.UseVisualStyleBackColor = true;
             // 
+            // checkBox_BroadcastFastestLap
+            // 
+            this.checkBox_BroadcastFastestLap.AutoSize = true;
+            this.checkBox_BroadcastFastestLap.Location = new System.Drawing.Point(247, 226);
+            this.checkBox_BroadcastFastestLap.Name = "checkBox_BroadcastFastestLap";
+            this.checkBox_BroadcastFastestLap.Size = new System.Drawing.Size(132, 17);
+            this.checkBox_BroadcastFastestLap.TabIndex = 16;
+            this.checkBox_BroadcastFastestLap.Text = "Broadcast Fastest Lap";
+            this.checkBox_BroadcastFastestLap.UseVisualStyleBackColor = true;
+            this.checkBox_BroadcastFastestLap.CheckedChanged += new System.EventHandler(this.checkBox_BroadcastFastestLap_CheckedChanged);
+            // 
+            // checkBox_BroadcastIncidents
+            // 
+            this.checkBox_BroadcastIncidents.AutoSize = true;
+            this.checkBox_BroadcastIncidents.Location = new System.Drawing.Point(247, 249);
+            this.checkBox_BroadcastIncidents.Name = "checkBox_BroadcastIncidents";
+            this.checkBox_BroadcastIncidents.Size = new System.Drawing.Size(120, 17);
+            this.checkBox_BroadcastIncidents.TabIndex = 15;
+            this.checkBox_BroadcastIncidents.Text = "Broadcast Incidents";
+            this.checkBox_BroadcastIncidents.ThreeState = true;
+            this.checkBox_BroadcastIncidents.UseVisualStyleBackColor = true;
+            this.checkBox_BroadcastIncidents.CheckStateChanged += new System.EventHandler(this.checkBox_BroadcastIncidents_CheckStateChanged);
+            // 
+            // checkBox_BroadcastResults
+            // 
+            this.checkBox_BroadcastResults.AutoSize = true;
+            this.checkBox_BroadcastResults.Location = new System.Drawing.Point(247, 203);
+            this.checkBox_BroadcastResults.Name = "checkBox_BroadcastResults";
+            this.checkBox_BroadcastResults.Size = new System.Drawing.Size(152, 17);
+            this.checkBox_BroadcastResults.TabIndex = 14;
+            this.checkBox_BroadcastResults.Text = "Broadcast Session Results";
+            this.checkBox_BroadcastResults.UseVisualStyleBackColor = true;
+            this.checkBox_BroadcastResults.CheckedChanged += new System.EventHandler(this.checkBox_BroadcastResults_CheckedChanged);
+            // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(305, 214);
+            this.label3.Location = new System.Drawing.Point(299, 99);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(134, 26);
+            this.label3.Size = new System.Drawing.Size(116, 26);
             this.label3.TabIndex = 12;
-            this.label3.Text = "minutes for practice/qualify\r\nlaps for race";
+            this.label3.Text = "Minutes for Pract/Quali\r\nLaps for Race";
             // 
             // numericUpDown_Length
             // 
-            this.numericUpDown_Length.Location = new System.Drawing.Point(253, 218);
+            this.numericUpDown_Length.Location = new System.Drawing.Point(247, 103);
             this.numericUpDown_Length.Maximum = new decimal(new int[] {
             1000,
             0,
@@ -264,19 +306,19 @@
             // 
             // button_SetLength
             // 
-            this.button_SetLength.Location = new System.Drawing.Point(253, 244);
+            this.button_SetLength.Location = new System.Drawing.Point(247, 129);
             this.button_SetLength.Name = "button_SetLength";
-            this.button_SetLength.Size = new System.Drawing.Size(142, 35);
+            this.button_SetLength.Size = new System.Drawing.Size(177, 35);
             this.button_SetLength.TabIndex = 4;
-            this.button_SetLength.Text = "Set Length of Current Session and Restart";
+            this.button_SetLength.Text = "Set Length of Current Session \r\nand Restart";
             this.button_SetLength.UseVisualStyleBackColor = true;
             this.button_SetLength.Click += new System.EventHandler(this.button_SetLength_Click);
             // 
             // button_NextSession
             // 
-            this.button_NextSession.Location = new System.Drawing.Point(253, 98);
+            this.button_NextSession.Location = new System.Drawing.Point(247, 41);
             this.button_NextSession.Name = "button_NextSession";
-            this.button_NextSession.Size = new System.Drawing.Size(142, 23);
+            this.button_NextSession.Size = new System.Drawing.Size(177, 23);
             this.button_NextSession.TabIndex = 3;
             this.button_NextSession.Text = "Next Session";
             this.button_NextSession.UseVisualStyleBackColor = true;
@@ -284,9 +326,9 @@
             // 
             // button_RestartSession
             // 
-            this.button_RestartSession.Location = new System.Drawing.Point(253, 69);
+            this.button_RestartSession.Location = new System.Drawing.Point(247, 12);
             this.button_RestartSession.Name = "button_RestartSession";
-            this.button_RestartSession.Size = new System.Drawing.Size(142, 23);
+            this.button_RestartSession.Size = new System.Drawing.Size(177, 23);
             this.button_RestartSession.TabIndex = 2;
             this.button_RestartSession.Text = "Restart Session";
             this.button_RestartSession.UseVisualStyleBackColor = true;
@@ -294,7 +336,7 @@
             // 
             // button_ChangeTrack
             // 
-            this.button_ChangeTrack.Location = new System.Drawing.Point(11, 178);
+            this.button_ChangeTrack.Location = new System.Drawing.Point(11, 191);
             this.button_ChangeTrack.Name = "button_ChangeTrack";
             this.button_ChangeTrack.Size = new System.Drawing.Size(177, 23);
             this.button_ChangeTrack.TabIndex = 1;
@@ -307,7 +349,7 @@
             this.listBox_CycleSessions.FormattingEnabled = true;
             this.listBox_CycleSessions.Location = new System.Drawing.Point(11, 12);
             this.listBox_CycleSessions.Name = "listBox_CycleSessions";
-            this.listBox_CycleSessions.Size = new System.Drawing.Size(177, 160);
+            this.listBox_CycleSessions.Size = new System.Drawing.Size(177, 173);
             this.listBox_CycleSessions.TabIndex = 0;
             // 
             // tabPage_ConnectedDrivers
@@ -325,7 +367,9 @@
             // 
             this.dataGridView_connections.AllowUserToAddRows = false;
             this.dataGridView_connections.AllowUserToDeleteRows = false;
+            this.dataGridView_connections.AllowUserToResizeColumns = false;
             this.dataGridView_connections.AllowUserToResizeRows = false;
+            this.dataGridView_connections.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGridView_connections.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView_connections.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column_CarId,
@@ -335,10 +379,13 @@
             this.dataGridView_connections.Location = new System.Drawing.Point(3, 3);
             this.dataGridView_connections.Name = "dataGridView_connections";
             this.dataGridView_connections.ReadOnly = true;
+            this.dataGridView_connections.RowHeadersWidth = 24;
+            this.dataGridView_connections.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this.dataGridView_connections.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView_connections.Size = new System.Drawing.Size(473, 431);
             this.dataGridView_connections.TabIndex = 0;
             this.dataGridView_connections.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView_connections_CellMouseDown);
+            this.dataGridView_connections.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dataGridView_connections_CellPainting);
             // 
             // Column_CarId
             // 
@@ -367,7 +414,7 @@
             // 
             // tabPage_PositionGraph
             // 
-            this.tabPage_PositionGraph.Controls.Add(this.pictureBox_positionGraph);
+            this.tabPage_PositionGraph.Controls.Add(this.trackMapControl);
             this.tabPage_PositionGraph.Location = new System.Drawing.Point(4, 22);
             this.tabPage_PositionGraph.Name = "tabPage_PositionGraph";
             this.tabPage_PositionGraph.Size = new System.Drawing.Size(479, 437);
@@ -375,20 +422,11 @@
             this.tabPage_PositionGraph.Text = "Track Graph";
             this.tabPage_PositionGraph.UseVisualStyleBackColor = true;
             // 
-            // pictureBox_positionGraph
-            // 
-            this.pictureBox_positionGraph.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBox_positionGraph.Location = new System.Drawing.Point(0, 0);
-            this.pictureBox_positionGraph.Name = "pictureBox_positionGraph";
-            this.pictureBox_positionGraph.Size = new System.Drawing.Size(479, 437);
-            this.pictureBox_positionGraph.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBox_positionGraph.TabIndex = 3;
-            this.pictureBox_positionGraph.TabStop = false;
-            // 
             // textBox_ConnectionCount
             // 
             this.textBox_ConnectionCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBox_ConnectionCount.BackColor = System.Drawing.SystemColors.Window;
             this.textBox_ConnectionCount.Location = new System.Drawing.Point(107, 64);
             this.textBox_ConnectionCount.Name = "textBox_ConnectionCount";
             this.textBox_ConnectionCount.ReadOnly = true;
@@ -417,9 +455,19 @@
             this.kickDriverToolStripMenuItem.Text = "Kick Driver";
             this.kickDriverToolStripMenuItem.Click += new System.EventHandler(this.kickDriverToolStripMenuItem_Click);
             // 
+            // trackMapControl
+            // 
+            this.trackMapControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.trackMapControl.Location = new System.Drawing.Point(0, 0);
+            this.trackMapControl.Name = "trackMapControl";
+            this.trackMapControl.Size = new System.Drawing.Size(479, 437);
+            this.trackMapControl.TabIndex = 0;
+            this.trackMapControl.Text = "trackMapControl1";
+            this.trackMapControl.Paint += new System.Windows.Forms.PaintEventHandler(this.trackMapControl_Paint);
+            // 
             // pictureBox_logo
             // 
-            this.pictureBox_logo.Image = global::AC_TrackCycle.Properties.Resources.AC_logo_small;
+            this.pictureBox_logo.Image = global::AC_TrackCycle.Properties.Resources.AC_logo_small_grey;
             this.pictureBox_logo.Location = new System.Drawing.Point(25, 38);
             this.pictureBox_logo.Name = "pictureBox_logo";
             this.pictureBox_logo.Size = new System.Drawing.Size(50, 41);
@@ -441,9 +489,10 @@
             this.Controls.Add(this.textBoxCurrentCycle);
             this.Controls.Add(this.buttonStart);
             this.DoubleBuffered = true;
-            this.MinimumSize = new System.Drawing.Size(480, 240);
+            this.MinimumSize = new System.Drawing.Size(490, 495);
             this.Name = "TrackCyclerForm";
             this.ShowIcon = false;
+            this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.Text = "AC Track Cycle";
             this.tabControl1.ResumeLayout(false);
             this.tabPage_ServerLog.ResumeLayout(false);
@@ -454,7 +503,6 @@
             this.tabPage_ConnectedDrivers.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_connections)).EndInit();
             this.tabPage_PositionGraph.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_positionGraph)).EndInit();
             this.contextMenuStrip_driver.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_logo)).EndInit();
             this.ResumeLayout(false);
@@ -480,7 +528,6 @@
         private System.Windows.Forms.DataGridView dataGridView_connections;
         private System.Windows.Forms.TextBox textBox_ConnectionCount;
         private System.Windows.Forms.TabPage tabPage_PositionGraph;
-        private System.Windows.Forms.PictureBox pictureBox_positionGraph;
         private System.Windows.Forms.TabPage tabPage_SessionControl;
         private System.Windows.Forms.Button button_ChangeTrack;
         private System.Windows.Forms.ListBox listBox_CycleSessions;
@@ -496,6 +543,10 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarModel;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.PictureBox pictureBox_logo;
+        private System.Windows.Forms.CheckBox checkBox_BroadcastIncidents;
+        private System.Windows.Forms.CheckBox checkBox_BroadcastResults;
+        private System.Windows.Forms.CheckBox checkBox_BroadcastFastestLap;
+        private TrackMapControl trackMapControl;
     }
 }
 

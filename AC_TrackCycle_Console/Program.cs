@@ -85,7 +85,7 @@ namespace AC_TrackCycle_Console
                         }
                         else if (line.ToLower() == "next_track")
                         {
-                            trackCycler.NextTrack();
+                            trackCycler.NextTrackAsync(true);
                         }
                         else
                         {

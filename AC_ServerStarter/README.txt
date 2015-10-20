@@ -88,7 +88,7 @@ note: chat started with / is not visible to other players
 Changelog:
 ----------
 
-2.5.0
+2.4.0
 - fixed change_track_after_every_loop doesn't cycle twice if used with race session
 - if next cycle has same track, layout and laps then the server is not restarted
 - showing number of connected drivers

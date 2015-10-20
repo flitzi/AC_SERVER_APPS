@@ -16,6 +16,13 @@ namespace AC_TrackCycle
             this.form = form;
         }
 
+        public override void ChangeTrack(int index, bool broadcastResults)
+        {
+            this.form.BeginInvoke(new Action(this.form.TrackChanging), null);
+            base.ChangeTrack(index, broadcastResults);
+            this.form.BeginInvoke(new Action(this.form.TrackChanged), null);
+        }
+
         protected override void OnNewSession(MsgSessionInfo msg)
         {
             base.OnNewSession(msg);

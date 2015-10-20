@@ -70,6 +70,9 @@
     <Compile Include="GuiLogWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TrackMapControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="GetStringForm.resx">
       <DependentUpon>GetStringForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -100,6 +103,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AC_logo_small.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\AC_logo_small_grey.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

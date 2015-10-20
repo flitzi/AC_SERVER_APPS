@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using acPlugins4net;
 using acPlugins4net.info;
 using acPlugins4net.messages;
+using System.Threading;
 
 namespace AC_TrackCycle
 {
@@ -245,7 +246,8 @@ namespace AC_TrackCycle
         {
             if (this.listBox_CycleSessions.SelectedIndex > -1)
             {
-                this.trackCycler.ChangeTrack(this.listBox_CycleSessions.SelectedIndex);
+                int trackIndex = this.listBox_CycleSessions.SelectedIndex;
+                ThreadPool.QueueUserWorkItem(o => this.trackCycler.ChangeTrack(trackIndex));
             }
         }
 

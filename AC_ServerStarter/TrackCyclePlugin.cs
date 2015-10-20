@@ -346,7 +346,7 @@ namespace AC_ServerStarter
                 {
                     if (this.PluginManager.IsConnected)
                     {
-                        Thread.Sleep(1000);
+                        Thread.Sleep(this.PluginManager.NewSessionStartDelay + 1000);
                         this.PluginManager.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
                         Thread.Sleep(2000);
                     }
@@ -357,7 +357,8 @@ namespace AC_ServerStarter
 
         public void NextTrack()
         {
-            this.ChangeTrack(this.cycle + 1);
+            int trackIndex = this.cycle + 1;
+            ThreadPool.QueueUserWorkItem(o => this.ChangeTrack(trackIndex));
         }
 
         public void StopServer()

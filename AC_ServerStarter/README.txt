@@ -7,6 +7,9 @@ Features:
 - track cycle via admin command
 - complete cfg template cycle (new since 2.0)
 - server message to inform players of incoming track change (new since 2.0)
+- session control tab (new since 2.4)
+- connected drivers tab (new since 2.4)
+- track graph tab (new since 2.4)
 - result logging into json, including all players (not only the last connected players), collision events, laps (new since 2.0) (optional upload to database and safety rating based player access will come soon)
 - server chat via server GUI or server command line (new since 2.0)
 - server chat via admin command (new since 2.0)
@@ -84,17 +87,18 @@ note: chat started with / is not visible to other players
 
 - the result json are saved in the "sessionresults" folder
 
+- for the track graph to work you need the official map.png and map.ini in the official folder structure. If you run acServer from a complete game steam installation, they will be found. If you are having a standalone server installation, you can put the two files per track in the content/tracks subfolders (where the surface.ini files are)
 
 Changelog:
 ----------
 
-2.4.0
+2.4.0 (2015/10/21)
 - fixed change_track_after_every_loop doesn't cycle twice if used with race session
 - if next cycle has same track, layout and laps then the server is not restarted
 - showing number of connected drivers
 - added Session Control tab
 - added Connected Drivers tab
-- added Position Graph tab
+- added Track Graph tab
 
 2.3.0 (2015/10/10)
 - updated to new acServer UDP protocol version (AC v1.3)

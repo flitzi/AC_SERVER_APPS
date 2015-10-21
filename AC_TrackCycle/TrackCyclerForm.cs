@@ -115,10 +115,17 @@ namespace AC_TrackCycle
 
                 foreach (string possibleFolder in possibleFolders)
                 {
-                    if (File.Exists(Path.Combine(possibleFolder, "map.png")) &&
+                    if ((File.Exists(Path.Combine(possibleFolder, "map.png")) || File.Exists(Path.Combine(possibleFolder, "Data", "map.png"))) &&
                         File.Exists(Path.Combine(possibleFolder, "Data", "map.ini")))
                     {
-                        this.trackMap = Bitmap.FromFile(Path.Combine(possibleFolder, "map.png"));
+                        if (File.Exists(Path.Combine(possibleFolder, "map.png")))
+                        {
+                            this.trackMap = Bitmap.FromFile(Path.Combine(possibleFolder, "map.png"));
+                        }
+                        else
+                        {
+                            this.trackMap = Bitmap.FromFile(Path.Combine(possibleFolder, "Data", "map.png"));
+                        }
 
                         Bitmap copy = new Bitmap(this.trackMap.Width, this.trackMap.Height);
                         using (Graphics graphics = Graphics.FromImage(copy))

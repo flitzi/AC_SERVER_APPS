@@ -296,7 +296,8 @@ namespace AC_TrackCycle
         {
             if (this.pluginManager.IsConnected)
             {
-                this.pluginManager.RestartSession();
+                this.pluginManager.AdminCommand("/restart_session");
+                //this.pluginManager.RestartSession();
             }
         }
 
@@ -410,7 +411,15 @@ namespace AC_TrackCycle
                     DrawDriverPos(pos, driver.CarId, graphics);
                 }
             }
-        }       
+        }
+
+        private void banDriverToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (this.dataGridView_connections.SelectedRows.Count == 1)
+            {
+                this.pluginManager.AdminCommand("/ban_id " + ((DriverInfo)this.dataGridView_connections.SelectedRows[0].DataBoundItem).CarId);
+            }
+        }
 
         private void kickDriverToolStripMenuItem_Click(object sender, EventArgs e)
         {

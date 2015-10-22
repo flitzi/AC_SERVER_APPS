@@ -56,14 +56,16 @@
             this.dataGridView_connections = new System.Windows.Forms.DataGridView();
             this.Column_CarId = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column_DriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_DriverGuid = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column_CarModel = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage_PositionGraph = new System.Windows.Forms.TabPage();
             this.textBox_ConnectionCount = new System.Windows.Forms.TextBox();
             this.contextMenuStrip_driver = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.sendChatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.kickDriverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.trackMapControl = new AC_TrackCycle.TrackMapControl();
+            this.banDriverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox_logo = new System.Windows.Forms.PictureBox();
+            this.trackMapControl = new AC_TrackCycle.TrackMapControl();
             this.tabControl1.SuspendLayout();
             this.tabPage_ServerLog.SuspendLayout();
             this.tabPage_SessionControl.SuspendLayout();
@@ -367,13 +369,13 @@
             // 
             this.dataGridView_connections.AllowUserToAddRows = false;
             this.dataGridView_connections.AllowUserToDeleteRows = false;
-            this.dataGridView_connections.AllowUserToResizeColumns = false;
             this.dataGridView_connections.AllowUserToResizeRows = false;
             this.dataGridView_connections.BackgroundColor = System.Drawing.SystemColors.Window;
             this.dataGridView_connections.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView_connections.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.Column_CarId,
             this.Column_DriverName,
+            this.Column_DriverGuid,
             this.Column_CarModel});
             this.dataGridView_connections.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView_connections.Location = new System.Drawing.Point(3, 3);
@@ -403,6 +405,14 @@
             this.Column_DriverName.HeaderText = "DriverName";
             this.Column_DriverName.Name = "Column_DriverName";
             this.Column_DriverName.ReadOnly = true;
+            // 
+            // Column_DriverGuid
+            // 
+            this.Column_DriverGuid.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Column_DriverGuid.DataPropertyName = "DriverGuid";
+            this.Column_DriverGuid.HeaderText = "DriverGuid";
+            this.Column_DriverGuid.Name = "Column_DriverGuid";
+            this.Column_DriverGuid.ReadOnly = true;
             // 
             // Column_CarModel
             // 
@@ -437,9 +447,10 @@
             // 
             this.contextMenuStrip_driver.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.sendChatToolStripMenuItem,
-            this.kickDriverToolStripMenuItem});
+            this.kickDriverToolStripMenuItem,
+            this.banDriverToolStripMenuItem});
             this.contextMenuStrip_driver.Name = "contextMenuStrip_driver";
-            this.contextMenuStrip_driver.Size = new System.Drawing.Size(131, 48);
+            this.contextMenuStrip_driver.Size = new System.Drawing.Size(131, 70);
             // 
             // sendChatToolStripMenuItem
             // 
@@ -455,15 +466,12 @@
             this.kickDriverToolStripMenuItem.Text = "Kick Driver";
             this.kickDriverToolStripMenuItem.Click += new System.EventHandler(this.kickDriverToolStripMenuItem_Click);
             // 
-            // trackMapControl
+            // banDriverToolStripMenuItem
             // 
-            this.trackMapControl.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.trackMapControl.Location = new System.Drawing.Point(0, 0);
-            this.trackMapControl.Name = "trackMapControl";
-            this.trackMapControl.Size = new System.Drawing.Size(479, 437);
-            this.trackMapControl.TabIndex = 0;
-            this.trackMapControl.Text = "trackMapControl1";
-            this.trackMapControl.Paint += new System.Windows.Forms.PaintEventHandler(this.trackMapControl_Paint);
+            this.banDriverToolStripMenuItem.Name = "banDriverToolStripMenuItem";
+            this.banDriverToolStripMenuItem.Size = new System.Drawing.Size(130, 22);
+            this.banDriverToolStripMenuItem.Text = "Ban Driver";
+            this.banDriverToolStripMenuItem.Click += new System.EventHandler(this.banDriverToolStripMenuItem_Click);
             // 
             // pictureBox_logo
             // 
@@ -473,6 +481,15 @@
             this.pictureBox_logo.Size = new System.Drawing.Size(50, 41);
             this.pictureBox_logo.TabIndex = 1;
             this.pictureBox_logo.TabStop = false;
+            // 
+            // trackMapControl
+            // 
+            this.trackMapControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.trackMapControl.Location = new System.Drawing.Point(0, 0);
+            this.trackMapControl.Name = "trackMapControl";
+            this.trackMapControl.Size = new System.Drawing.Size(479, 437);
+            this.trackMapControl.TabIndex = 8;
+            this.trackMapControl.Paint += new System.Windows.Forms.PaintEventHandler(this.trackMapControl_Paint);
             // 
             // TrackCyclerForm
             // 
@@ -538,14 +555,16 @@
         private System.Windows.Forms.ToolStripMenuItem kickDriverToolStripMenuItem;
         private System.Windows.Forms.NumericUpDown numericUpDown_Length;
         private System.Windows.Forms.Button button_SetLength;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarId;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_DriverName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarModel;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.PictureBox pictureBox_logo;
         private System.Windows.Forms.CheckBox checkBox_BroadcastIncidents;
         private System.Windows.Forms.CheckBox checkBox_BroadcastResults;
         private System.Windows.Forms.CheckBox checkBox_BroadcastFastestLap;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarId;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_DriverName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_DriverGuid;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarModel;
+        private System.Windows.Forms.ToolStripMenuItem banDriverToolStripMenuItem;
         private TrackMapControl trackMapControl;
     }
 }

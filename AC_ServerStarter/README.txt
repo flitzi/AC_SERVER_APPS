@@ -92,6 +92,12 @@ note: chat started with / is not visible to other players
 Changelog:
 ----------
 
+2.5.0 (2015/10/22)
+- updated to new acServer UDP protocol version (AC v1.3.4)
+- added DriverGuid column to Connected Drivers tab
+- added ban context menu option
+
+
 2.4.0 (2015/10/21)
 - fixed change_track_after_every_loop doesn't cycle twice if used with race session
 - if next cycle has same track, layout and laps then the server is not restarted

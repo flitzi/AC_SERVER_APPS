@@ -25,12 +25,17 @@ namespace AC_TrackCycle
         private MsgSessionInfo currentSessionInfo;
         private Image trackMap;
         private double trackMapScale, trackMapOffsetX, trackMapOffsetY;
+        private TrackMapControl trackMapControl;
 
         private int origBroadcastResultCount;
 
         public TrackCyclerForm()
         {
             this.InitializeComponent();
+            this.trackMapControl = new TrackMapControl();
+            this.trackMapControl.Dock = DockStyle.Fill;
+            this.trackMapControl.Paint += trackMapControl_Paint;
+            this.tabPage_PositionGraph.Controls.Add(this.trackMapControl);
 
             this.logWriter = new GuiLogWriter(
                 this,
@@ -184,10 +189,17 @@ namespace AC_TrackCycle
             {
                 this.textBoxOutput.Text = string.Empty;
                 this.logLength = 0;
+
+                this.textBox_chatlog.Text = string.Empty;
             }
 
             this.textBoxOutput.AppendText(message + Environment.NewLine);
             this.logLength++;
+
+            if (message.StartsWith("CHAT ["))
+            {
+                this.textBox_chatlog.AppendText(message.Substring(5) + Environment.NewLine);
+            }
         }
 
         protected override void OnClosed(EventArgs e)
@@ -227,6 +239,7 @@ namespace AC_TrackCycle
             {
                 e.Handled = true;
                 this.pluginManager.BroadcastChatMessage(this.textBox_chat.Text);
+                this.textBox_chatlog.AppendText("[Server]: " + this.textBox_chat.Text + Environment.NewLine);
                 this.textBox_chat.Text = string.Empty;
             }
         }
@@ -325,6 +338,7 @@ namespace AC_TrackCycle
                 if (form.ShowDialog(this) == DialogResult.OK)
                 {
                     this.pluginManager.SendChatMessage(((DriverInfo)this.dataGridView_connections.SelectedRows[0].DataBoundItem).CarId, form.String);
+                    this.textBox_chatlog.AppendText("[Server to " + ((DriverInfo)this.dataGridView_connections.SelectedRows[0].DataBoundItem).DriverName + "]: " + form.String + Environment.NewLine);
                 }
             }
         }

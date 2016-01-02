@@ -92,6 +92,10 @@ note: chat started with / is not visible to other players
 Changelog:
 ----------
 
+2.5.1 (2016/01/02)
+- blocking "Smoothing" server log messages
+
+
 2.5.0 (2015/10/22)
 - updated to new acServer UDP protocol version (AC v1.3.4)
 - added DriverGuid column to Connected Drivers tab

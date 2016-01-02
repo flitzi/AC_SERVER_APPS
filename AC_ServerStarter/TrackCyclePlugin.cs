@@ -274,7 +274,7 @@ namespace AC_ServerStarter
             {
                 try
                 {
-                    if (!string.IsNullOrEmpty(message) && !message.StartsWith("No car with address"))
+                    if (!string.IsNullOrEmpty(message) && !message.StartsWith("No car with address") && !message.StartsWith("Smoothing"))
                     {
                         this.PluginManager.Log(message);
 

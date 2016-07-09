@@ -92,6 +92,10 @@ note: chat started with / is not visible to other players
 Changelog:
 ----------
 
+2.6.0 (2016/07/09)
+- option to start additional executables, they are also restarted when the server is restarted due to track change, this helps with plugins that can't handle server restarts/track changes
+
+
 2.5.1 (2016/01/02)
 - blocking "Smoothing" server log messages
 

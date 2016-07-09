@@ -25,6 +25,8 @@ namespace AC_ServerStarter
         private string[] iniLines = new string[0];
         public List<object> Sessions = new List<object>();
         private bool changeTrackAfterEveryLoop = false;
+        private readonly List<string> additionalExes = new List<string>();
+        private readonly List<Process> additionalProcesses = new List<Process>();
 
         public string ServerFolder
         {
@@ -66,6 +68,18 @@ namespace AC_ServerStarter
             this.entry_list = Path.Combine(serverfolder, "cfg", "entry_list.ini");
 
             this.changeTrackAfterEveryLoop = PluginManager.Config.GetSettingAsInt("change_track_after_every_loop", 0) == 1;
+
+            string tmpExes = PluginManager.Config.GetSetting("additional_exes");
+            if (!string.IsNullOrWhiteSpace(tmpExes))
+            {
+                foreach (string exe in tmpExes.Split(';'))
+                {
+                    if (!string.IsNullOrWhiteSpace(exe) && File.Exists(exe))
+                    {
+                        this.additionalExes.Add(exe);
+                    }
+                }
+            }
 
             this.AutoChangeTrack = true;
 
@@ -260,6 +274,11 @@ namespace AC_ServerStarter
             this.serverInstance.OutputDataReceived += this.process_OutputDataReceived;
             this.serverInstance.Start();
             this.serverInstance.BeginOutputReadLine();
+
+            foreach (string additionalExe in this.additionalExes)
+            {
+                this.additionalProcesses.Add(Process.Start(additionalExe));
+            }
         }
 
         private void process_OutputDataReceived(object sender, DataReceivedEventArgs e)
@@ -371,6 +390,15 @@ namespace AC_ServerStarter
 
         public void StopServer()
         {
+            foreach (Process additionalProcess in this.additionalProcesses)
+            {
+                if (additionalProcess != null && !additionalProcess.HasExited)
+                {
+                    additionalProcess.Kill();
+                }
+            }
+            additionalProcesses.Clear();
+
             if (this.serverInstance != null && !this.serverInstance.HasExited)
             {
                 this.serverInstance.Kill();

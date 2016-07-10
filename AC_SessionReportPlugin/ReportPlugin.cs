@@ -15,7 +15,7 @@ namespace AC_SessionReportPlugin
 {
     public class ReportPlugin : AcServerPlugin
     {
-        public const string Version = "2.5.1"; // for now use same version
+        public const string Version = "2.6.1"; // for now use same version
 
         public int BroadcastIncidents { get; set; }
         public int BroadcastResults { get; set; }
@@ -111,14 +111,27 @@ namespace AC_SessionReportPlugin
 
         protected override void OnLapCompleted(LapInfo lap)
         {
-            if (this.BroadcastFastestLap > 0 && lap.Cuts == 0)
+            if (this.BroadcastFastestLap > 0)
             {
                 DriverInfo driver = PluginManager.GetDriverByConnectionId(lap.ConnectionId);
                 // check if this is a new fastest lap for this session
-                if (this.PluginManager.CurrentSession.Laps.FirstOrDefault(l => l.Cuts == 0 && l.Laptime < lap.Laptime) == null)
+                if (lap.Cuts == 0 && this.PluginManager.CurrentSession.Laps.FirstOrDefault(l => l.Cuts == 0 && l.Laptime < lap.Laptime) == null)
                 {
                     this.PluginManager.BroadcastChatMessage(
                             string.Format("{0} has set a new fastest lap: {1}", driver.DriverName, AcServerPluginManager.FormatTimespan((int)lap.Laptime)));
+                }
+                else if (this.BroadcastFastestLap > 1)
+                {
+                    if (lap.Cuts == 0)
+                    {
+                        this.PluginManager.BroadcastChatMessage(
+                                string.Format("{0} completed a lap: {1}", driver.DriverName, AcServerPluginManager.FormatTimespan((int)lap.Laptime)));
+                    }
+                    else
+                    {
+                        this.PluginManager.BroadcastChatMessage(
+                                string.Format("{0} did a lap with {1} cut(s): {2}", driver.DriverName, lap.Cuts, AcServerPluginManager.FormatTimespan((int)lap.Laptime)));
+                    }
                 }
             }
         }

@@ -58,7 +58,7 @@ In the exe.config you can also specify which incidents are broadcasted, 0=off, 1
 You can specify the number of result broadcast positions
 <add key="broadcast_results" value="10"/>
 
-You can specify whether fastest lap set in session should be broadcasted live, 0=off, 1=on
+You can specify whether fastest lap set in session should be broadcasted live, 0=off, 1=on, 2=every lap
 <add key="broadcast_fastest_lap" value="1"/>
 
 You can specify the welcome message. For multiple lines use the | for line breaks. To disable set to empty string.
@@ -91,6 +91,10 @@ note: chat started with / is not visible to other players
 
 Changelog:
 ----------
+
+2.6.1 (2016/07/10)
+- option to set broadcast_fastest_lap to 2 to broadcast every completed lap
+
 
 2.6.0 (2016/07/09)
 - option to start additional executables, they are also restarted when the server is restarted due to track change, this helps with plugins that can't handle server restarts/track changes

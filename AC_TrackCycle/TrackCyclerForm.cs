@@ -82,7 +82,7 @@ namespace AC_TrackCycle
 
             this.checkBox_BroadcastIncidents.CheckState = (CheckState)this.trackCycler.BroadcastIncidents;
 
-            this.checkBox_BroadcastFastestLap.Checked = this.trackCycler.BroadcastFastestLap > 0;
+            this.checkBox_BroadcastFastestLap.CheckState = (CheckState)this.trackCycler.BroadcastFastestLap;
 
             this.dataGridView_connections.AutoGenerateColumns = false;
 
@@ -370,7 +370,7 @@ namespace AC_TrackCycle
 
         private void checkBox_BroadcastFastestLap_CheckedChanged(object sender, EventArgs e)
         {
-            this.trackCycler.BroadcastFastestLap = this.checkBox_BroadcastFastestLap.Checked ? 1 : 0;
+            this.trackCycler.BroadcastFastestLap = (int)this.checkBox_BroadcastFastestLap.CheckState;
         }
 
         private void trackMapControl_Paint(object sender, PaintEventArgs e)

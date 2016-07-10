@@ -58,6 +58,8 @@
             this.Column_DriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column_DriverGuid = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.Column_CarModel = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tabPage_chatlog = new System.Windows.Forms.TabPage();
+            this.textBox_chatlog = new System.Windows.Forms.TextBox();
             this.tabPage_PositionGraph = new System.Windows.Forms.TabPage();
             this.textBox_ConnectionCount = new System.Windows.Forms.TextBox();
             this.contextMenuStrip_driver = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -65,18 +67,15 @@
             this.kickDriverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.banDriverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox_logo = new System.Windows.Forms.PictureBox();
-            this.tabPage_chatlog = new System.Windows.Forms.TabPage();
-            this.textBox_chatlog = new System.Windows.Forms.TextBox();
             this.tabControl1.SuspendLayout();
             this.tabPage_ServerLog.SuspendLayout();
             this.tabPage_SessionControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Length)).BeginInit();
             this.tabPage_ConnectedDrivers.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_connections)).BeginInit();
-            this.tabPage_PositionGraph.SuspendLayout();
+            this.tabPage_chatlog.SuspendLayout();
             this.contextMenuStrip_driver.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_logo)).BeginInit();
-            this.tabPage_chatlog.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonStart
@@ -92,8 +91,8 @@
             // 
             // textBoxOutput
             // 
-            this.textBoxOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.textBoxOutput.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxOutput.BackColor = System.Drawing.SystemColors.Window;
             this.textBoxOutput.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
@@ -119,7 +118,7 @@
             // 
             // textBoxCurrentCycle
             // 
-            this.textBoxCurrentCycle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.textBoxCurrentCycle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxCurrentCycle.BackColor = System.Drawing.SystemColors.Window;
             this.textBoxCurrentCycle.Location = new System.Drawing.Point(107, 12);
@@ -166,7 +165,7 @@
             // 
             // textBox_chat
             // 
-            this.textBox_chat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
+            this.textBox_chat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_chat.Location = new System.Drawing.Point(47, 560);
             this.textBox_chat.Name = "textBox_chat";
@@ -186,7 +185,7 @@
             // 
             // textBox_sessionInfo
             // 
-            this.textBox_sessionInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.textBox_sessionInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_sessionInfo.BackColor = System.Drawing.SystemColors.Window;
             this.textBox_sessionInfo.Location = new System.Drawing.Point(107, 38);
@@ -197,8 +196,8 @@
             // 
             // tabControl1
             // 
-            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage_ServerLog);
             this.tabControl1.Controls.Add(this.tabPage_SessionControl);
@@ -252,6 +251,7 @@
             this.checkBox_BroadcastFastestLap.Size = new System.Drawing.Size(132, 17);
             this.checkBox_BroadcastFastestLap.TabIndex = 16;
             this.checkBox_BroadcastFastestLap.Text = "Broadcast Fastest Lap";
+            this.checkBox_BroadcastFastestLap.ThreeState = true;
             this.checkBox_BroadcastFastestLap.UseVisualStyleBackColor = true;
             this.checkBox_BroadcastFastestLap.CheckedChanged += new System.EventHandler(this.checkBox_BroadcastFastestLap_CheckedChanged);
             // 
@@ -425,6 +425,32 @@
             this.Column_CarModel.Name = "Column_CarModel";
             this.Column_CarModel.ReadOnly = true;
             // 
+            // tabPage_chatlog
+            // 
+            this.tabPage_chatlog.Controls.Add(this.textBox_chatlog);
+            this.tabPage_chatlog.Location = new System.Drawing.Point(4, 22);
+            this.tabPage_chatlog.Name = "tabPage_chatlog";
+            this.tabPage_chatlog.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage_chatlog.Size = new System.Drawing.Size(479, 437);
+            this.tabPage_chatlog.TabIndex = 4;
+            this.tabPage_chatlog.Text = "Chat Messages";
+            this.tabPage_chatlog.UseVisualStyleBackColor = true;
+            // 
+            // textBox_chatlog
+            // 
+            this.textBox_chatlog.BackColor = System.Drawing.SystemColors.Window;
+            this.textBox_chatlog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.textBox_chatlog.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.textBox_chatlog.Location = new System.Drawing.Point(3, 3);
+            this.textBox_chatlog.MaxLength = 327670000;
+            this.textBox_chatlog.Multiline = true;
+            this.textBox_chatlog.Name = "textBox_chatlog";
+            this.textBox_chatlog.ReadOnly = true;
+            this.textBox_chatlog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
+            this.textBox_chatlog.Size = new System.Drawing.Size(473, 431);
+            this.textBox_chatlog.TabIndex = 2;
+            this.textBox_chatlog.WordWrap = false;
+            // 
             // tabPage_PositionGraph
             // 
             this.tabPage_PositionGraph.Location = new System.Drawing.Point(4, 22);
@@ -436,7 +462,7 @@
             // 
             // textBox_ConnectionCount
             // 
-            this.textBox_ConnectionCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left)
+            this.textBox_ConnectionCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBox_ConnectionCount.BackColor = System.Drawing.SystemColors.Window;
             this.textBox_ConnectionCount.Location = new System.Drawing.Point(107, 64);
@@ -484,32 +510,6 @@
             this.pictureBox_logo.TabIndex = 1;
             this.pictureBox_logo.TabStop = false;
             // 
-            // tabPage_chatlog
-            // 
-            this.tabPage_chatlog.Controls.Add(this.textBox_chatlog);
-            this.tabPage_chatlog.Location = new System.Drawing.Point(4, 22);
-            this.tabPage_chatlog.Name = "tabPage_chatlog";
-            this.tabPage_chatlog.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage_chatlog.Size = new System.Drawing.Size(479, 437);
-            this.tabPage_chatlog.TabIndex = 4;
-            this.tabPage_chatlog.Text = "Chat Messages";
-            this.tabPage_chatlog.UseVisualStyleBackColor = true;
-            // 
-            // textBox_chatlog
-            // 
-            this.textBox_chatlog.BackColor = System.Drawing.SystemColors.Window;
-            this.textBox_chatlog.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.textBox_chatlog.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBox_chatlog.Location = new System.Drawing.Point(3, 3);
-            this.textBox_chatlog.MaxLength = 327670000;
-            this.textBox_chatlog.Multiline = true;
-            this.textBox_chatlog.Name = "textBox_chatlog";
-            this.textBox_chatlog.ReadOnly = true;
-            this.textBox_chatlog.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.textBox_chatlog.Size = new System.Drawing.Size(473, 431);
-            this.textBox_chatlog.TabIndex = 2;
-            this.textBox_chatlog.WordWrap = false;
-            // 
             // TrackCyclerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -538,11 +538,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Length)).EndInit();
             this.tabPage_ConnectedDrivers.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_connections)).EndInit();
-            this.tabPage_PositionGraph.ResumeLayout(false);
-            this.contextMenuStrip_driver.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_logo)).EndInit();
             this.tabPage_chatlog.ResumeLayout(false);
             this.tabPage_chatlog.PerformLayout();
+            this.contextMenuStrip_driver.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBox_logo)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

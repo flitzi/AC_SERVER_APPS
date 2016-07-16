@@ -198,7 +198,7 @@ namespace AC_TrackCycle
 
             if (message.StartsWith("CHAT ["))
             {
-                this.textBox_chatlog.AppendText(message.Substring(5) + Environment.NewLine);
+                this.textBox_chatlog.AppendText("[" + DateTime.Now.ToString("HH:mm:ss") + "]: " + message.Substring(5) + Environment.NewLine);
             }
         }
 

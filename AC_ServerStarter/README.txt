@@ -92,6 +92,12 @@ note: chat started with / is not visible to other players
 Changelog:
 ----------
 
+2.7.0 (2016/07/16)
+- updated to AC v1.7
+- fixed issue with broadcast results
+- showing timestamp in chat
+
+
 2.6.1 (2016/07/10)
 - option to set broadcast_fastest_lap to 2 to broadcast every completed lap
 

@@ -21,6 +21,7 @@ namespace AC_ServerStarter
     public class TrackCyclePlugin : ReportPlugin
     {
         private string serverfolder, serverExe, server_cfg, entry_list;
+        private bool createServerWindow;
         private object lockObject = new object();
         private string[] iniLines = new string[0];
         public List<object> Sessions = new List<object>();
@@ -68,6 +69,8 @@ namespace AC_ServerStarter
             this.entry_list = Path.Combine(serverfolder, "cfg", "entry_list.ini");
 
             this.changeTrackAfterEveryLoop = PluginManager.Config.GetSettingAsInt("change_track_after_every_loop", 0) == 1;
+
+            this.createServerWindow = PluginManager.Config.GetSettingAsInt("create_server_window", 0) == 1;
 
             string tmpExes = PluginManager.Config.GetSetting("additional_exes");
             if (!string.IsNullOrWhiteSpace(tmpExes))
@@ -270,7 +273,7 @@ namespace AC_ServerStarter
             this.serverInstance.StartInfo.WorkingDirectory = this.serverfolder;
             this.serverInstance.StartInfo.RedirectStandardOutput = true;
             this.serverInstance.StartInfo.UseShellExecute = false;
-            this.serverInstance.StartInfo.CreateNoWindow = true;
+            this.serverInstance.StartInfo.CreateNoWindow = !this.createServerWindow;
             this.serverInstance.OutputDataReceived += this.process_OutputDataReceived;
             this.serverInstance.Start();
             this.serverInstance.BeginOutputReadLine();
@@ -401,12 +404,30 @@ namespace AC_ServerStarter
 
             if (this.serverInstance != null && !this.serverInstance.HasExited)
             {
-                this.serverInstance.Kill();
+                this.PluginManager.Log("Trying to kill the acServer.exe process");
+                if (this.createServerWindow)
+                {
+                    this.serverInstance.CloseMainWindow();
+                }
+                else
+                {
+                    this.serverInstance.Kill();
+                }
+                Thread.Sleep(100);
+                if (this.serverInstance.HasExited)
+                {
+                    this.PluginManager.Log("acServer.exe process killed");
+                }
+                else
+                {
+                    this.PluginManager.Log("acServer.exe process could not be killed");
+                }
             }
 
             if (this.PluginManager.IsConnected)
             {
                 this.PluginManager.Disconnect();
+                Thread.Sleep(100);
             }
         }
     }

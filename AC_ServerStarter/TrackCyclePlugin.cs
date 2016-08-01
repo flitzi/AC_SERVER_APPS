@@ -11,6 +11,7 @@ using acPlugins4net.configuration;
 using AC_SessionReportPlugin;
 using acPlugins4net.messages;
 using acPlugins4net.info;
+using System.Linq;
 
 namespace AC_ServerStarter
 {
@@ -21,7 +22,7 @@ namespace AC_ServerStarter
     public class TrackCyclePlugin : ReportPlugin
     {
         private string serverfolder, serverExe, server_cfg, entry_list;
-        private bool createServerWindow;
+        private bool createServerWindow, kick_before_change;
         private object lockObject = new object();
         private string[] iniLines = new string[0];
         public List<object> Sessions = new List<object>();
@@ -37,11 +38,27 @@ namespace AC_ServerStarter
             }
         }
 
+        public bool CreateServerWindow
+        {
+            get
+            {
+                return createServerWindow;
+            }
+        }
+
         public bool HasCycle
         {
             get
             {
                 return this.Sessions.Count > 1;
+            }
+        }
+
+        public bool HasAdditionalExes
+        {
+            get
+            {
+                return this.additionalExes.Count > 0;
             }
         }
 
@@ -71,6 +88,8 @@ namespace AC_ServerStarter
             this.changeTrackAfterEveryLoop = PluginManager.Config.GetSettingAsInt("change_track_after_every_loop", 0) == 1;
 
             this.createServerWindow = PluginManager.Config.GetSettingAsInt("create_server_window", 0) == 1;
+
+            this.kick_before_change = PluginManager.Config.GetSettingAsInt("kick_before_change", 0) == 1;
 
             string tmpExes = PluginManager.Config.GetSetting("additional_exes");
             if (!string.IsNullOrWhiteSpace(tmpExes))
@@ -375,6 +394,14 @@ namespace AC_ServerStarter
                         Thread.Sleep(this.PluginManager.NewSessionStartDelay + 1000);
                         this.PluginManager.BroadcastChatMessage("TRACK CHANGE INCOMING, PLEASE EXIT and RECONNECT");
                         Thread.Sleep(2000);
+                        if (this.kick_before_change)
+                        {
+                            foreach (DriverInfo driver in this.PluginManager.GetDriverInfos().Where(d => d.IsConnected))
+                            {
+                                this.PluginManager.RequestKickDriverById(driver.CarId);
+                            }
+                            Thread.Sleep(1000);
+                        }
                     }
                     this.StartServer();
                 }

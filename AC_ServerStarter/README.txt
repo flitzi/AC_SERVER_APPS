@@ -92,6 +92,12 @@ note: chat started with / is not visible to other players
 Changelog:
 ----------
 
+2.7.2 (2016/08/01)
+- new config options
+    <add key="kick_before_change" value="0"/>
+    <add key="create_server_window" value="0"/><!-- if AC_TrackCycle crashes because the acServer.exe process can not be killed on track change then set this to 1 -->
+
+
 2.7.0 (2016/07/16)
 - updated to AC v1.7
 - fixed issue with broadcast results

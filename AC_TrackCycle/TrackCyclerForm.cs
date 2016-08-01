@@ -86,7 +86,10 @@ namespace AC_TrackCycle
 
             this.dataGridView_connections.AutoGenerateColumns = false;
 
-
+            if (this.trackCycler.CreateServerWindow || this.trackCycler.HasAdditionalExes)
+            {
+                this.TopMost = true;
+            }
         }
 
         public void SetSessionInfo(MsgSessionInfo msg)

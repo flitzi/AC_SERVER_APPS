@@ -305,16 +305,12 @@ namespace AC_ServerStarter
 
         private void process_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
-            string message = e.Data;
-            ThreadPool.QueueUserWorkItem(o => this.processAsync(message));
-        }
-
-        private void processAsync(string message)
-        {
             lock (this.lockObject)
             {
                 try
                 {
+                    string message = e.Data;
+
                     if (!string.IsNullOrEmpty(message) && !message.StartsWith("No car with address") && !message.StartsWith("Smoothing"))
                     {
                         this.PluginManager.Log(message);

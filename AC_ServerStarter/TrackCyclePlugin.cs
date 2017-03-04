@@ -27,8 +27,7 @@ namespace AC_ServerStarter
         private string[] iniLines = new string[0];
         public List<object> Sessions = new List<object>();
         private byte[] votes;
-        private List<string> votedIds = new List<string>();
-        private bool changeTrackAfterEveryLoop = false;
+        private List<string> votedIds;
         private readonly List<string> additionalExes = new List<string>();
         private readonly List<Process> additionalProcesses = new List<Process>();
 
@@ -87,8 +86,6 @@ namespace AC_ServerStarter
             this.server_cfg = Path.Combine(serverfolder, "cfg", "server_cfg.ini");
             this.entry_list = Path.Combine(serverfolder, "cfg", "entry_list.ini");
 
-            this.changeTrackAfterEveryLoop = PluginManager.Config.GetSettingAsInt("change_track_after_every_loop", 0) == 1;
-
             this.createServerWindow = PluginManager.Config.GetSettingAsInt("create_server_window", 0) == 1;
 
             this.kick_before_change = PluginManager.Config.GetSettingAsInt("kick_before_change", 0) == 1;
@@ -127,7 +124,6 @@ namespace AC_ServerStarter
                     }
                 }
             }
-            this.votes = new byte[this.Sessions.Count];
         }
 
         protected override void OnChatMessage(MsgChat msg)
@@ -184,6 +180,7 @@ namespace AC_ServerStarter
                     }
                     if (trackIndex > -1)
                     {
+                        this.votes = null; //disable voting
                         PluginManager.SendChatMessage(msg.CarId, "Next track will be " + this.Sessions[trackIndex]);
                         this.cycle = trackIndex - 1;
                         if (this.cycle < 0)
@@ -201,7 +198,7 @@ namespace AC_ServerStarter
             {
                 for (int i = 0; i < this.Sessions.Count; i++)
                 {
-                    PluginManager.SendChatMessage(msg.CarId, (i + 1).ToString() + ": " + this.Sessions[i]);
+                    PluginManager.SendChatMessage(msg.CarId, i + ": " + this.Sessions[i]);
                 }
             }
             if (msg.Message.StartsWith("/vote_track ", StringComparison.InvariantCultureIgnoreCase))
@@ -209,6 +206,12 @@ namespace AC_ServerStarter
                 if (driver == null)
                 {
                     PluginManager.SendChatMessage(msg.CarId, "Sorry, you can't vote at this time, please try again later.");
+                    return;
+                }
+
+                if (this.votes == null)
+                {
+                    PluginManager.SendChatMessage(msg.CarId, "The admin already specified the next track, please try again later.");
                     return;
                 }
 
@@ -236,6 +239,7 @@ namespace AC_ServerStarter
                 {
                     this.votedIds.Add(driver.DriverGuid);
                     this.votes[trackIndex]++;
+                    PluginManager.SendChatMessage(msg.CarId, "Vote registered.");
                 }
                 else
                 {
@@ -303,27 +307,6 @@ namespace AC_ServerStarter
 
             if (this.HasCycle)
             {
-                int bestVote = -1;
-                int bestVoteCount = 0;
-
-                for (int i = 0; i < 0; i++)
-                {
-                    if (this.votes[i] > bestVoteCount)
-                    {
-                        bestVote = i;
-                        bestVoteCount = this.votes[i];
-                    }
-                    else if (this.votes[i] == bestVoteCount)
-                    {
-                        bestVote = -1;
-                    }
-                }
-
-                if (bestVote != -1)
-                {
-                    this.cycle = bestVote;
-                }
-
                 if (this.cycle >= this.Sessions.Count)
                 {
                     this.cycle = 0;
@@ -374,6 +357,9 @@ namespace AC_ServerStarter
                         }
                     }
                 }
+
+                this.votes = new byte[this.Sessions.Count];
+                this.votedIds = new List<string>();
             }
 
             string servername, track, layout;
@@ -404,9 +390,6 @@ namespace AC_ServerStarter
             {
                 this.additionalProcesses.Add(Process.Start(additionalExe));
             }
-
-            this.votes = new byte[this.Sessions.Count];
-            this.votedIds = new List<string>();
         }
 
         private void process_OutputDataReceived(object sender, DataReceivedEventArgs e)
@@ -421,14 +404,35 @@ namespace AC_ServerStarter
                     {
                         this.PluginManager.Log(message);
 
-                        if (this.AutoChangeTrack && !this.changeTrackAfterEveryLoop && message == "HasSentRaceoverPacket, move to the next session")
+                        if (this.AutoChangeTrack && message == "Server looping")
                         {
-                            this.NextTrackAsync(false);
-                        }
+                            int bestVote = -1;
+                            int bestVoteCount = 0;
 
-                        if (this.AutoChangeTrack && this.changeTrackAfterEveryLoop && message == "Server looping")
-                        {
-                            this.NextTrackAsync(false);
+                            if (this.votes != null)
+                            {
+                                for (int i = 0; i < this.votes.Length; i++)
+                                {
+                                    if (this.votes[i] > bestVoteCount)
+                                    {
+                                        bestVote = i;
+                                        bestVoteCount = this.votes[i];
+                                    }
+                                    else if (this.votes[i] == bestVoteCount)
+                                    {
+                                        bestVote = -1;
+                                    }
+                                }
+                            }
+
+                            if (bestVote != -1)
+                            {
+                                ThreadPool.QueueUserWorkItem(o => this.ChangeTrack(bestVote, false));
+                            }
+                            else
+                            {
+                                this.NextTrackAsync(false);
+                            }
                         }
                     }
                 }

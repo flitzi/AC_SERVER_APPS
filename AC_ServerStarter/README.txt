@@ -70,10 +70,30 @@ You can specify the welcome message. For multiple lines use the | for line break
 
 - you can also use admin commands to change the track while you are in the game, just type in the chat after you authorized yourself as admin with /admin myPassword
 
+/list_tracks
+lists the all the tracks in the cycle
+
 /next_track
+switches to the next track in list
+
 /change_track spa
-/change_track ks_nordschleife,endurance
-the track(and config, separated with comma, but no space!) in /change_track needs to be in the TRACKS=... list
+/change_track ks_nordschleife,endurance    (separated with comma, but no space)
+the track in needs to be in the TRACKS=... list
+this also works with the id of the track that is shown with /list_tracks, e.g. /change_track 1
+
+/queue_track spa
+/queue_track ks_nordschleife,endurance    (separated with comma, but no space)
+the track in needs to be in the TRACKS=... list
+this also works with the id of the track that is shown with /list_tracks, e.g. /queue_track 1
+
+/vote_track spa
+/vote_track ks_nordschleife,endurance    (separated with comma, but no space)
+the track in needs to be in the TRACKS=... list
+this also works with the id of the track that is shown with /list_tracks, e.g. /vote_track 1
+you can only vote once per cycle, it doesn't matter when you vote (practice/qualify/race)
+the track with the most votes will be the next track, unless the server admin chooses something else
+if two tracks have the same amount of votes, none of them is used
+
 
 - admin command for broadcasting a message from the server
 /broadcast blablabla
@@ -81,9 +101,9 @@ the track(and config, separated with comma, but no space!) in /change_track need
 - admin command for sending a message from the server to a specific player
 /send_chat carId blablabla
 
-note: chat started with / is not visible to other players
 
-- the server does NOT change the track if restart_session or next_session is voted after the race, so people can prevent the track change if they make a successful vote. Only after the RACE_OVER_TIME has passed the server will change the track
+note: 
+- chat started with / is not visible to other players
 
 - the result json are saved in the "sessionresults" folder
 
@@ -91,6 +111,15 @@ note: chat started with / is not visible to other players
 
 Changelog:
 ----------
+
+2.7.3 (2017/03/03)
+- trying to write the server log messages in correct order
+- allowing /change_track with index
+- added /queue_track admin command
+- added /list_tracks command
+- added /vote_track command
+- removed change_track_after_every_loop config option, now always changing track after every loop
+
 
 2.7.2 (2016/08/01)
 - new config options

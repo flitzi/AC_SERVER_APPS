@@ -26,6 +26,8 @@ namespace AC_ServerStarter
         private object lockObject = new object();
         private string[] iniLines = new string[0];
         public List<object> Sessions = new List<object>();
+        private byte[] votes;
+        private List<string> votedIds = new List<string>();
         private bool changeTrackAfterEveryLoop = false;
         private readonly List<string> additionalExes = new List<string>();
         private readonly List<Process> additionalProcesses = new List<Process>();
@@ -125,13 +127,14 @@ namespace AC_ServerStarter
                     }
                 }
             }
+            this.votes = new byte[this.Sessions.Count];
         }
 
         protected override void OnChatMessage(MsgChat msg)
         {
             base.OnChatMessage(msg);
 
-            DriverInfo driver;
+            DriverInfo driver = null;
             if (this.PluginManager.TryGetDriverInfo(msg.CarId, out driver) && driver.IsAdmin)
             {
                 if (msg.Message.StartsWith("/next_track", StringComparison.InvariantCultureIgnoreCase))
@@ -141,15 +144,19 @@ namespace AC_ServerStarter
                 else if (msg.Message.StartsWith("/change_track "))
                 {
                     string track = msg.Message.Substring("/change_track ".Length).Trim();
-                    string layout = string.Empty;
-                    string[] parts = track.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
-                    if (parts.Length == 2)
+                    int trackIndex;
+                    if (!int.TryParse(track, out trackIndex) || trackIndex < 0 || trackIndex > this.Sessions.Count - 1)
                     {
-                        track = parts[0];
-                        layout = parts[1];
-                    }
+                        string layout = string.Empty;
+                        string[] parts = track.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length == 2)
+                        {
+                            track = parts[0];
+                            layout = parts[1];
+                        }
 
-                    int trackIndex = GetTrackIndex(track, layout);
+                        trackIndex = GetTrackIndex(track, layout);
+                    }
                     if (trackIndex > -1)
                     {
                         ThreadPool.QueueUserWorkItem(o => this.ChangeTrack(trackIndex, true));
@@ -158,6 +165,81 @@ namespace AC_ServerStarter
                     {
                         PluginManager.SendChatMessage(msg.CarId, "Specified track is not in trackcycle");
                     }
+                }
+                else if (msg.Message.StartsWith("/queue_track "))
+                {
+                    string track = msg.Message.Substring("/queue_track ".Length).Trim();
+                    int trackIndex;
+                    if (!int.TryParse(track, out trackIndex) || trackIndex < 0 || trackIndex > this.Sessions.Count - 1)
+                    {
+                        string layout = string.Empty;
+                        string[] parts = track.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length == 2)
+                        {
+                            track = parts[0];
+                            layout = parts[1];
+                        }
+
+                        trackIndex = GetTrackIndex(track, layout);
+                    }
+                    if (trackIndex > -1)
+                    {
+                        PluginManager.SendChatMessage(msg.CarId, "Next track will be " + this.Sessions[trackIndex]);
+                        this.cycle = trackIndex - 1;
+                        if (this.cycle < 0)
+                        {
+                            this.cycle = this.Sessions.Count - 1;
+                        }
+                    }
+                    else
+                    {
+                        PluginManager.SendChatMessage(msg.CarId, "Specified track is not in trackcycle");
+                    }
+                }
+            }
+            if (msg.Message.Equals("/list_tracks", StringComparison.InvariantCultureIgnoreCase))
+            {
+                for (int i = 0; i < this.Sessions.Count; i++)
+                {
+                    PluginManager.SendChatMessage(msg.CarId, (i + 1).ToString() + ": " + this.Sessions[i]);
+                }
+            }
+            if (msg.Message.StartsWith("/vote_track ", StringComparison.InvariantCultureIgnoreCase))
+            {
+                if (driver == null)
+                {
+                    PluginManager.SendChatMessage(msg.CarId, "Sorry, you can't vote at this time, please try again later.");
+                    return;
+                }
+
+                if (this.votedIds.Contains(driver.DriverGuid))
+                {
+                    PluginManager.SendChatMessage(msg.CarId, "You can only vote once.");
+                    return;
+                }
+
+                string track = msg.Message.Substring("/vote_track ".Length).Trim();
+                int trackIndex;
+                if (!int.TryParse(track, out trackIndex) || trackIndex < 0 || trackIndex > this.Sessions.Count - 1)
+                {
+                    string layout = string.Empty;
+                    string[] parts = track.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (parts.Length == 2)
+                    {
+                        track = parts[0];
+                        layout = parts[1];
+                    }
+
+                    trackIndex = GetTrackIndex(track, layout);
+                }
+                if (trackIndex > -1)
+                {
+                    this.votedIds.Add(driver.DriverGuid);
+                    this.votes[trackIndex]++;
+                }
+                else
+                {
+                    PluginManager.SendChatMessage(msg.CarId, "Specified track is not in trackcycle");
                 }
             }
         }
@@ -221,6 +303,27 @@ namespace AC_ServerStarter
 
             if (this.HasCycle)
             {
+                int bestVote = -1;
+                int bestVoteCount = 0;
+
+                for (int i = 0; i < 0; i++)
+                {
+                    if (this.votes[i] > bestVoteCount)
+                    {
+                        bestVote = i;
+                        bestVoteCount = this.votes[i];
+                    }
+                    else if (this.votes[i] == bestVoteCount)
+                    {
+                        bestVote = -1;
+                    }
+                }
+
+                if (bestVote != -1)
+                {
+                    this.cycle = bestVote;
+                }
+
                 if (this.cycle >= this.Sessions.Count)
                 {
                     this.cycle = 0;
@@ -301,6 +404,9 @@ namespace AC_ServerStarter
             {
                 this.additionalProcesses.Add(Process.Start(additionalExe));
             }
+
+            this.votes = new byte[this.Sessions.Count];
+            this.votedIds = new List<string>();
         }
 
         private void process_OutputDataReceived(object sender, DataReceivedEventArgs e)

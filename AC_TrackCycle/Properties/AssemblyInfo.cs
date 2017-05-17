@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("the gurus")]
 [assembly: AssemblyProduct("AC_TrackCycle")]
-[assembly: AssemblyCopyright("Copyright flitzi © 2015")]
+[assembly: AssemblyCopyright("Copyright flitzi © 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

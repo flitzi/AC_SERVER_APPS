@@ -11,6 +11,28 @@ using AC_SessionReportPlugin;
 
 namespace AC_TrackCycle_Console
 {
+    /// <summary>
+    /// A static helper class Mono related.
+    /// </summary>
+    public static class MonoHelper
+    {
+        /// <summary>
+        /// Whether this program is running on mono.
+        /// </summary>
+        public static readonly bool IsRunningMono;
+        /// <summary>
+        /// Whether this program is running on linux.
+        /// </summary>
+        public static readonly bool IsLinux;
+
+        static MonoHelper()
+        {
+            IsRunningMono = Type.GetType("Mono.Runtime") != null;
+            int p = (int)Environment.OSVersion.Platform;
+            IsLinux = (p == 4) || (p == 6) || (p == 128);
+        }
+    }
+
     internal static class Program
     {
         private static TrackCyclePlugin trackCycler;
@@ -66,9 +88,12 @@ namespace AC_TrackCycle_Console
                     pluginManager.AddPlugin(trackCycler);
                     pluginManager.LoadPluginsFromAppConfig();
 
-                    // Some biolerplate to react to close window event, CTRL-C, kill, etc
-                    _handler += new EventHandler(Handler);
-                    SetConsoleCtrlHandler(_handler, true);
+                    if (!MonoHelper.IsLinux)
+                    {
+                        // Some boilerplate to react to close window event, CTRL-C, kill, etc
+                        _handler += new EventHandler(Handler);
+                        SetConsoleCtrlHandler(_handler, true);
+                    }
 
                     trackCycler.StartServer();
                     Console.Out.WriteLine("Server running...");

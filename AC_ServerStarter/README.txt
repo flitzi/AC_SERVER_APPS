@@ -112,6 +112,10 @@ note:
 Changelog:
 ----------
 
+2.7.4 (2017/05/16)
+- small changes to make AC_TrackCycle_Console.exe Linux compatible (using mono) (tested with a mono docker)
+
+
 2.7.3 (2017/03/03)
 - trying to write the server log messages in correct order
 - allowing /change_track with index

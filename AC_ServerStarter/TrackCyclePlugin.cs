@@ -21,7 +21,7 @@ namespace AC_ServerStarter
 
     public class TrackCyclePlugin : ReportPlugin
     {
-        private string serverfolder, serverExe, server_cfg, entry_list;
+        private string serverfolder, serverExe, configFolder, server_cfg, entry_list;
         private bool createServerWindow, kick_before_change;
         private object lockObject = new object();
         private string[] iniLines = new string[0];
@@ -83,8 +83,12 @@ namespace AC_ServerStarter
                 this.serverExe = "acServer.exe";
             }
 
-            this.server_cfg = Path.Combine(serverfolder, "cfg", "server_cfg.ini");
-            this.entry_list = Path.Combine(serverfolder, "cfg", "entry_list.ini");
+            this.configFolder = PluginManager.Config.GetSetting("ac_cfg_directory");
+            if (string.IsNullOrEmpty(this.configFolder))
+                this.configFolder = "cfg";
+
+            this.server_cfg = Path.Combine(this.serverfolder, this.configFolder, "server_cfg.ini");
+            this.entry_list = Path.Combine(this.serverfolder, this.configFolder, "entry_list.ini");
 
             this.createServerWindow = PluginManager.Config.GetSettingAsInt("create_server_window", 0) == 1;
 
@@ -116,7 +120,7 @@ namespace AC_ServerStarter
                     string[] templates = templatecycle.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (string template in templates)
                     {
-                        string dir = Path.Combine(this.serverfolder, "cfg", template.Trim());
+                        string dir = Path.Combine(this.serverfolder, this.configFolder, template.Trim());
                         if (Directory.Exists(dir))
                         {
                             this.Sessions.Add(dir);

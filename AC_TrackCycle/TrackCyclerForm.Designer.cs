@@ -54,10 +54,6 @@
             this.listBox_CycleSessions = new System.Windows.Forms.ListBox();
             this.tabPage_ConnectedDrivers = new System.Windows.Forms.TabPage();
             this.dataGridView_connections = new System.Windows.Forms.DataGridView();
-            this.Column_CarId = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_DriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_DriverGuid = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Column_CarModel = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage_chatlog = new System.Windows.Forms.TabPage();
             this.textBox_chatlog = new System.Windows.Forms.TextBox();
             this.tabPage_PositionGraph = new System.Windows.Forms.TabPage();
@@ -67,6 +63,12 @@
             this.kickDriverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.banDriverToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox_logo = new System.Windows.Forms.PictureBox();
+            this.Column_CarId = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_DriverName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_DriverGuid = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_CarModel = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_BestLap = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Column_LapCount = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1.SuspendLayout();
             this.tabPage_ServerLog.SuspendLayout();
             this.tabPage_SessionControl.SuspendLayout();
@@ -379,7 +381,9 @@
             this.Column_CarId,
             this.Column_DriverName,
             this.Column_DriverGuid,
-            this.Column_CarModel});
+            this.Column_CarModel,
+            this.Column_BestLap,
+            this.Column_LapCount});
             this.dataGridView_connections.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView_connections.Location = new System.Drawing.Point(3, 3);
             this.dataGridView_connections.Name = "dataGridView_connections";
@@ -391,39 +395,6 @@
             this.dataGridView_connections.TabIndex = 0;
             this.dataGridView_connections.CellMouseDown += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dataGridView_connections_CellMouseDown);
             this.dataGridView_connections.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dataGridView_connections_CellPainting);
-            // 
-            // Column_CarId
-            // 
-            this.Column_CarId.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
-            this.Column_CarId.DataPropertyName = "CarId";
-            this.Column_CarId.HeaderText = "CarId";
-            this.Column_CarId.Name = "Column_CarId";
-            this.Column_CarId.ReadOnly = true;
-            this.Column_CarId.Width = 57;
-            // 
-            // Column_DriverName
-            // 
-            this.Column_DriverName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Column_DriverName.DataPropertyName = "DriverName";
-            this.Column_DriverName.HeaderText = "DriverName";
-            this.Column_DriverName.Name = "Column_DriverName";
-            this.Column_DriverName.ReadOnly = true;
-            // 
-            // Column_DriverGuid
-            // 
-            this.Column_DriverGuid.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Column_DriverGuid.DataPropertyName = "DriverGuid";
-            this.Column_DriverGuid.HeaderText = "DriverGuid";
-            this.Column_DriverGuid.Name = "Column_DriverGuid";
-            this.Column_DriverGuid.ReadOnly = true;
-            // 
-            // Column_CarModel
-            // 
-            this.Column_CarModel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
-            this.Column_CarModel.DataPropertyName = "CarModel";
-            this.Column_CarModel.HeaderText = "CarModel";
-            this.Column_CarModel.Name = "Column_CarModel";
-            this.Column_CarModel.ReadOnly = true;
             // 
             // tabPage_chatlog
             // 
@@ -510,6 +481,56 @@
             this.pictureBox_logo.TabIndex = 1;
             this.pictureBox_logo.TabStop = false;
             // 
+            // Column_CarId
+            // 
+            this.Column_CarId.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Column_CarId.DataPropertyName = "CarId";
+            this.Column_CarId.HeaderText = "CarId";
+            this.Column_CarId.Name = "Column_CarId";
+            this.Column_CarId.ReadOnly = true;
+            this.Column_CarId.Width = 57;
+            // 
+            // Column_DriverName
+            // 
+            this.Column_DriverName.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Column_DriverName.DataPropertyName = "DriverName";
+            this.Column_DriverName.HeaderText = "DriverName";
+            this.Column_DriverName.Name = "Column_DriverName";
+            this.Column_DriverName.ReadOnly = true;
+            // 
+            // Column_DriverGuid
+            // 
+            this.Column_DriverGuid.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Column_DriverGuid.DataPropertyName = "DriverGuid";
+            this.Column_DriverGuid.HeaderText = "DriverGuid";
+            this.Column_DriverGuid.Name = "Column_DriverGuid";
+            this.Column_DriverGuid.ReadOnly = true;
+            // 
+            // Column_CarModel
+            // 
+            this.Column_CarModel.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Column_CarModel.DataPropertyName = "CarModel";
+            this.Column_CarModel.HeaderText = "CarModel";
+            this.Column_CarModel.Name = "Column_CarModel";
+            this.Column_CarModel.ReadOnly = true;
+            // 
+            // Column_BestLap
+            // 
+            this.Column_BestLap.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.Fill;
+            this.Column_BestLap.DataPropertyName = "BestLapTxt";
+            this.Column_BestLap.HeaderText = "BestLap";
+            this.Column_BestLap.Name = "Column_BestLap";
+            this.Column_BestLap.ReadOnly = true;
+            // 
+            // Column_LapCount
+            // 
+            this.Column_LapCount.AutoSizeMode = System.Windows.Forms.DataGridViewAutoSizeColumnMode.ColumnHeader;
+            this.Column_LapCount.DataPropertyName = "LapCount";
+            this.Column_LapCount.HeaderText = "Laps";
+            this.Column_LapCount.Name = "Column_LapCount";
+            this.Column_LapCount.ReadOnly = true;
+            this.Column_LapCount.Width = 55;
+            // 
             // TrackCyclerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -580,13 +601,15 @@
         private System.Windows.Forms.CheckBox checkBox_BroadcastIncidents;
         private System.Windows.Forms.CheckBox checkBox_BroadcastResults;
         private System.Windows.Forms.CheckBox checkBox_BroadcastFastestLap;
+        private System.Windows.Forms.ToolStripMenuItem banDriverToolStripMenuItem;
+        private System.Windows.Forms.TabPage tabPage_chatlog;
+        private System.Windows.Forms.TextBox textBox_chatlog;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarId;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_DriverName;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_DriverGuid;
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_CarModel;
-        private System.Windows.Forms.ToolStripMenuItem banDriverToolStripMenuItem;
-        private System.Windows.Forms.TabPage tabPage_chatlog;
-        private System.Windows.Forms.TextBox textBox_chatlog;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_BestLap;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Column_LapCount;
     }
 }
 

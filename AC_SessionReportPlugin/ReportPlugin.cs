@@ -103,7 +103,7 @@ namespace AC_SessionReportPlugin
                             (d.DriverName == null || d.DriverName.Length <= 10) ? d.DriverName : d.DriverName.Substring(0, 10),
                             (d.CarModel == null || d.CarModel.Length <= 10) ? d.CarModel : d.CarModel.Substring(0, 10),
                             d.Gap,
-                            AcServerPluginManager.FormatTimespan((int)d.BestLap),
+                            d.BestLapTxt,
                             d.Incidents));
                 }
             }

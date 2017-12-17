@@ -7,3 +7,7 @@
 bin/
 obj/
 packages/
+/.vs/AllProjects/v15/Server/sqlite3/db.lock
+/.vs/AllProjects/v15/Server/sqlite3/storage.ide
+/.vs/AllProjects/v15/Server/sqlite3/storage.ide-shm
+/.vs/AllProjects/v15/Server/sqlite3/storage.ide-wal

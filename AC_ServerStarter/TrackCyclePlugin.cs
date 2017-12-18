@@ -387,12 +387,15 @@ namespace AC_ServerStarter
             this.serverInstance.StartInfo.UseShellExecute = false;
             this.serverInstance.StartInfo.CreateNoWindow = !this.createServerWindow;
             this.serverInstance.OutputDataReceived += this.process_OutputDataReceived;
+            this.serverInstance.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
             this.serverInstance.Start();
             this.serverInstance.BeginOutputReadLine();
 
             foreach (string additionalExe in this.additionalExes)
             {
-                this.additionalProcesses.Add(Process.Start(additionalExe));
+                ProcessStartInfo startInfo = new ProcessStartInfo(additionalExe);
+                startInfo.WindowStyle = ProcessWindowStyle.Minimized;
+                this.additionalProcesses.Add(Process.Start(startInfo));
             }
         }
 

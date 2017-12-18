@@ -112,10 +112,13 @@ note:
 Changelog:
 ----------
 
+2.7.6 (2017/12/18)
+- (re)starting other processes in background
+
+
 2.7.5 (2017/12/18)
 - added BestLap and LapCount columns to Drivers tab
 - added elapsed time textbox
-- (re)starting other processes in background
 
 
 2.7.4 (2017/05/16)

@@ -92,11 +92,16 @@ namespace AC_TrackCycle
             }
         }
 
+        private DateTime? sessionStart;
+
         public void SetSessionInfo(MsgSessionInfo msg)
         {
             if (msg != null)
             {
                 this.currentSessionInfo = msg;
+
+                sessionStart = DateTime.Now.AddMilliseconds(-msg.ElapsedMS);
+
                 if (msg.SessionType == (byte)MsgSessionInfo.SessionTypeEnum.Race)
                 {
                     this.textBox_sessionInfo.Text = msg.Name + " " + msg.Laps + " laps, " + msg.Weather + ", ambient " + msg.AmbientTemp
@@ -435,6 +440,15 @@ namespace AC_TrackCycle
             if (this.dataGridView_connections.SelectedRows.Count == 1)
             {
                 this.pluginManager.AdminCommand("/ban_id " + ((DriverInfo)this.dataGridView_connections.SelectedRows[0].DataBoundItem).CarId);
+            }
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (this.sessionStart != null)
+            {
+                TimeSpan time = DateTime.Now - this.sessionStart.Value;
+                textBox_elapedTime.Text = ((time < TimeSpan.Zero) ? "-" : "") + time.ToString(@"hh\:mm\:ss");
             }
         }
 

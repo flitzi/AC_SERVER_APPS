@@ -15,7 +15,7 @@ namespace AC_SessionReportPlugin
 {
     public class ReportPlugin : AcServerPlugin
     {
-        public const string Version = "2.7.4"; // for now use same version
+        public const string Version = "2.7.5"; // for now use same version
 
         public int BroadcastIncidents { get; set; }
         public int BroadcastResults { get; set; }
@@ -111,9 +111,15 @@ namespace AC_SessionReportPlugin
 
         protected override void OnLapCompleted(LapInfo lap)
         {
+            DriverInfo driver = PluginManager.GetDriverByConnectionId(lap.ConnectionId);
+            driver.LapCount = lap.LapNo;
+            if (lap.Cuts == 0 && (lap.Laptime < driver.BestLap || driver.BestLap == 0))
+            {
+                driver.BestLap = lap.Laptime;
+            }
+
             if (this.BroadcastFastestLap > 0)
             {
-                DriverInfo driver = PluginManager.GetDriverByConnectionId(lap.ConnectionId);
                 // check if this is a new fastest lap for this session
                 if (lap.Cuts == 0 && this.PluginManager.CurrentSession.Laps.FirstOrDefault(l => l.Cuts == 0 && l.Laptime < lap.Laptime) == null)
                 {

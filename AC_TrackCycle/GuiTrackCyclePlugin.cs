@@ -48,5 +48,11 @@ namespace AC_TrackCycle
             base.OnBulkCarUpdateFinished();
             this.form.BeginInvoke(new Action(this.form.UpdatePositionGraph), null);
         }
+
+        protected override void OnLapCompleted(LapInfo lap)
+        {
+            base.OnLapCompleted(lap);
+            this.form.BeginInvoke(new Action(this.form.UpdateGui), null);
+        }
     }
 }

@@ -112,6 +112,11 @@ note:
 Changelog:
 ----------
 
+2.7.7 (2017/12/23)
+- changed startup order
+- using additional kill process when using create_server_window = 1
+
+
 2.7.6 (2017/12/18)
 - (re)starting other processes in background
 

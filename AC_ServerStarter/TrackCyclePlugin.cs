@@ -373,13 +373,6 @@ namespace AC_ServerStarter
 
             ReadCfg(this.PluginManager.Config, false, out servername, out track, out layout, out laps, ref tmpS, out tmpL);
 
-            if (this.PluginManager != null)
-            {
-                //this.pluginManager.MaxClients = maxClients;
-
-                this.PluginManager.Connect();
-            }
-
             this.serverInstance = new Process();
             this.serverInstance.StartInfo.FileName = Path.Combine(this.serverfolder, this.serverExe);
             this.serverInstance.StartInfo.WorkingDirectory = this.serverfolder;
@@ -390,6 +383,13 @@ namespace AC_ServerStarter
             this.serverInstance.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
             this.serverInstance.Start();
             this.serverInstance.BeginOutputReadLine();
+
+            if (this.PluginManager != null)
+            {
+                Thread.Sleep(1000);
+                //this.pluginManager.MaxClients = maxClients;
+                this.PluginManager.Connect();
+            }
 
             foreach (string additionalExe in this.additionalExes)
             {
@@ -548,11 +548,17 @@ namespace AC_ServerStarter
                 if (this.createServerWindow)
                 {
                     this.serverInstance.CloseMainWindow();
+                    Thread.Sleep(500); // give it time to close
                 }
-                else
+
+                try
                 {
                     this.serverInstance.Kill();
                 }
+                catch
+                {
+                }
+
                 Thread.Sleep(100);
                 if (this.serverInstance.HasExited)
                 {

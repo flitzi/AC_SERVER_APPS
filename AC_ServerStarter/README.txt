@@ -127,8 +127,8 @@ Changelog:
 ----------
 
 2.7.8 (2018/01/06)
-- reamed template_cycle to preset_cycle in exe.config
-- added ac_presets_directory in exe.config, this is the directory where the presets ( note: before 2.7.8 this was always the cfg directory, but since acServerManager.exe creates a templates directory why not use that as default. If you want the 2.7.7 behaviour use <add key="ac_presets_directory" value="cfg"/> )
+- renamed template_cycle to preset_cycle in exe.config
+- added ac_presets_directory in exe.config, this is the directory where the presets should be stored ( note: before 2.7.8 this was always the cfg directory, but since acServerManager.exe creates a templates directory why not use that as default. If you want the 2.7.7 behaviour use <add key="ac_presets_directory" value="cfg"/> )
 - not showing the complete path of the presets
 - fixed GUI not showing the current session status for the very first session
 

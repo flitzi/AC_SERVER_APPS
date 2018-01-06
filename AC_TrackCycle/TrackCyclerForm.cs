@@ -122,8 +122,8 @@ namespace AC_TrackCycle
 
                 string[] possibleFolders = new string[]
                 {
-                    Path.Combine(this.trackCycler.ServerFolder,"content", "tracks", msg.Track, msg.TrackConfig),
-                    Path.Combine(Path.GetDirectoryName(this.trackCycler.ServerFolder.Substring(0, this.trackCycler.ServerFolder.Length - 1)),"content", "tracks", msg.Track, msg.TrackConfig),
+                    Path.Combine(this.trackCycler.ServerDirectory,"content", "tracks", msg.Track, msg.TrackConfig),
+                    Path.Combine(Path.GetDirectoryName(this.trackCycler.ServerDirectory.Substring(0, this.trackCycler.ServerDirectory.Length - 1)),"content", "tracks", msg.Track, msg.TrackConfig),
                 };
 
                 foreach (string possibleFolder in possibleFolders)

@@ -30,6 +30,13 @@ namespace AC_TrackCycle
             this.form.BeginInvoke(new Action(this.form.UpdateGui), null);
         }
 
+        protected override void OnSessionInfo(MsgSessionInfo msg)
+        {
+            base.OnNewSession(msg);
+            this.form.BeginInvoke(new Action<MsgSessionInfo>(this.form.SetSessionInfo), msg);
+            this.form.BeginInvoke(new Action(this.form.UpdateGui), null);
+        }
+
         protected override void OnClientLoaded(MsgClientLoaded msg)
         {
             base.OnClientLoaded(msg);

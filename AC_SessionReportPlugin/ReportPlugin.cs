@@ -15,7 +15,7 @@ namespace AC_SessionReportPlugin
 {
     public class ReportPlugin : AcServerPlugin
     {
-        public const string Version = "2.7.7"; // for now use same version
+        public const string Version = "2.7.8"; // for now use same version
 
         public int BroadcastIncidents { get; set; }
         public int BroadcastResults { get; set; }

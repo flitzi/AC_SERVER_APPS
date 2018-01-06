@@ -21,7 +21,7 @@ namespace AC_ServerStarter
 
     public class TrackCyclePlugin : ReportPlugin
     {
-        private string serverfolder, serverExe, configFolder, server_cfg, entry_list;
+        private string serverDirectory, serverExe, configDirectory, presetsDirectory, server_cfg, entry_list;
         private bool createServerWindow, kick_before_change;
         private object lockObject = new object();
         private string[] iniLines = new string[0];
@@ -31,11 +31,11 @@ namespace AC_ServerStarter
         private readonly List<string> additionalExes = new List<string>();
         private readonly List<Process> additionalProcesses = new List<Process>();
 
-        public string ServerFolder
+        public string ServerDirectory
         {
             get
             {
-                return this.serverfolder;
+                return this.serverDirectory;
             }
         }
 
@@ -71,30 +71,34 @@ namespace AC_ServerStarter
         {
             base.OnInit();
 
-            this.serverfolder = PluginManager.Config.GetSetting("ac_server_directory");
-            if (string.IsNullOrWhiteSpace(this.serverfolder))
+            this.serverDirectory = this.PluginManager.Config.GetSetting("ac_server_directory");
+            if (string.IsNullOrWhiteSpace(this.serverDirectory))
             {
-                this.serverfolder = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+                this.serverDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
             }
 
-            this.serverExe = PluginManager.Config.GetSetting("ac_server_executable");
+            this.serverExe = this.PluginManager.Config.GetSetting("ac_server_executable");
             if (string.IsNullOrWhiteSpace(this.serverExe))
             {
                 this.serverExe = "acServer.exe";
             }
 
-            this.configFolder = PluginManager.Config.GetSetting("ac_cfg_directory");
-            if (string.IsNullOrEmpty(this.configFolder))
-                this.configFolder = "cfg";
+            this.configDirectory = this.PluginManager.Config.GetSetting("ac_cfg_directory");
+            if (string.IsNullOrEmpty(this.configDirectory))
+                this.configDirectory = "cfg";
 
-            this.server_cfg = Path.Combine(this.serverfolder, this.configFolder, "server_cfg.ini");
-            this.entry_list = Path.Combine(this.serverfolder, this.configFolder, "entry_list.ini");
+            this.presetsDirectory = PluginManager.Config.GetSetting("ac_presets_directory");
+            if (string.IsNullOrEmpty(this.presetsDirectory))
+                this.presetsDirectory = "presets";
 
-            this.createServerWindow = PluginManager.Config.GetSettingAsInt("create_server_window", 0) == 1;
+            this.server_cfg = Path.Combine(this.serverDirectory, this.configDirectory, "server_cfg.ini");
+            this.entry_list = Path.Combine(this.serverDirectory, this.configDirectory, "entry_list.ini");
 
-            this.kick_before_change = PluginManager.Config.GetSettingAsInt("kick_before_change", 0) == 1;
+            this.createServerWindow = this.PluginManager.Config.GetSettingAsInt("create_server_window", 0) == 1;
 
-            string tmpExes = PluginManager.Config.GetSetting("additional_exes");
+            this.kick_before_change = this.PluginManager.Config.GetSettingAsInt("kick_before_change", 0) == 1;
+
+            string tmpExes = this.PluginManager.Config.GetSetting("additional_exes");
             if (!string.IsNullOrWhiteSpace(tmpExes))
             {
                 foreach (string exe in tmpExes.Split(';'))
@@ -114,16 +118,16 @@ namespace AC_ServerStarter
 
             if (this.Sessions.Count == 0)
             {
-                string templatecycle = PluginManager.Config.GetSetting("template_cycle");
-                if (!string.IsNullOrEmpty(templatecycle))
+                string presetscycle = this.PluginManager.Config.GetSetting("presets_cycle");
+                if (!string.IsNullOrEmpty(presetscycle))
                 {
-                    string[] templates = templatecycle.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-                    foreach (string template in templates)
+                    string[] presets = presetscycle.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach (string preset in presets)
                     {
-                        string dir = Path.Combine(this.serverfolder, this.configFolder, template.Trim());
+                        string dir = Path.Combine(this.serverDirectory, this.presetsDirectory, preset.Trim());
                         if (Directory.Exists(dir))
                         {
-                            this.Sessions.Add(dir);
+                            this.Sessions.Add(new RaceConfig(dir));
                         }
                     }
                 }
@@ -155,7 +159,7 @@ namespace AC_ServerStarter
                             layout = parts[1];
                         }
 
-                        trackIndex = GetTrackIndex(track, layout);
+                        trackIndex = this.GetTrackIndex(track, layout);
                     }
                     if (trackIndex > -1)
                     {
@@ -163,7 +167,7 @@ namespace AC_ServerStarter
                     }
                     else
                     {
-                        PluginManager.SendChatMessage(msg.CarId, "Specified track is not in trackcycle");
+                        this.PluginManager.SendChatMessage(msg.CarId, "Specified track is not in trackcycle");
                     }
                 }
                 else if (msg.Message.StartsWith("/queue_track "))
@@ -180,12 +184,12 @@ namespace AC_ServerStarter
                             layout = parts[1];
                         }
 
-                        trackIndex = GetTrackIndex(track, layout);
+                        trackIndex = this.GetTrackIndex(track, layout);
                     }
                     if (trackIndex > -1)
                     {
                         this.votes = null; //disable voting
-                        PluginManager.SendChatMessage(msg.CarId, "Next track will be " + this.Sessions[trackIndex]);
+                        this.PluginManager.SendChatMessage(msg.CarId, "Next track will be " + this.Sessions[trackIndex]);
                         this.cycle = trackIndex - 1;
                         if (this.cycle < 0)
                         {
@@ -194,7 +198,7 @@ namespace AC_ServerStarter
                     }
                     else
                     {
-                        PluginManager.SendChatMessage(msg.CarId, "Specified track is not in trackcycle");
+                        this.PluginManager.SendChatMessage(msg.CarId, "Specified track is not in trackcycle");
                     }
                 }
             }
@@ -202,26 +206,26 @@ namespace AC_ServerStarter
             {
                 for (int i = 0; i < this.Sessions.Count; i++)
                 {
-                    PluginManager.SendChatMessage(msg.CarId, i + ": " + this.Sessions[i]);
+                    this.PluginManager.SendChatMessage(msg.CarId, i + ": " + this.Sessions[i]);
                 }
             }
             if (msg.Message.StartsWith("/vote_track ", StringComparison.InvariantCultureIgnoreCase))
             {
                 if (driver == null)
                 {
-                    PluginManager.SendChatMessage(msg.CarId, "Sorry, you can't vote at this time, please try again later.");
+                    this.PluginManager.SendChatMessage(msg.CarId, "Sorry, you can't vote at this time, please try again later.");
                     return;
                 }
 
                 if (this.votes == null)
                 {
-                    PluginManager.SendChatMessage(msg.CarId, "The admin already specified the next track, please try again later.");
+                    this.PluginManager.SendChatMessage(msg.CarId, "The admin already specified the next track, please try again later.");
                     return;
                 }
 
                 if (this.votedIds.Contains(driver.DriverGuid))
                 {
-                    PluginManager.SendChatMessage(msg.CarId, "You can only vote once.");
+                    this.PluginManager.SendChatMessage(msg.CarId, "You can only vote once.");
                     return;
                 }
 
@@ -237,17 +241,17 @@ namespace AC_ServerStarter
                         layout = parts[1];
                     }
 
-                    trackIndex = GetTrackIndex(track, layout);
+                    trackIndex = this.GetTrackIndex(track, layout);
                 }
                 if (trackIndex > -1)
                 {
                     this.votedIds.Add(driver.DriverGuid);
                     this.votes[trackIndex]++;
-                    PluginManager.SendChatMessage(msg.CarId, "Vote registered.");
+                    this.PluginManager.SendChatMessage(msg.CarId, "Vote registered.");
                 }
                 else
                 {
-                    PluginManager.SendChatMessage(msg.CarId, "Specified track is not in trackcycle");
+                    this.PluginManager.SendChatMessage(msg.CarId, "Specified track is not in trackcycle");
                 }
             }
         }
@@ -342,9 +346,9 @@ namespace AC_ServerStarter
                     }
                     sw.Dispose();
                 }
-                else if (this.Sessions[this.cycle] is string)
+                else if (this.Sessions[this.cycle] is RaceConfig)
                 {
-                    string cfgDir = (string)this.Sessions[this.cycle];
+                    string cfgDir = ((RaceConfig)this.Sessions[this.cycle]).Directory;
 
                     if (Directory.Exists(cfgDir))
                     {
@@ -374,8 +378,8 @@ namespace AC_ServerStarter
             ReadCfg(this.PluginManager.Config, false, out servername, out track, out layout, out laps, ref tmpS, out tmpL);
 
             this.serverInstance = new Process();
-            this.serverInstance.StartInfo.FileName = Path.Combine(this.serverfolder, this.serverExe);
-            this.serverInstance.StartInfo.WorkingDirectory = this.serverfolder;
+            this.serverInstance.StartInfo.FileName = Path.Combine(this.serverDirectory, this.serverExe);
+            this.serverInstance.StartInfo.WorkingDirectory = this.serverDirectory;
             this.serverInstance.StartInfo.RedirectStandardOutput = true;
             this.serverInstance.StartInfo.UseShellExecute = false;
             this.serverInstance.StartInfo.CreateNoWindow = !this.createServerWindow;
@@ -464,9 +468,9 @@ namespace AC_ServerStarter
                         break;
                     }
                 }
-                else if (this.Sessions[i] is string)
+                else if (this.Sessions[i] is RaceConfig)
                 {
-                    if ((string)this.Sessions[i] == track)
+                    if (this.Sessions[i].ToString() == track)
                     {
                         index = i;
                         break;
@@ -540,7 +544,7 @@ namespace AC_ServerStarter
                     additionalProcess.Kill();
                 }
             }
-            additionalProcesses.Clear();
+            this.additionalProcesses.Clear();
 
             if (this.serverInstance != null && !this.serverInstance.HasExited)
             {

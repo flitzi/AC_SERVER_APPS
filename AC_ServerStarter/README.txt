@@ -45,11 +45,23 @@ TRACKS=spa,5;ks_nordschleife,endurance,2;mugello,6;nurburgring,6;silverstone,6;i
 syntax is like this <trackname>,<lapcount>;<trackname>,<lapcount>,<layout>;<trackname>,<lapcount>
 
 
-cfg Template Cycle (optional):
+Presets Cycle (optional):
 
-- fill the name of the cfg template folder that includes a server_cfg.ini and/or entry_list.ini in the exe.config key template_cycle, separated with ;
+- fill the name of the preset directory that includes a server_cfg.ini and/or entry_list.ini in the exe.config key presets_cycle, separated with ;
 e.g.
-<add key="template_cycle" value="spa_gt3;nurburgring_street_mix"/>
+<add key="presets_cycle" value="spa_gt3;nurburgring_street_mix"/>
+
+the default directory stucture for this then should be:
+
+/acserver.exe
+/presets/spa_gt3/server_cfg.ini
+/presets/spa_gt3/server_cfg.ini
+/presets/nurburgring_street_mix/server_cfg.ini
+/presets/nurburgring_street_mix/server_cfg.ini
+
+you can change the presets directory name in the exe.config with the key ac_presets_directory ( note: before 2.7.8 this was always the cfg directory, but since acServerManager.exe creates a templates directory why not use that as default. If you want the 2.7.7 behaviour use <add key="ac_presets_directory" value="cfg"/> )
+
+note: If you have the [TRACK_CYCLE] block in the default cfg/server_cfg.ini then this will take priority over the presets cycle.
 
 
 In the exe.config you can also specify which incidents are broadcasted, 0=off, 1=only car with car, 2=all
@@ -70,9 +82,6 @@ You can specify the welcome message. For multiple lines use the | for line break
 
 - you can also use admin commands to change the track while you are in the game, just type in the chat after you authorized yourself as admin with /admin myPassword
 
-/list_tracks
-lists the all the tracks in the cycle
-
 /next_track
 switches to the next track in list
 
@@ -86,14 +95,19 @@ this also works with the id of the track that is shown with /list_tracks, e.g. /
 the track in needs to be in the TRACKS=... list
 this also works with the id of the track that is shown with /list_tracks, e.g. /queue_track 1
 
+
+- everyone can use these commands in the chat
+
+/list_tracks
+lists the all the tracks in the cycle
+
 /vote_track spa
 /vote_track ks_nordschleife,endurance    (separated with comma, but no space)
 the track in needs to be in the TRACKS=... list
 this also works with the id of the track that is shown with /list_tracks, e.g. /vote_track 1
 you can only vote once per cycle, it doesn't matter when you vote (practice/qualify/race)
 the track with the most votes will be the next track, unless the server admin chooses something else
-if two tracks have the same amount of votes, none of them is used
-
+if multiple tracks have the same amount of votes, none of them is used
 
 - admin command for broadcasting a message from the server
 /broadcast blablabla
@@ -111,6 +125,13 @@ note:
 
 Changelog:
 ----------
+
+2.7.8 (2018/01/06)
+- reamed template_cycle to preset_cycle in exe.config
+- added ac_presets_directory in exe.config, this is the directory where the presets ( note: before 2.7.8 this was always the cfg directory, but since acServerManager.exe creates a templates directory why not use that as default. If you want the 2.7.7 behaviour use <add key="ac_presets_directory" value="cfg"/> )
+- not showing the complete path of the presets
+- fixed GUI not showing the current session status for the very first session
+
 
 2.7.7 (2017/12/23)
 - changed startup order

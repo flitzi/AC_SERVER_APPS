@@ -1,4 +1,6 @@
-﻿namespace AC_ServerStarter
+﻿using System.IO;
+
+namespace AC_ServerStarter
 {
     public class RaceSession
     {
@@ -19,6 +21,21 @@
                 return this.Track + " " + this.Laps + " laps";
             }
             return this.Track + "," + this.Layout + " " + this.Laps + " laps";
+        }
+    }
+
+    public class RaceConfig
+    {
+        public readonly string Directory;
+
+        public RaceConfig(string directory)
+        {
+            this.Directory = directory;
+        }
+
+        public override string ToString()
+        {
+            return Path.GetFileName(this.Directory);
         }
     }
 }

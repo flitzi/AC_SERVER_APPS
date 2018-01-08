@@ -126,6 +126,10 @@ note:
 Changelog:
 ----------
 
+2.7.9 (2018/01/08)
+- added log_to_console and overwrite_log_file in AC_TrackCycle_Console.exe.config
+
+
 2.7.8 (2018/01/06)
 - renamed template_cycle to preset_cycle in exe.config
 - added ac_presets_directory in exe.config, this is the directory where the presets should be stored ( note: before 2.7.8 this was always the cfg directory, but since acServerManager.exe creates a templates directory why not use that as default. If you want the 2.7.7 behaviour use <add key="ac_presets_directory" value="cfg"/> )

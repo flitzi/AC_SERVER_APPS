@@ -7,6 +7,7 @@ using acPlugins4net;
 using acPlugins4net.helpers;
 using AC_ServerStarter;
 using System.Text;
+using acPlugins4net.configuration;
 using AC_SessionReportPlugin;
 
 namespace AC_TrackCycle_Console
@@ -73,17 +74,32 @@ namespace AC_TrackCycle_Console
         {
             try
             {
+                FileLogWriter logWriter = null;
 
-                IFileLog logWriter = new FileLogWriter(
-                    Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"),
-                    DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log")
-                { LogWithTimestamp = true };
+                IConfigManager config = new AppConfigConfigurator();
+                if (config.GetSettingAsInt("log_to_console", 0) == 0)
+                {
+                    if (config.GetSettingAsInt("overwrite_log_file", 0) == 1)
+                    {
+                        logWriter = new FileLogWriter(
+                                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"),
+                                "TrackCycle.log")
+                        { LogWithTimestamp = true };
+                    }
+                    else
+                    {
+                        logWriter = new FileLogWriter(
+                                Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "logs"),
+                                DateTime.UtcNow.ToString("yyyyMMdd_HHmmss") + "_Startup.log")
+                        { LogWithTimestamp = true };
+                    }
+                }
 
                 try
                 {
                     trackCycler = new TrackCyclePlugin();
 
-                    AcServerPluginManager pluginManager = new AcServerPluginManager(logWriter);
+                    AcServerPluginManager pluginManager = new AcServerPluginManager(logWriter, config);
                     pluginManager.LoadInfoFromServerConfig();
                     pluginManager.AddPlugin(trackCycler);
                     pluginManager.LoadPluginsFromAppConfig();
@@ -122,9 +138,19 @@ namespace AC_TrackCycle_Console
                 }
                 catch (Exception ex)
                 {
-                    logWriter.Log(ex);
+                    if (logWriter != null)
+                    {
+                        logWriter.Log(ex);
+                    }
+                    else
+                    {
+                        throw;
+                    }
                 }
-                logWriter.StopLoggingToFile();
+                if (logWriter != null)
+                {
+                    logWriter.StopLoggingToFile();
+                }
             }
             catch (Exception ex)
             {

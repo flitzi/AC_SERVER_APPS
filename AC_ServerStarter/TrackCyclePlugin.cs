@@ -380,13 +380,16 @@ namespace AC_ServerStarter
             this.serverInstance = new Process();
             this.serverInstance.StartInfo.FileName = Path.Combine(this.serverDirectory, this.serverExe);
             this.serverInstance.StartInfo.WorkingDirectory = this.serverDirectory;
+            this.serverInstance.StartInfo.RedirectStandardError = true;
             this.serverInstance.StartInfo.RedirectStandardOutput = true;
             this.serverInstance.StartInfo.UseShellExecute = false;
             this.serverInstance.StartInfo.CreateNoWindow = !this.createServerWindow;
             this.serverInstance.OutputDataReceived += this.process_OutputDataReceived;
+            this.serverInstance.ErrorDataReceived += this.process_OutputDataReceived;
             this.serverInstance.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
             this.serverInstance.Start();
             this.serverInstance.BeginOutputReadLine();
+            this.serverInstance.BeginErrorReadLine();
 
             if (this.PluginManager != null)
             {

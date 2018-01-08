@@ -127,7 +127,7 @@ Changelog:
 ----------
 
 2.7.9 (2018/01/08)
-- added log_to_console and overwrite_log_file in AC_TrackCycle_Console.exe.config
+- added log_to_console, overwrite_log_file and interactive_console keys in AC_TrackCycle_Console.exe.config
 
 
 2.7.8 (2018/01/06)

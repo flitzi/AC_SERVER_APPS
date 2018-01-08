@@ -7,6 +7,7 @@ using acPlugins4net;
 using acPlugins4net.helpers;
 using AC_ServerStarter;
 using System.Text;
+using System.Threading;
 using acPlugins4net.configuration;
 using AC_SessionReportPlugin;
 
@@ -77,6 +78,9 @@ namespace AC_TrackCycle_Console
                 FileLogWriter logWriter = null;
 
                 IConfigManager config = new AppConfigConfigurator();
+
+                bool interactiveConsole = config.GetSettingAsInt("interactive_console", 0) == 1;
+
                 if (config.GetSettingAsInt("log_to_console", 0) == 0)
                 {
                     if (config.GetSettingAsInt("overwrite_log_file", 0) == 1)
@@ -114,23 +118,33 @@ namespace AC_TrackCycle_Console
                     trackCycler.StartServer();
                     Console.Out.WriteLine("Server running...");
 
-                    Console.Out.WriteLine("Write 'next_track' to cycle to the next track.");
-                    Console.Out.WriteLine("Write 'exit' to shut the server down.");
+                    if (interactiveConsole)
+                    {
+                        Console.Out.WriteLine("Write 'next_track' to cycle to the next track.");
+                        Console.Out.WriteLine("Write 'exit' to shut the server down.");
+                    }
 
                     while (true)
                     {
-                        string line = Console.ReadLine();
-                        if (line.ToLower() == "exit")
+                        if (interactiveConsole)
                         {
-                            break;
-                        }
-                        else if (line.ToLower() == "next_track")
-                        {
-                            trackCycler.NextTrackAsync(true);
+                            string line = Console.ReadLine();
+                            if (line.ToLower() == "exit")
+                            {
+                                break;
+                            }
+                            else if (line.ToLower() == "next_track")
+                            {
+                                trackCycler.NextTrackAsync(true);
+                            }
+                            else
+                            {
+                                pluginManager.BroadcastChatMessage(line);
+                            }
                         }
                         else
                         {
-                            pluginManager.BroadcastChatMessage(line);
+                            Thread.Sleep(500);
                         }
                     }
 

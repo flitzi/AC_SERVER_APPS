@@ -13,3 +13,5 @@ packages/
 /.vs/AllProjects/v15/Server/sqlite3/storage.ide-wal
 /.vs/AC_SERVER_APPS/v15/Server/sqlite3/db.lock
 /.vs/AC_SERVER_APPS/v15/Server/sqlite3/storage.ide
+/.vs/AC_SERVER_APPS/v15/Server/sqlite3/storage.ide-shm
+/.vs/AC_SERVER_APPS/v15/Server/sqlite3/storage.ide-wal

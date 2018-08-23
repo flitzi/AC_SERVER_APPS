@@ -544,6 +544,7 @@
             this.checkBox_enableWhiteList.TabIndex = 0;
             this.checkBox_enableWhiteList.Text = "enable white list";
             this.checkBox_enableWhiteList.UseVisualStyleBackColor = true;
+            this.checkBox_enableWhiteList.CheckedChanged += new System.EventHandler(this.checkBox_enableWhiteList_CheckedChanged);
             // 
             // textBox_ConnectionCount
             // 

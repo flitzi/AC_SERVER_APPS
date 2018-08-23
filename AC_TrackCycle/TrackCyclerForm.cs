@@ -13,6 +13,7 @@ using System.Threading;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Text;
+using System.Configuration;
 
 namespace AC_TrackCycle
 {
@@ -106,7 +107,9 @@ namespace AC_TrackCycle
                 f.Close();
                 whiteList = new List<string>();
             }
-        }
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            checkBox_enableWhiteList.Checked = (config.AppSettings.Settings["enable_white_list"].Value == "1" ? true : false);
+         }
 
         private DateTime? sessionStart;
 
@@ -535,6 +538,15 @@ namespace AC_TrackCycle
         private void listBox_LastConnectedGUID_SelectedIndexChanged(object sender, EventArgs e)
         {
             textBox_driver_guid.Text = listBox_LastConnectedGUID.SelectedItem.ToString().Split(':').First().Replace(" ","");
+        }
+
+        private void checkBox_enableWhiteList_CheckedChanged(object sender, EventArgs e)
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["enable_white_list"].Value = (checkBox_enableWhiteList.Checked ? "1" : "0");
+            config.Save(ConfigurationSaveMode.Modified);
+
+            ConfigurationManager.RefreshSection("appSettings");
         }
 
         private void kickDriverToolStripMenuItem_Click(object sender, EventArgs e)

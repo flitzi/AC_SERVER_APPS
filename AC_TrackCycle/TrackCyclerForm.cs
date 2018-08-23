@@ -26,6 +26,7 @@ namespace AC_TrackCycle
         private Image trackMap;
         private double trackMapScale, trackMapOffsetX, trackMapOffsetY;
         private TrackMapControl trackMapControl;
+        private List<string> whiteList;
 
         private int origBroadcastResultCount;
 
@@ -89,6 +90,19 @@ namespace AC_TrackCycle
             if (this.trackCycler.CreateServerWindow || this.trackCycler.HasAdditionalExes)
             {
                 this.TopMost = true;
+            }
+
+            if(File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt"))
+            {
+                string[] data = File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                whiteList = data.ToList();
+                listBox_whitelist.DataSource = whiteList;
+               
+            }
+            else
+            {
+                FileStream f = File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                f.Close();
             }
         }
 
@@ -255,6 +269,16 @@ namespace AC_TrackCycle
         public void UpdateGui()
         {
             List<DriverInfo> connectedDrivers = this.pluginManager.GetDriverInfos().Where(d => d.IsConnected).ToList();
+            if (checkBox_enableWhiteList.Checked)
+            {
+                foreach(var driver in connectedDrivers)
+                {
+                    if (!whiteList.Contains(driver.DriverGuid))
+                    {
+                        this.pluginManager.RequestKickDriverById(driver.CarId);
+                    }
+                }
+            }
             this.textBox_ConnectionCount.Text = connectedDrivers.Count + " driver(s) currently connected";
             this.dataGridView_connections.DataSource = connectedDrivers;
         }

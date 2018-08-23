@@ -64,8 +64,8 @@
             this.textBox_chatlog = new System.Windows.Forms.TextBox();
             this.tabPage_PositionGraph = new System.Windows.Forms.TabPage();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.button1 = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.button_addToWhiteList = new System.Windows.Forms.Button();
+            this.textBox_driver_guid = new System.Windows.Forms.TextBox();
             this.listBox_whitelist = new System.Windows.Forms.ListBox();
             this.checkBox_enableWhiteList = new System.Windows.Forms.CheckBox();
             this.textBox_ConnectionCount = new System.Windows.Forms.TextBox();
@@ -76,6 +76,8 @@
             this.pictureBox_logo = new System.Windows.Forms.PictureBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.textBox_elapedTime = new System.Windows.Forms.TextBox();
+            this.button_removeFromWhiteList = new System.Windows.Forms.Button();
+            this.listBox_LastConnectedGUID = new System.Windows.Forms.ListBox();
             this.tabPage_WhiteList.SuspendLayout();
             this.tabPage_ServerLog.SuspendLayout();
             this.tabPage_SessionControl.SuspendLayout();
@@ -493,8 +495,10 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.button1);
-            this.tabPage1.Controls.Add(this.textBox1);
+            this.tabPage1.Controls.Add(this.listBox_LastConnectedGUID);
+            this.tabPage1.Controls.Add(this.button_removeFromWhiteList);
+            this.tabPage1.Controls.Add(this.button_addToWhiteList);
+            this.tabPage1.Controls.Add(this.textBox_driver_guid);
             this.tabPage1.Controls.Add(this.listBox_whitelist);
             this.tabPage1.Controls.Add(this.checkBox_enableWhiteList);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
@@ -505,30 +509,31 @@
             this.tabPage1.Text = "White list";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // button1
+            // button_addToWhiteList
             // 
-            this.button1.Location = new System.Drawing.Point(398, 5);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 20);
-            this.button1.TabIndex = 3;
-            this.button1.Text = "Add";
-            this.button1.UseVisualStyleBackColor = true;
+            this.button_addToWhiteList.Location = new System.Drawing.Point(324, 5);
+            this.button_addToWhiteList.Name = "button_addToWhiteList";
+            this.button_addToWhiteList.Size = new System.Drawing.Size(75, 20);
+            this.button_addToWhiteList.TabIndex = 3;
+            this.button_addToWhiteList.Text = "Add";
+            this.button_addToWhiteList.UseVisualStyleBackColor = true;
+            this.button_addToWhiteList.Click += new System.EventHandler(this.button_addToWhiteList_Click);
             // 
-            // textBox1
+            // textBox_driver_guid
             // 
-            this.textBox1.Location = new System.Drawing.Point(114, 5);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(284, 20);
-            this.textBox1.TabIndex = 2;
+            this.textBox_driver_guid.Location = new System.Drawing.Point(114, 5);
+            this.textBox_driver_guid.Name = "textBox_driver_guid";
+            this.textBox_driver_guid.Size = new System.Drawing.Size(204, 20);
+            this.textBox_driver_guid.TabIndex = 2;
             // 
             // listBox_whitelist
             // 
             this.listBox_whitelist.FormattingEnabled = true;
-            this.listBox_whitelist.Location = new System.Drawing.Point(7, 31);
+            this.listBox_whitelist.Location = new System.Drawing.Point(7, 44);
             this.listBox_whitelist.Name = "listBox_whitelist";
-            this.listBox_whitelist.SelectionMode = System.Windows.Forms.SelectionMode.None;
-            this.listBox_whitelist.Size = new System.Drawing.Size(466, 394);
+            this.listBox_whitelist.Size = new System.Drawing.Size(219, 381);
             this.listBox_whitelist.TabIndex = 1;
+            this.listBox_whitelist.SelectedIndexChanged += new System.EventHandler(this.listBox_whitelist_SelectedIndexChanged);
             // 
             // checkBox_enableWhiteList
             // 
@@ -606,6 +611,25 @@
             this.textBox_elapedTime.Size = new System.Drawing.Size(64, 20);
             this.textBox_elapedTime.TabIndex = 12;
             this.textBox_elapedTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
+            // 
+            // button_removeFromWhiteList
+            // 
+            this.button_removeFromWhiteList.Location = new System.Drawing.Point(398, 5);
+            this.button_removeFromWhiteList.Name = "button_removeFromWhiteList";
+            this.button_removeFromWhiteList.Size = new System.Drawing.Size(75, 20);
+            this.button_removeFromWhiteList.TabIndex = 4;
+            this.button_removeFromWhiteList.Text = "Remove";
+            this.button_removeFromWhiteList.UseVisualStyleBackColor = true;
+            this.button_removeFromWhiteList.Click += new System.EventHandler(this.button_removeFromWhiteList_Click);
+            // 
+            // listBox_LastConnectedGUID
+            // 
+            this.listBox_LastConnectedGUID.FormattingEnabled = true;
+            this.listBox_LastConnectedGUID.Location = new System.Drawing.Point(233, 44);
+            this.listBox_LastConnectedGUID.Name = "listBox_LastConnectedGUID";
+            this.listBox_LastConnectedGUID.Size = new System.Drawing.Size(240, 381);
+            this.listBox_LastConnectedGUID.TabIndex = 5;
+            this.listBox_LastConnectedGUID.SelectedIndexChanged += new System.EventHandler(this.listBox_LastConnectedGUID_SelectedIndexChanged);
             // 
             // TrackCyclerForm
             // 
@@ -692,10 +716,12 @@
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.TextBox textBox_elapedTime;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.Button button_addToWhiteList;
+        private System.Windows.Forms.TextBox textBox_driver_guid;
         private System.Windows.Forms.ListBox listBox_whitelist;
         private System.Windows.Forms.CheckBox checkBox_enableWhiteList;
+        private System.Windows.Forms.Button button_removeFromWhiteList;
+        private System.Windows.Forms.ListBox listBox_LastConnectedGUID;
     }
 }
 

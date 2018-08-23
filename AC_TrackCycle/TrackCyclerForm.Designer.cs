@@ -78,6 +78,8 @@
             this.textBox_elapedTime = new System.Windows.Forms.TextBox();
             this.button_removeFromWhiteList = new System.Windows.Forms.Button();
             this.listBox_LastConnectedGUID = new System.Windows.Forms.ListBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
             this.tabPage_WhiteList.SuspendLayout();
             this.tabPage_ServerLog.SuspendLayout();
             this.tabPage_SessionControl.SuspendLayout();
@@ -495,6 +497,8 @@
             // 
             // tabPage1
             // 
+            this.tabPage1.Controls.Add(this.label5);
+            this.tabPage1.Controls.Add(this.label4);
             this.tabPage1.Controls.Add(this.listBox_LastConnectedGUID);
             this.tabPage1.Controls.Add(this.button_removeFromWhiteList);
             this.tabPage1.Controls.Add(this.button_addToWhiteList);
@@ -632,6 +636,24 @@
             this.listBox_LastConnectedGUID.TabIndex = 5;
             this.listBox_LastConnectedGUID.SelectedIndexChanged += new System.EventHandler(this.listBox_LastConnectedGUID_SelectedIndexChanged);
             // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 27);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(50, 13);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "White list";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(233, 27);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(110, 13);
+            this.label5.TabIndex = 7;
+            this.label5.Text = "Last connected driver";
+            // 
             // TrackCyclerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -723,6 +745,8 @@
         private System.Windows.Forms.CheckBox checkBox_enableWhiteList;
         private System.Windows.Forms.Button button_removeFromWhiteList;
         private System.Windows.Forms.ListBox listBox_LastConnectedGUID;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
     }
 }
 

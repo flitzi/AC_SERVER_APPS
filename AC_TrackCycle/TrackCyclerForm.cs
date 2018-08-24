@@ -12,6 +12,8 @@ using acPlugins4net.messages;
 using System.Threading;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Text;
+using System.Configuration;
 
 namespace AC_TrackCycle
 {
@@ -26,6 +28,7 @@ namespace AC_TrackCycle
         private Image trackMap;
         private double trackMapScale, trackMapOffsetX, trackMapOffsetY;
         private TrackMapControl trackMapControl;
+        private List<string> whiteList;
 
         private int origBroadcastResultCount;
 
@@ -90,7 +93,23 @@ namespace AC_TrackCycle
             {
                 this.TopMost = true;
             }
-        }
+
+            if(File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt"))
+            {
+                string[] data = File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                whiteList = data.ToList();
+                listBox_whitelist.DataSource = whiteList;
+               
+            }
+            else
+            {
+                FileStream f = File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                f.Close();
+                whiteList = new List<string>();
+            }
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            checkBox_enableWhiteList.Checked = (config.AppSettings.Settings["enable_white_list"].Value == "1" ? true : false);
+         }
 
         private DateTime? sessionStart;
 
@@ -255,8 +274,24 @@ namespace AC_TrackCycle
         public void UpdateGui()
         {
             List<DriverInfo> connectedDrivers = this.pluginManager.GetDriverInfos().Where(d => d.IsConnected).ToList();
+            if (checkBox_enableWhiteList.Checked)
+            {
+                foreach(var driver in connectedDrivers)
+                {
+                    if (!whiteList.Contains(driver.DriverGuid))
+                    {
+                        this.pluginManager.RequestKickDriverById(driver.CarId);
+                    }
+                }
+            }
             this.textBox_ConnectionCount.Text = connectedDrivers.Count + " driver(s) currently connected";
             this.dataGridView_connections.DataSource = connectedDrivers;
+
+        }
+        public void OnClientLoadedG(MsgClientLoaded msg)
+        {
+            DriverInfo Driver = this.pluginManager.GetDriverInfos().Where(d => msg.CarId == d.CarId).First();
+            listBox_LastConnectedGUID.Items.Add(Driver.DriverGuid + ": " + Driver.DriverName);
         }
 
         private SolidBrush getCarBrush(byte carId)
@@ -450,6 +485,68 @@ namespace AC_TrackCycle
                 TimeSpan time = DateTime.Now - this.sessionStart.Value;
                 textBox_elapedTime.Text = ((time < TimeSpan.Zero) ? "-" : "") + time.ToString(@"hh\:mm\:ss");
             }
+        }
+
+        private void button_addToWhiteList_Click(object sender, EventArgs e)
+        {
+            if(textBox_driver_guid.Text != null && textBox_driver_guid.Text != "")
+            {
+                whiteList.Add(textBox_driver_guid.Text);
+                listBox_whitelist.DataSource = whiteList.ToList();
+                listBox_whitelist.Refresh();
+                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt"))
+                {
+                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                }
+                FileStream f = File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                var offset = 0;
+                foreach (var guid in whiteList)
+                {
+                    byte[] toWrite = Encoding.ASCII.GetBytes(guid + Environment.NewLine);
+                    f.Write(toWrite, 0, toWrite.Length);
+                    offset += toWrite.Length;
+                }
+                f.Close();
+            }
+        }
+
+        private void listBox_whitelist_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            textBox_driver_guid.Text = listBox_whitelist.SelectedItem.ToString();
+        }
+
+        private void button_removeFromWhiteList_Click(object sender, EventArgs e)
+        {
+            whiteList.Remove(listBox_whitelist.SelectedItem.ToString());
+            listBox_whitelist.DataSource = whiteList.ToList();
+            listBox_whitelist.Refresh();
+            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt"))
+            {
+                File.Delete(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+            }
+            FileStream f = File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+            var offset = 0;
+            foreach (var guid in whiteList)
+            {
+                byte[] toWrite = Encoding.ASCII.GetBytes(guid + Environment.NewLine);
+                f.Write(toWrite, 0, toWrite.Length);
+                offset += toWrite.Length;
+            }
+            f.Close();
+        }
+
+        private void listBox_LastConnectedGUID_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            textBox_driver_guid.Text = listBox_LastConnectedGUID.SelectedItem.ToString().Split(':').First().Replace(" ","");
+        }
+
+        private void checkBox_enableWhiteList_CheckedChanged(object sender, EventArgs e)
+        {
+            var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+            config.AppSettings.Settings["enable_white_list"].Value = (checkBox_enableWhiteList.Checked ? "1" : "0");
+            config.Save(ConfigurationSaveMode.Modified);
+
+            ConfigurationManager.RefreshSection("appSettings");
         }
 
         private void kickDriverToolStripMenuItem_Click(object sender, EventArgs e)

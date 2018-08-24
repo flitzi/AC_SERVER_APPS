@@ -39,7 +39,7 @@
             this.textBox_chat = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.textBox_sessionInfo = new System.Windows.Forms.TextBox();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage_WhiteList = new System.Windows.Forms.TabControl();
             this.tabPage_ServerLog = new System.Windows.Forms.TabPage();
             this.tabPage_SessionControl = new System.Windows.Forms.TabPage();
             this.checkBox_BroadcastFastestLap = new System.Windows.Forms.CheckBox();
@@ -63,6 +63,11 @@
             this.tabPage_chatlog = new System.Windows.Forms.TabPage();
             this.textBox_chatlog = new System.Windows.Forms.TextBox();
             this.tabPage_PositionGraph = new System.Windows.Forms.TabPage();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.button_addToWhiteList = new System.Windows.Forms.Button();
+            this.textBox_driver_guid = new System.Windows.Forms.TextBox();
+            this.listBox_whitelist = new System.Windows.Forms.ListBox();
+            this.checkBox_enableWhiteList = new System.Windows.Forms.CheckBox();
             this.textBox_ConnectionCount = new System.Windows.Forms.TextBox();
             this.contextMenuStrip_driver = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.sendChatToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -71,13 +76,18 @@
             this.pictureBox_logo = new System.Windows.Forms.PictureBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.textBox_elapedTime = new System.Windows.Forms.TextBox();
-            this.tabControl1.SuspendLayout();
+            this.button_removeFromWhiteList = new System.Windows.Forms.Button();
+            this.listBox_LastConnectedGUID = new System.Windows.Forms.ListBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.tabPage_WhiteList.SuspendLayout();
             this.tabPage_ServerLog.SuspendLayout();
             this.tabPage_SessionControl.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.numericUpDown_Length)).BeginInit();
             this.tabPage_ConnectedDrivers.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_connections)).BeginInit();
             this.tabPage_chatlog.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.contextMenuStrip_driver.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_logo)).BeginInit();
             this.SuspendLayout();
@@ -198,21 +208,23 @@
             this.textBox_sessionInfo.Size = new System.Drawing.Size(325, 20);
             this.textBox_sessionInfo.TabIndex = 9;
             // 
-            // tabControl1
+            // tabPage_WhiteList
             // 
-            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.tabPage_WhiteList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.tabControl1.Controls.Add(this.tabPage_ServerLog);
-            this.tabControl1.Controls.Add(this.tabPage_SessionControl);
-            this.tabControl1.Controls.Add(this.tabPage_ConnectedDrivers);
-            this.tabControl1.Controls.Add(this.tabPage_chatlog);
-            this.tabControl1.Controls.Add(this.tabPage_PositionGraph);
-            this.tabControl1.Location = new System.Drawing.Point(15, 90);
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(487, 463);
-            this.tabControl1.TabIndex = 10;
+            this.tabPage_WhiteList.Controls.Add(this.tabPage_ServerLog);
+            this.tabPage_WhiteList.Controls.Add(this.tabPage_SessionControl);
+            this.tabPage_WhiteList.Controls.Add(this.tabPage_ConnectedDrivers);
+            this.tabPage_WhiteList.Controls.Add(this.tabPage_chatlog);
+            this.tabPage_WhiteList.Controls.Add(this.tabPage_PositionGraph);
+            this.tabPage_WhiteList.Controls.Add(this.tabPage1);
+            this.tabPage_WhiteList.Location = new System.Drawing.Point(15, 90);
+            this.tabPage_WhiteList.Name = "tabPage_WhiteList";
+            this.tabPage_WhiteList.SelectedIndex = 0;
+            this.tabPage_WhiteList.Size = new System.Drawing.Size(487, 463);
+            this.tabPage_WhiteList.TabIndex = 10;
+            this.tabPage_WhiteList.Tag = "";
             // 
             // tabPage_ServerLog
             // 
@@ -483,6 +495,61 @@
             this.tabPage_PositionGraph.Text = "Track Graph";
             this.tabPage_PositionGraph.UseVisualStyleBackColor = true;
             // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.label5);
+            this.tabPage1.Controls.Add(this.label4);
+            this.tabPage1.Controls.Add(this.listBox_LastConnectedGUID);
+            this.tabPage1.Controls.Add(this.button_removeFromWhiteList);
+            this.tabPage1.Controls.Add(this.button_addToWhiteList);
+            this.tabPage1.Controls.Add(this.textBox_driver_guid);
+            this.tabPage1.Controls.Add(this.listBox_whitelist);
+            this.tabPage1.Controls.Add(this.checkBox_enableWhiteList);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(479, 437);
+            this.tabPage1.TabIndex = 5;
+            this.tabPage1.Text = "White list";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // button_addToWhiteList
+            // 
+            this.button_addToWhiteList.Location = new System.Drawing.Point(324, 5);
+            this.button_addToWhiteList.Name = "button_addToWhiteList";
+            this.button_addToWhiteList.Size = new System.Drawing.Size(75, 20);
+            this.button_addToWhiteList.TabIndex = 3;
+            this.button_addToWhiteList.Text = "Add";
+            this.button_addToWhiteList.UseVisualStyleBackColor = true;
+            this.button_addToWhiteList.Click += new System.EventHandler(this.button_addToWhiteList_Click);
+            // 
+            // textBox_driver_guid
+            // 
+            this.textBox_driver_guid.Location = new System.Drawing.Point(114, 5);
+            this.textBox_driver_guid.Name = "textBox_driver_guid";
+            this.textBox_driver_guid.Size = new System.Drawing.Size(204, 20);
+            this.textBox_driver_guid.TabIndex = 2;
+            // 
+            // listBox_whitelist
+            // 
+            this.listBox_whitelist.FormattingEnabled = true;
+            this.listBox_whitelist.Location = new System.Drawing.Point(7, 44);
+            this.listBox_whitelist.Name = "listBox_whitelist";
+            this.listBox_whitelist.Size = new System.Drawing.Size(219, 381);
+            this.listBox_whitelist.TabIndex = 1;
+            this.listBox_whitelist.SelectedIndexChanged += new System.EventHandler(this.listBox_whitelist_SelectedIndexChanged);
+            // 
+            // checkBox_enableWhiteList
+            // 
+            this.checkBox_enableWhiteList.AutoSize = true;
+            this.checkBox_enableWhiteList.Location = new System.Drawing.Point(7, 7);
+            this.checkBox_enableWhiteList.Name = "checkBox_enableWhiteList";
+            this.checkBox_enableWhiteList.Size = new System.Drawing.Size(101, 17);
+            this.checkBox_enableWhiteList.TabIndex = 0;
+            this.checkBox_enableWhiteList.Text = "enable white list";
+            this.checkBox_enableWhiteList.UseVisualStyleBackColor = true;
+            this.checkBox_enableWhiteList.CheckedChanged += new System.EventHandler(this.checkBox_enableWhiteList_CheckedChanged);
+            // 
             // textBox_ConnectionCount
             // 
             this.textBox_ConnectionCount.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -550,6 +617,43 @@
             this.textBox_elapedTime.TabIndex = 12;
             this.textBox_elapedTime.TextAlign = System.Windows.Forms.HorizontalAlignment.Right;
             // 
+            // button_removeFromWhiteList
+            // 
+            this.button_removeFromWhiteList.Location = new System.Drawing.Point(398, 5);
+            this.button_removeFromWhiteList.Name = "button_removeFromWhiteList";
+            this.button_removeFromWhiteList.Size = new System.Drawing.Size(75, 20);
+            this.button_removeFromWhiteList.TabIndex = 4;
+            this.button_removeFromWhiteList.Text = "Remove";
+            this.button_removeFromWhiteList.UseVisualStyleBackColor = true;
+            this.button_removeFromWhiteList.Click += new System.EventHandler(this.button_removeFromWhiteList_Click);
+            // 
+            // listBox_LastConnectedGUID
+            // 
+            this.listBox_LastConnectedGUID.FormattingEnabled = true;
+            this.listBox_LastConnectedGUID.Location = new System.Drawing.Point(233, 44);
+            this.listBox_LastConnectedGUID.Name = "listBox_LastConnectedGUID";
+            this.listBox_LastConnectedGUID.Size = new System.Drawing.Size(240, 381);
+            this.listBox_LastConnectedGUID.TabIndex = 5;
+            this.listBox_LastConnectedGUID.SelectedIndexChanged += new System.EventHandler(this.listBox_LastConnectedGUID_SelectedIndexChanged);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 27);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(50, 13);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "White list";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(230, 27);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(110, 13);
+            this.label5.TabIndex = 7;
+            this.label5.Text = "Last connected driver";
+            // 
             // TrackCyclerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -558,7 +662,7 @@
             this.Controls.Add(this.textBox_elapedTime);
             this.Controls.Add(this.pictureBox_logo);
             this.Controls.Add(this.textBox_ConnectionCount);
-            this.Controls.Add(this.tabControl1);
+            this.Controls.Add(this.tabPage_WhiteList);
             this.Controls.Add(this.textBox_sessionInfo);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.textBox_chat);
@@ -571,7 +675,7 @@
             this.ShowIcon = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.Text = "AC Track Cycle";
-            this.tabControl1.ResumeLayout(false);
+            this.tabPage_WhiteList.ResumeLayout(false);
             this.tabPage_ServerLog.ResumeLayout(false);
             this.tabPage_ServerLog.PerformLayout();
             this.tabPage_SessionControl.ResumeLayout(false);
@@ -581,6 +685,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView_connections)).EndInit();
             this.tabPage_chatlog.ResumeLayout(false);
             this.tabPage_chatlog.PerformLayout();
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             this.contextMenuStrip_driver.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox_logo)).EndInit();
             this.ResumeLayout(false);
@@ -600,7 +706,7 @@
         private System.Windows.Forms.TextBox textBox_chat;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox textBox_sessionInfo;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl tabPage_WhiteList;
         private System.Windows.Forms.TabPage tabPage_ServerLog;
         private System.Windows.Forms.TabPage tabPage_ConnectedDrivers;
         private System.Windows.Forms.DataGridView dataGridView_connections;
@@ -632,6 +738,15 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn Column_LapCount;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.TextBox textBox_elapedTime;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.Button button_addToWhiteList;
+        private System.Windows.Forms.TextBox textBox_driver_guid;
+        private System.Windows.Forms.ListBox listBox_whitelist;
+        private System.Windows.Forms.CheckBox checkBox_enableWhiteList;
+        private System.Windows.Forms.Button button_removeFromWhiteList;
+        private System.Windows.Forms.ListBox listBox_LastConnectedGUID;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label4;
     }
 }
 

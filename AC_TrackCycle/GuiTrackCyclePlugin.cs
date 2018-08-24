@@ -41,6 +41,7 @@ namespace AC_TrackCycle
         {
             base.OnClientLoaded(msg);
             this.form.BeginInvoke(new Action(this.form.UpdateGui), null);
+            this.form.BeginInvoke(new Action<MsgClientLoaded>(this.form.OnClientLoadedG), msg);
         }
 
         protected override void OnConnectionClosed(MsgConnectionClosed msg)

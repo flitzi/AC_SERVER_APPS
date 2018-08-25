@@ -29,6 +29,7 @@ namespace AC_TrackCycle
         private double trackMapScale, trackMapOffsetX, trackMapOffsetY;
         private TrackMapControl trackMapControl;
         private List<string> whiteList;
+        private string whiteListStoragePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "whitelist.txt");
 
         private int origBroadcastResultCount;
 
@@ -94,16 +95,16 @@ namespace AC_TrackCycle
                 this.TopMost = true;
             }
 
-            if(File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt"))
+            if(File.Exists(whiteListStoragePath))
             {
-                string[] data = File.ReadAllLines(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                string[] data = File.ReadAllLines(whiteListStoragePath);
                 whiteList = data.ToList();
                 listBox_whitelist.DataSource = whiteList;
                
             }
             else
             {
-                FileStream f = File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                FileStream f = File.Create(whiteListStoragePath);
                 f.Close();
                 whiteList = new List<string>();
             }
@@ -500,11 +501,11 @@ namespace AC_TrackCycle
                     whiteList.Add(textBox_driver_guid.Text);
                     listBox_whitelist.DataSource = whiteList.ToList();
                     listBox_whitelist.Refresh();
-                    if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt"))
+                    if (File.Exists(whiteListStoragePath))
                     {
-                        File.Delete(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                        File.Delete(whiteListStoragePath);
                     }
-                    FileStream f = File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                    FileStream f = File.Create(whiteListStoragePath);
                     var offset = 0;
                     foreach (var guid in whiteList)
                     {
@@ -527,11 +528,11 @@ namespace AC_TrackCycle
             whiteList.Remove(listBox_whitelist.SelectedItem.ToString());
             listBox_whitelist.DataSource = whiteList.ToList();
             listBox_whitelist.Refresh();
-            if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt"))
+            if (File.Exists(whiteListStoragePath))
             {
-                File.Delete(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                File.Delete(whiteListStoragePath);
             }
-            FileStream f = File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+            FileStream f = File.Create(whiteListStoragePath);
             var offset = 0;
             foreach (var guid in whiteList)
             {

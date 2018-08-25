@@ -491,22 +491,29 @@ namespace AC_TrackCycle
         {
             if(textBox_driver_guid.Text != null && textBox_driver_guid.Text != "")
             {
-                whiteList.Add(textBox_driver_guid.Text);
-                listBox_whitelist.DataSource = whiteList.ToList();
-                listBox_whitelist.Refresh();
-                if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt"))
+                if (whiteList.Contains(textBox_driver_guid.Text))
                 {
-                    File.Delete(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                    MessageBox.Show("Already in list");
                 }
-                FileStream f = File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
-                var offset = 0;
-                foreach (var guid in whiteList)
+                else
                 {
-                    byte[] toWrite = Encoding.ASCII.GetBytes(guid + Environment.NewLine);
-                    f.Write(toWrite, 0, toWrite.Length);
-                    offset += toWrite.Length;
+                    whiteList.Add(textBox_driver_guid.Text);
+                    listBox_whitelist.DataSource = whiteList.ToList();
+                    listBox_whitelist.Refresh();
+                    if (File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt"))
+                    {
+                        File.Delete(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                    }
+                    FileStream f = File.Create(AppDomain.CurrentDomain.BaseDirectory + "\\whitelist.txt");
+                    var offset = 0;
+                    foreach (var guid in whiteList)
+                    {
+                        byte[] toWrite = Encoding.ASCII.GetBytes(guid + Environment.NewLine);
+                        f.Write(toWrite, 0, toWrite.Length);
+                        offset += toWrite.Length;
+                    }
+                    f.Close();
                 }
-                f.Close();
             }
         }
 

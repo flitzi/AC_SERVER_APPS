@@ -87,7 +87,7 @@ namespace AC_ServerStarter
             if (string.IsNullOrEmpty(this.configDirectory))
                 this.configDirectory = "cfg";
 
-            this.presetsDirectory = PluginManager.Config.GetSetting("ac_presets_directory");
+            this.presetsDirectory = this.PluginManager.Config.GetSetting("ac_presets_directory");
             if (string.IsNullOrEmpty(this.presetsDirectory))
                 this.presetsDirectory = "presets";
 
@@ -110,7 +110,7 @@ namespace AC_ServerStarter
                 }
             }
 
-            this.AutoChangeTrack = true;
+            this.AutoChangeTrack = this.PluginManager.Config.GetSettingAsInt("auto_change_track", 1) == 1;
 
             string servername, track, layout;
             int laps;

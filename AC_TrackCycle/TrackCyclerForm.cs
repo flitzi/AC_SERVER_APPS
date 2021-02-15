@@ -67,7 +67,7 @@ namespace AC_TrackCycle
                 this.listBox_CycleSessions.DataSource = this.trackCycler.Sessions;
             }
 
-            this.trackCycler.AutoChangeTrack = this.checkBoxAutoChangeTrack.Checked;
+            this.checkBoxAutoChangeTrack.Checked = this.trackCycler.AutoChangeTrack;
 
             this.origBroadcastResultCount = this.trackCycler.BroadcastResults;
             if (origBroadcastResultCount <= 0)

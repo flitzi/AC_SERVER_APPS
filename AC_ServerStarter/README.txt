@@ -126,6 +126,10 @@ note:
 Changelog:
 ----------
 
+2.8.0 (2021/02/15)
+- added auto_change_track config option
+
+
 2.7.9 (2018/01/08)
 - added log_to_console, overwrite_log_file and interactive_console keys in AC_TrackCycle_Console.exe.config
 

@@ -418,7 +418,7 @@ namespace AC_ServerStarter
                     {
                         this.PluginManager.Log(message);
 
-                        if (this.AutoChangeTrack && message == "Server looping")
+                        if (message == "Server looping")
                         {
                             int bestVote = -1;
                             int bestVoteCount = 0;
@@ -432,10 +432,10 @@ namespace AC_ServerStarter
                                         bestVote = i;
                                         bestVoteCount = this.votes[i];
                                     }
-                                    else if (this.votes[i] == bestVoteCount)
-                                    {
-                                        bestVote = -1;
-                                    }
+                                    //else if (this.votes[i] == bestVoteCount)
+                                    //{
+                                    //    bestVote = -1;
+                                    //}
                                 }
                             }
 
@@ -443,7 +443,7 @@ namespace AC_ServerStarter
                             {
                                 ThreadPool.QueueUserWorkItem(o => this.ChangeTrack(bestVote, false));
                             }
-                            else
+                            else if (this.AutoChangeTrack)
                             {
                                 this.NextTrackAsync(false);
                             }

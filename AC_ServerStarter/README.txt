@@ -126,6 +126,11 @@ note:
 Changelog:
 ----------
 
+2.8.0 (2021/02/20)
+- votes now change track if auto_change_track = 0
+- if several tracks get the same number of votes, the track which reached this number fist will be used
+
+
 2.8.0 (2021/02/15)
 - added auto_change_track config option
 

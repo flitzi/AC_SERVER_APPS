@@ -126,6 +126,10 @@ note:
 Changelog:
 ----------
 
+2.8.2 (2021/03/11)
+- fixed missing enable_white_list key in AC_TrackCycle.exe.config
+
+
 2.8.1 (2021/02/20)
 - votes now change track if auto_change_track = 0
 - if several tracks get the same number of votes, the first track in list with this number of votes will be used

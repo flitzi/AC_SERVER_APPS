@@ -23,6 +23,7 @@ namespace AC_ServerStarter
     {
         private string serverDirectory, serverExe, configDirectory, presetsDirectory, server_cfg, entry_list;
         private bool createServerWindow, kick_before_change;
+        private double changeTrackImmediatelyIfPercentageOfPlayersVoted;
         private object lockObject = new object();
         private string[] iniLines = new string[0];
         public List<object> Sessions = new List<object>();
@@ -97,6 +98,8 @@ namespace AC_ServerStarter
             this.createServerWindow = this.PluginManager.Config.GetSettingAsInt("create_server_window", 0) == 1;
 
             this.kick_before_change = this.PluginManager.Config.GetSettingAsInt("kick_before_change", 0) == 1;
+
+            this.changeTrackImmediatelyIfPercentageOfPlayersVoted = this.PluginManager.Config.GetSettingAsInt("change_track_immediately_if_percentage_of_players_voted", 101) / 100.0;
 
             string tmpExes = this.PluginManager.Config.GetSetting("additional_exes");
             if (!string.IsNullOrWhiteSpace(tmpExes))
@@ -248,6 +251,17 @@ namespace AC_ServerStarter
                     this.votedIds.Add(driver.DriverGuid);
                     this.votes[trackIndex]++;
                     this.PluginManager.SendChatMessage(msg.CarId, "Vote registered.");
+
+                    if (this.changeTrackImmediatelyIfPercentageOfPlayersVoted <= 100 &&
+                        (double)this.votes.Sum(v => v) / this.PluginManager.GetDriverInfos().Length >=
+                        this.changeTrackImmediatelyIfPercentageOfPlayersVoted)
+                    {
+                        int bestVote = GetBestVote(true);
+                        if (bestVote != -1)
+                        {
+                            ThreadPool.QueueUserWorkItem(o => this.ChangeTrack(bestVote, true));
+                        }
+                    }
                 }
                 else
                 {
@@ -420,24 +434,7 @@ namespace AC_ServerStarter
 
                         if (message == "Server looping")
                         {
-                            int bestVote = -1;
-                            int bestVoteCount = 0;
-
-                            if (this.votes != null)
-                            {
-                                for (int i = 0; i < this.votes.Length; i++)
-                                {
-                                    if (this.votes[i] > bestVoteCount)
-                                    {
-                                        bestVote = i;
-                                        bestVoteCount = this.votes[i];
-                                    }
-                                    //else if (this.votes[i] == bestVoteCount)
-                                    //{
-                                    //    bestVote = -1;
-                                    //}
-                                }
-                            }
+                            int bestVote = GetBestVote(false);
 
                             if (bestVote != -1)
                             {
@@ -455,6 +452,30 @@ namespace AC_ServerStarter
                     this.PluginManager.Log(ex);
                 }
             }
+        }
+
+        private int GetBestVote(bool onlyIfClearWinner)
+        {
+            int bestVote = -1;
+            int bestVoteCount = 0;
+
+            if (this.votes != null)
+            {
+                for (int i = 0; i < this.votes.Length; i++)
+                {
+                    if (this.votes[i] > bestVoteCount)
+                    {
+                        bestVote = i;
+                        bestVoteCount = this.votes[i];
+                    }
+                    else if (onlyIfClearWinner && this.votes[i] == bestVoteCount)
+                    {
+                        bestVote = -1;
+                    }
+                }
+            }
+
+            return bestVote;
         }
 
         public int GetTrackIndex(string track, string layout)

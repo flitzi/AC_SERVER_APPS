@@ -126,6 +126,10 @@ note:
 Changelog:
 ----------
 
+2.8.3 (2021/03/17)
+- added change_track_immediately_if_percentage_of_players_voted config option
+
+
 2.8.2 (2021/03/11)
 - fixed missing enable_white_list key in AC_TrackCycle.exe.config
 
